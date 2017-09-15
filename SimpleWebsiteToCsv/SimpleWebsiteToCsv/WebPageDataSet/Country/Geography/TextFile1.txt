@@ -1,0 +1,2 @@
+﻿To Get the coordinates of a country:
+https://stackoverflow.com/questions/2702309/need-a-list-of-all-countries-in-the-world-with-a-longitude-and-latitude-coordin
