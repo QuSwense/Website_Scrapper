@@ -64,6 +64,8 @@
     <Compile Include="Engine\WebScrapperEngine.cs" />
     <Compile Include="Engine\WikipediaFIFACodeEngine.cs" />
     <Compile Include="GlobalSettings.cs" />
+    <Compile Include="Output\ProcessorEngineOutput.cs" />
+    <Compile Include="Output\ProcessorJsonOutput.cs" />
     <Compile Include="ParseTree\EHtmlNodeType.cs" />
     <Compile Include="ParseTree\HtmlPathProcessorNode.cs" />
     <Compile Include="ParseTree\IProcessorNode.cs" />
