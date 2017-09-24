@@ -17,11 +17,6 @@ namespace SimpleWebsiteScrapper.ParseTree
         public ScrapBaseProcessorNodeList GetParent() { return (ScrapBaseProcessorNodeList)Parent; }
 
         /// <summary>
-        /// A unique identifier to identify the processor node
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// The user input data processor
         /// </summary>
         public UserDataProcessorNode UserFeature { get; set; }
