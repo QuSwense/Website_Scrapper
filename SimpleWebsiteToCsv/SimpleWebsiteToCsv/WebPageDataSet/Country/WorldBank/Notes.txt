@@ -1,2 +1,0 @@
-﻿Do the API Queries
-https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-api-indicator-queries
