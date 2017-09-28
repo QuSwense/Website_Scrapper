@@ -1,9 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleWebsiteScrapper", "SimpleWebsiteScrapper\SimpleWebsiteScrapper.csproj", "{75087A9F-1994-4DC4-B48C-25B5972993D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QWCommonDST", "QWCommonDST\QWCommonDST.csproj", "{1FE0DD4D-B275-4A8D-85C2-64D89FB0AB4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QWWebScrap", "QWWebScrap\QWWebScrap.csproj", "{525DDA55-CF35-4CC0-804E-A967D849071D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QWSettings", "QWSettings\QWSettings.csproj", "{AD670E6E-B975-49B7-B395-E7B660C197C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QWScrapEngine", "QWScrapEngine\QWScrapEngine.csproj", "{59444680-521C-40DC-87F0-5037EC0F2AB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +23,27 @@ Global
 		{75087A9F-1994-4DC4-B48C-25B5972993D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75087A9F-1994-4DC4-B48C-25B5972993D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75087A9F-1994-4DC4-B48C-25B5972993D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FE0DD4D-B275-4A8D-85C2-64D89FB0AB4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FE0DD4D-B275-4A8D-85C2-64D89FB0AB4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FE0DD4D-B275-4A8D-85C2-64D89FB0AB4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FE0DD4D-B275-4A8D-85C2-64D89FB0AB4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{525DDA55-CF35-4CC0-804E-A967D849071D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{525DDA55-CF35-4CC0-804E-A967D849071D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{525DDA55-CF35-4CC0-804E-A967D849071D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{525DDA55-CF35-4CC0-804E-A967D849071D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD670E6E-B975-49B7-B395-E7B660C197C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD670E6E-B975-49B7-B395-E7B660C197C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD670E6E-B975-49B7-B395-E7B660C197C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD670E6E-B975-49B7-B395-E7B660C197C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59444680-521C-40DC-87F0-5037EC0F2AB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59444680-521C-40DC-87F0-5037EC0F2AB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59444680-521C-40DC-87F0-5037EC0F2AB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59444680-521C-40DC-87F0-5037EC0F2AB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AADE803-F10D-45AA-9327-D007A005338A}
 	EndGlobalSection
 EndGlobal

@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{75087A9F-1994-4DC4-B48C-25B5972993D1}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{525DDA55-CF35-4CC0-804E-A967D849071D}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleWebsiteScrapper</RootNamespace>
-    <AssemblyName>SimpleWebsiteScrapper</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>QWWebScrap</RootNamespace>
+    <AssemblyName>QWWebScrap</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +24,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -36,12 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HtmlAgilityPack, Version=1.5.5.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.5.5\lib\Net40\HtmlAgilityPack.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\HtmlAgilityPack.1.5.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,18 +45,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Model\CustomDataHint.cs" />
+    <Compile Include="Model\EUriResourceType.cs" />
+    <Compile Include="Model\HtmlPathHint.cs" />
+    <Compile Include="Model\SegmentMetadata.cs" />
+    <Compile Include="Model\SegmentMetadataTree.cs" />
+    <Compile Include="Model\SegmentMetadataVisitorEventArgs.cs" />
+    <Compile Include="Model\UriHint.cs" />
+    <Compile Include="Model\WebSegmentTree.cs" />
+    <Compile Include="Model\WebSegmentVisitorEventArgs.cs" />
+    <Compile Include="Model\XPathHint.cs" />
+    <Compile Include="OModel\ScrapMetadata.cs" />
+    <Compile Include="OModel\ScrapWebData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QWSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\QWScrapEngine\QWScrapEngine.csproj">
-      <Project>{59444680-521c-40dc-87f0-5037ec0f2ab2}</Project>
-      <Name>QWScrapEngine</Name>
+    <ProjectReference Include="..\QWCommonDST\QWCommonDST.csproj">
+      <Project>{1fe0dd4d-b275-4a8d-85c2-64d89fb0ab4c}</Project>
+      <Name>QWCommonDST</Name>
     </ProjectReference>
+    <ProjectReference Include="..\QWSettings\QWSettings.csproj">
+      <Project>{ad670e6e-b975-49b7-b395-e7b660c197c8}</Project>
+      <Name>QWSettings</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

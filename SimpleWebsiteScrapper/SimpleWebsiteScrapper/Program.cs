@@ -1,4 +1,4 @@
-﻿using SimpleWebsiteScrapper.Engine;
+﻿using QWScrapEngine.Wikipedia.FIFA;
 
 namespace SimpleWebsiteScrapper
 {
@@ -6,8 +6,8 @@ namespace SimpleWebsiteScrapper
     {
         static void Main(string[] args)
         {
-            WikipediaFIFACodeEngine wikiFifaCodeEngine = new WikipediaFIFACodeEngine();
-            wikiFifaCodeEngine.Scrap();
+            MembersAndListOfCodes wikiFifaCodeEngine = new MembersAndListOfCodes();
+            wikiFifaCodeEngine.Parse();
         }
     }
 }
