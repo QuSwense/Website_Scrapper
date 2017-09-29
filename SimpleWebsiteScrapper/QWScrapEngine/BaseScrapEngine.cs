@@ -2,6 +2,7 @@
 using QWCommonDST.Cache;
 using QWWebScrap.Model;
 using QWWebScrap.OModel;
+using QWCommonDST.Helper;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,30 +12,51 @@ using System.Threading.Tasks;
 
 namespace QWScrapEngine
 {
+    /// <summary>
+    /// This class is the base class for all Website scrapper business logic. The derived classes
+    /// contains web scrapping tree creation logic. All website data to be scrapped should have a class 
+    /// derived from this class. 
+    /// </summary>
     public class BaseScrapEngine
     {
-        internal class HAPTemp
-        {
-            public HtmlNodeCollection Collection;
-            public HtmlNode Single;
-            public HtmlAttribute Attribute;
-            public int CollectionIndex = -1;
-            public Uri Url;
-        }
-
+        /// <summary>
+        /// The Grammer parser tree. The derived classes defines the grammer tree which defines the data
+        /// to be scrapped.
+        /// </summary>
         public List<WebSegmentTree> WebpageScrapperGrammer { get; set; }
 
-        private List<HAPTemp> stackHtmlNodes { get; set; }
-        private List<HAPTemp> stackHtmlMetadataNodes { get; set; }
-
+        /// <summary>
+        /// The parsed data from the website(s) using the grammer <see cref="WebpageScrapperGrammer"/>
+        /// </summary>
         public List<ScrapWebData> ProcessedWebData { get; set; }
 
+        /// <summary>
+        /// A temporary stack of Html Node elements currently processed, processed at parent level
+        /// which is only used during the processing of the Scrapper.
+        /// This stacks the Element currently referred by <see cref="WebSegmentTree"/>
+        /// </summary>
+        private Stack<HtmlElementHeap> webSegmentElementStack;
+
+        /// <summary>
+        /// A temporary stack of Html Node elements currently processed, processed at parent level
+        /// which is only used during the processing of the Scrapper.
+        /// This stacks the Element currently referred by <see cref="SegmentMetadataTree"/>
+        /// </summary>
+        private Stack<HtmlElementHeap> metadataSegmentElementStack;
+                
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public BaseScrapEngine()
         {
             WebpageScrapperGrammer = new List<WebSegmentTree>();
-            
         }
 
+        /// <summary>
+        /// Add root tree to the list
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         protected WebSegmentTree AddRoot(string name)
         {
             if (WebpageScrapperGrammer == null) WebpageScrapperGrammer = new List<WebSegmentTree>();
@@ -45,130 +67,238 @@ namespace QWScrapEngine
             return rootTree;
         }
 
+        /// <summary>
+        /// The main public method
+        /// </summary>
         public void Parse()
         {
             try
             {
-                // register static event handlers
-                stackHtmlNodes = new List<HAPTemp>();
-                ProcessedWebData = new List<ScrapWebData>();
+                // Initialize data types
+                InitializeParserRequisites();
 
-                if (WebpageScrapperGrammer != null)
-                {
-                    for (int indx = 0; indx < WebpageScrapperGrammer.Count; indx++)
-                    {
-                        WebSegmentTree webSegment = WebpageScrapperGrammer[indx];
+                // Loop through all the webpage parser trees
+                WebpageScrapperGrammer.ForLoop((webSegment, indx) => {
+                    ScrapWebData scrapWebData = new ScrapWebData();
+                    OnWebSegmentTreeVisitorBFSTraversal(webSegment, scrapWebData);
 
-                        ScrapWebData scrapWebData = new ScrapWebData();
-                        OnWebSegmentTreeVisitorBFSTraversal(webSegment, scrapWebData);
-
-                        ProcessedWebData.Add(scrapWebData);
-                    }
-                }
+                    ProcessedWebData.Add(scrapWebData);
+                });
             }
             finally
             {
-                // Must be cleared or there will be memory leak
-                stackHtmlNodes.Clear();
-                stackHtmlNodes = null;
+                ClearParserRequisites();
             }
         }
 
-        protected void OnWebSegmentTreeVisitorBFSTraversal(WebSegmentTree webSegment, ScrapWebData scrapWebData)
+        /// <summary>
+        /// Initialize all the Data structures required before parsing
+        /// </summary>
+        protected void InitializeParserRequisites()
         {
-            scrapWebData.id = webSegment.Id;
+            // Register static event handlers
+            webSegmentElementStack = new Stack<HtmlElementHeap>();
+            ProcessedWebData = new List<ScrapWebData>();
+        }
 
-            // Get and load the url document
-            HAPTemp hapLink = null;
+        /// <summary>
+        /// Clear all the Data structures required before parsing
+        /// </summary>
+        protected void ClearParserRequisites()
+        {
+            // Must be cleared or there will be memory leak
+            webSegmentElementStack.Clear();
+            webSegmentElementStack = null;
+        }
+
+        /// <summary>
+        /// Get or Load the Html node from the Document Store or from the stack
+        /// </summary>
+        /// <returns></returns>
+        internal HtmlElementHeap GetOrLoadHtmlNode(HtmlPathHint htmlPath, Stack<HtmlElementHeap> stack)
+        {
+            HtmlElementHeap hapLink = null;
 
             // Check from Global cache if the document is already loaded
-            if (webSegment.ActualData.HtmlPath != null && webSegment.ActualData.HtmlPath.Url != null)
+            if (htmlPath != null && htmlPath.Url != null)
             {
-                HtmlDocCache htmldocCache = GlobalCacheStore.This.HtmlCache.Retrieve(webSegment.ActualData.HtmlPath.Url.Online,
-                    webSegment.ActualData.HtmlPath.Url.Offline);
-                hapLink = new HAPTemp();
-                hapLink.Url = htmldocCache.UrlUsed;
-                hapLink.Single = htmldocCache.Document.DocumentNode;
-                stackHtmlNodes.Add(hapLink);
+                HtmlDocCache htmldocCache = GlobalCacheStore.This.HtmlCache.Retrieve(htmlPath.Url.Online,
+                    htmlPath.Url.Offline);
+                hapLink = new HtmlElementHeap(htmldocCache.Document.DocumentNode);
+                stack.Push(hapLink);
             }
             else
             {
-                hapLink = stackHtmlNodes.Last();
+                hapLink = stack.Peek();
             }
 
-            // A single node is required for further processing, if the parent node is collection provide the index as well
-            HAPTemp hapLinkChild = new HAPTemp();
+            return hapLink;
+        }
 
-            // From the path get the Node collection object
-            if (webSegment.ActualData.HtmlPath != null && webSegment.ActualData.HtmlPath.Path != null)
+        /// <summary>
+        /// Calculate the current node type from the <see cref="HtmlPathHint"/> and the 
+        /// parent <see cref="HtmlElementHeap"/>
+        /// </summary>
+        /// <param name="htmlPath"></param>
+        /// <param name="hapLinkParent"></param>
+        /// <param name="stack"></param>
+        /// <returns></returns>
+        internal HtmlElementHeap CalculateHtmlNode(HtmlPathHint htmlPath, HtmlElementHeap hapLinkParent)
+        {
+            HtmlElementHeap hapLinkChild = new HtmlElementHeap();
+
+            if (htmlPath != null && htmlPath.Path != null)
             {
-                if (hapLink.Single != null)
-                    hapLinkChild.Collection = hapLink.Single.SelectNodes(webSegment.ActualData.HtmlPath.Path.XPath);
-                else if (hapLink.Collection != null)
-                    hapLinkChild.Collection = hapLink.Collection[0].SelectNodes(webSegment.ActualData.HtmlPath.Path.XPath);
+                if (hapLinkParent.Single != null)
+                    hapLinkChild.Collection = hapLinkParent.Single.SelectNodes(htmlPath.Path.XPath);
+                else if (hapLinkParent.Collection != null)
+                    hapLinkChild.Collection = hapLinkParent.Collection[0].SelectNodes(htmlPath.Path.XPath);
                 else
                     throw new Exception("Error in temporary statck Hap url");
-                hapLinkChild.Url = hapLink.Url;
 
                 if (hapLinkChild.Collection != null)
                 {
-                    if (webSegment.ActualData.HtmlPath.Path.CollectionIndex >= 0)
+                    if (htmlPath.Path.CollectionIndex >= 0)
                     {
-                        hapLinkChild.Single = hapLinkChild.Collection[webSegment.ActualData.HtmlPath.Path.CollectionIndex];
-                        hapLinkChild.CollectionIndex = webSegment.ActualData.HtmlPath.Path.CollectionIndex;
+                        hapLinkChild.Single = hapLinkChild.Collection[htmlPath.Path.CollectionIndex];
+                        hapLinkChild.CollectionIndex = htmlPath.Path.CollectionIndex;
                         hapLinkChild.Collection = null;
 
-                        if (!string.IsNullOrEmpty(webSegment.ActualData.HtmlPath.Path.Attribute))
-                            hapLinkChild.Attribute = hapLinkChild.Single.Attributes[webSegment.ActualData.HtmlPath.Path.Attribute];
+                        if (!string.IsNullOrEmpty(htmlPath.Path.Attribute))
+                            hapLinkChild.Attribute = hapLinkChild.Single.Attributes[htmlPath.Path.Attribute];
                     }
                 }
                 else
                     throw new Exception("Node not found");
             }
 
-            stackHtmlNodes.Add(hapLinkChild);
+            return hapLinkChild;
+        }
 
-            // References
-            if (webSegment.References != null)
+        /// <summary>
+        /// Process and parse Metadata tree
+        /// </summary>
+        /// <param name="metadataTree"></param>
+        /// <param name="hapLinkChild"></param>
+        internal List<ScrapMetadata> ProcessMetadata(List<SegmentMetadataTree> metadataTree, HtmlElementHeap hapLinkChild)
+        {
+            List<ScrapMetadata> metadataParsedList = new List<ScrapMetadata>();
+
+            metadataTree.ForLoop((metadataChildTree, indx) =>
             {
-                scrapWebData.References = new List<ScrapMetadata>();
+                ScrapMetadata metadataChild = new ScrapMetadata();
 
-                for (int indx = 0; indx < webSegment.References.Count; ++indx)
+                metadataSegmentElementStack = new Stack<HtmlElementHeap>();
+                metadataSegmentElementStack.Push(hapLinkChild);
+
+                OnSegmentMetadataTreeVisitorBFSTraversal(metadataChildTree, metadataChild);
+
+                metadataParsedList.Add(metadataChild);
+
+                metadataSegmentElementStack.Clear();
+            });
+
+            return metadataParsedList;
+        }
+
+        /// <summary>
+        /// Calculate the row of data for a html single node in the grammer tree.
+        /// It is a recursive function.
+        /// </summary>
+        /// <param name="webSegmentNodes"></param>
+        /// <param name="htmlNodeCurrent"></param>
+        /// <param name="stack"></param>
+        /// <returns></returns>
+        internal List<OT> CalculateRowData<T, OT>(List<T> webSegmentNodes, 
+            HtmlNode htmlNodeCurrent, Stack<HtmlElementHeap> stack,
+            Action<T, OT> actionMethod) where OT: new()
+        {
+            List<OT> singleRowChildNodes = new List<OT>();
+
+            webSegmentNodes.ForLoop((childSegmentTree, indx) =>
+            {
+                OT scrapWebDataChild = new OT();
+                stack.Push(new HtmlElementHeap(htmlNodeCurrent));
+
+                actionMethod(childSegmentTree, scrapWebDataChild);
+
+                stack.Pop();
+
+                singleRowChildNodes.Add(scrapWebDataChild);
+            });
+
+            return singleRowChildNodes;
+        }
+
+        /// <summary>
+        /// Calculate the data
+        /// </summary>
+        /// <param name="webSegment"></param>
+        /// <param name="hapLinkChild"></param>
+        /// <returns></returns>
+        internal string CalculateScrappedData(SegmentMetadata segmentMetadata, HtmlElementHeap hapLinkChild)
+        {
+            string scrapWebDataText = "";
+            if (hapLinkChild.Attribute != null)
+                scrapWebDataText = hapLinkChild.Attribute.Value;
+            else if (hapLinkChild.Single != null)
+                scrapWebDataText = hapLinkChild.Single.InnerText;
+            else if (hapLinkChild.Collection != null && hapLinkChild.CollectionIndex >= 0)
+                scrapWebDataText = hapLinkChild.Collection[hapLinkChild.CollectionIndex].InnerText;
+            else
+                throw new Exception("There is an error getting the text from the link");
+
+            if (segmentMetadata.Custom != null)
+            {
+                if (segmentMetadata.Custom.IsPath)
                 {
-                    SegmentMetadataTree metadataTree = webSegment.References[indx];
-                    ScrapMetadata metadataChild = new ScrapMetadata();
-
-                    stackHtmlMetadataNodes = new List<HAPTemp>();
-                    stackHtmlMetadataNodes.Add(hapLinkChild);
-
-                    OnSegmentMetadataTreeVisitorBFSTraversal(metadataTree, metadataChild);
-
-                    scrapWebData.References.Add(metadataChild);
-
-                    stackHtmlMetadataNodes.Clear();
+                    if (segmentMetadata.Custom.DoAppendToHtmlHint)
+                    {
+                        Uri result;
+                        Uri.TryCreate(new Uri(scrapWebDataText), segmentMetadata.Custom.Text, out result);
+                        scrapWebDataText = result.AbsoluteUri;
+                    }
+                    else
+                    {
+                        Uri result;
+                        Uri.TryCreate(new Uri(segmentMetadata.Custom.Text), scrapWebDataText, out result);
+                        scrapWebDataText = result.AbsoluteUri;
+                    }
+                }
+                else
+                {
+                    if (segmentMetadata.Custom.DoAppendToHtmlHint)
+                        scrapWebDataText += segmentMetadata.Custom.Text;
+                    else
+                        scrapWebDataText = segmentMetadata.Custom.Text + scrapWebDataText;
                 }
             }
 
-            // Copyright
-            if (webSegment.Copyrights != null)
-            {
-                scrapWebData.Copyrights = new List<ScrapMetadata>();
+            return scrapWebDataText;
+        }
 
-                for (int indx = 0; indx < webSegment.Copyrights.Count; ++indx)
-                {
-                    SegmentMetadataTree metadataTree = webSegment.Copyrights[indx];
-                    ScrapMetadata metadataChild = new ScrapMetadata();
+        /// <summary>
+        /// The parser logic for parsing and scrapping a webpage tree grammer and store data in the scrapped 
+        /// model
+        /// </summary>
+        /// <param name="webSegment"></param>
+        /// <param name="scrapWebData"></param>
+        protected void OnWebSegmentTreeVisitorBFSTraversal(WebSegmentTree webSegment, ScrapWebData scrapWebData)
+        {
+            scrapWebData.id = webSegment.Id;
 
-                    stackHtmlMetadataNodes = new List<HAPTemp>();
-                    stackHtmlMetadataNodes.Add(hapLinkChild);
+            // Get and load the url document
+            HtmlElementHeap hapLinkParent = GetOrLoadHtmlNode(webSegment.ActualData.HtmlPath, webSegmentElementStack);
 
-                    OnSegmentMetadataTreeVisitorBFSTraversal(metadataTree, metadataChild);
+            // A single node is required for further processing, if the parent node is collection provide the index as well
+            HtmlElementHeap hapLinkChild = CalculateHtmlNode(webSegment.ActualData.HtmlPath, hapLinkParent);
+            webSegmentElementStack.Push(hapLinkChild);
 
-                    scrapWebData.Copyrights.Add(metadataChild);
+            // Process and parse References for this segment node
+            scrapWebData.References = ProcessMetadata(webSegment.References, hapLinkChild);
 
-                    stackHtmlMetadataNodes.Clear();
-                }
-            }
+            // Process and parse Copyrights for this segment node
+            scrapWebData.Copyrights = ProcessMetadata(webSegment.Copyrights, hapLinkChild);
 
             // Child
             if(webSegment.Nodes != null)
@@ -176,220 +306,69 @@ namespace QWScrapEngine
                 scrapWebData.Nodes = new List<List<ScrapWebData>>();
                 if (webSegment.ActualData.HtmlPath.Path.CollectionIndex >= 0)
                 {
-                    List<ScrapWebData> singleRowChildNodes = new List<ScrapWebData>();
-                    // This is a single node as collection index is whole number
-                    for (int indx = 0; indx < webSegment.Nodes.Count; ++indx)
-                    {
-                        WebSegmentTree childSegmentTree = webSegment.Nodes[indx];
-
-                        ScrapWebData scrapWebDataChild = new ScrapWebData();
-                        OnWebSegmentTreeVisitorBFSTraversal(childSegmentTree, scrapWebDataChild);
-                        singleRowChildNodes.Add(scrapWebDataChild);
-                    }
-
-                    scrapWebData.Nodes.Add(singleRowChildNodes);
+                    scrapWebData.Nodes.Add(CalculateRowData<WebSegmentTree, ScrapWebData>(webSegment.Nodes,
+                            hapLinkChild.Single, webSegmentElementStack,
+                            OnWebSegmentTreeVisitorBFSTraversal));
                 }
                 else
                 {
                     // This is a collection node and we have looping here
-                    for(int indxRow = 0; indxRow < hapLinkChild.Collection.Count; ++indxRow)
-                    {
-                        List<ScrapWebData> singleRowChildNodes = new List<ScrapWebData>();
-
-                        for (int indx = 0; indx < webSegment.Nodes.Count; ++indx)
-                        {
-                            WebSegmentTree childSegmentTree = webSegment.Nodes[indx];
-
-                            ScrapWebData scrapWebDataChild = new ScrapWebData();
-                            HAPTemp hapTemp = new HAPTemp();
-                            hapTemp.Single = hapLinkChild.Collection[indxRow];
-
-                            stackHtmlNodes.Add(hapTemp);
-
-                            OnWebSegmentTreeVisitorBFSTraversal(childSegmentTree, scrapWebDataChild);
-
-                            stackHtmlNodes.Remove(hapTemp);
-
-                            singleRowChildNodes.Add(scrapWebDataChild);
-                        }
-
-                        scrapWebData.Nodes.Add(singleRowChildNodes);
-                    }
+                    hapLinkChild.Collection.ForLoop((hapLinkNodeChild, indxRow) => {
+                        scrapWebData.Nodes.Add(CalculateRowData<WebSegmentTree, ScrapWebData>(webSegment.Nodes,
+                            hapLinkNodeChild, webSegmentElementStack,
+                            OnWebSegmentTreeVisitorBFSTraversal));
+                    });
                 }
             }
             else
             {
-                scrapWebData.Text = new ScrapMetadata();
-                scrapWebData.Text.Id = webSegment.Id;
-                if (hapLinkChild.Attribute != null)
-                    scrapWebData.Text.Text = hapLinkChild.Attribute.Value;
-                else if (hapLinkChild.Single != null)
-                    scrapWebData.Text.Text = hapLinkChild.Single.InnerText;
-                else if (hapLinkChild.Collection != null && hapLinkChild.CollectionIndex >= 0)
-                    scrapWebData.Text.Text = hapLinkChild.Collection[hapLinkChild.CollectionIndex].InnerText;
-                else
-                    throw new Exception("There is an error getting the text from the link");
-
-                if(webSegment.ActualData.Custom != null)
+                scrapWebData.Text = new ScrapMetadata
                 {
-                    if(webSegment.ActualData.Custom.IsPath)
-                    {
-                        if (webSegment.ActualData.Custom.DoAppendToHtmlHint)
-                        {
-                            Uri result;
-                            Uri.TryCreate(new Uri(scrapWebData.Text.Text), webSegment.ActualData.Custom.Text, out result);
-                            scrapWebData.Text.Text = result.AbsoluteUri;
-                        }
-                        else
-                        {
-                            Uri result;
-                            Uri.TryCreate(new Uri(webSegment.ActualData.Custom.Text), scrapWebData.Text.Text, out result);
-                            scrapWebData.Text.Text = result.AbsoluteUri;
-                        }
-                    }
-                    else
-                    {
-                        if (webSegment.ActualData.Custom.DoAppendToHtmlHint)
-                            scrapWebData.Text.Text += webSegment.ActualData.Custom.Text;
-                        else
-                            scrapWebData.Text.Text = webSegment.ActualData.Custom.Text + scrapWebData.Text.Text;
-                    }
-                }
+                    Id = webSegment.Id,
+                    Text = CalculateScrappedData(webSegment.ActualData, hapLinkChild)
+                };
             }
 
-            stackHtmlNodes.Remove(hapLinkChild);
+            webSegmentElementStack.Pop();
         }
         
+        /// <summary>
+        /// The metadata logic parser to parse data and store in output
+        /// </summary>
+        /// <param name="metadataTree"></param>
+        /// <param name="scrapMetadata"></param>
         protected void OnSegmentMetadataTreeVisitorBFSTraversal(SegmentMetadataTree metadataTree, ScrapMetadata scrapMetadata)
         {
             scrapMetadata.Id = metadataTree.Id;
 
             // Get and load the url document
-            HAPTemp hapLink = null;
+            HtmlElementHeap hapLinkParent = GetOrLoadHtmlNode(metadataTree.ActualData.HtmlPath, metadataSegmentElementStack);
 
-            // Check from Global cache if the document is already loaded
-            if (metadataTree.ActualData.HtmlPath != null && metadataTree.ActualData.HtmlPath.Url != null)
-            {
-                HtmlDocCache htmldocCache = GlobalCacheStore.This.HtmlCache.Retrieve(metadataTree.ActualData.HtmlPath.Url.Online,
-                    metadataTree.ActualData.HtmlPath.Url.Offline);
-                hapLink = new HAPTemp();
-                hapLink.Single = htmldocCache.Document.DocumentNode;
-                hapLink.Url = htmldocCache.UrlUsed;
-                stackHtmlMetadataNodes.Add(hapLink);
-            }
-            else
-            {
-                hapLink = stackHtmlMetadataNodes.Last();
-            }
-
-            HAPTemp metdatalinkChild = new HAPTemp();
-
-            // From the path get the Node collection object
-            if (metadataTree.ActualData.HtmlPath != null && metadataTree.ActualData.HtmlPath.Path != null)
-            {
-                if(hapLink.Single != null)
-                    metdatalinkChild.Collection = hapLink.Single.SelectNodes(metadataTree.ActualData.HtmlPath.Path.XPath);
-                else if(hapLink.Collection != null)
-                    metdatalinkChild.Collection = hapLink.Collection[0].SelectNodes(metadataTree.ActualData.HtmlPath.Path.XPath);
-                else
-                    throw new Exception("Error in temporary statck Hap url");
-                metdatalinkChild.Url = hapLink.Url;
-
-                if (metdatalinkChild.Collection != null)
-                {
-                    if (metadataTree.ActualData.HtmlPath.Path.CollectionIndex >= 0)
-                    {
-                        metdatalinkChild.Single = metdatalinkChild.Collection[metadataTree.ActualData.HtmlPath.Path.CollectionIndex];
-                        metdatalinkChild.CollectionIndex = metadataTree.ActualData.HtmlPath.Path.CollectionIndex;
-                        metdatalinkChild.Collection = null;
-
-                        if (!string.IsNullOrEmpty(metadataTree.ActualData.HtmlPath.Path.Attribute))
-                            metdatalinkChild.Attribute = metdatalinkChild.Single.Attributes[metadataTree.ActualData.HtmlPath.Path.Attribute];
-                    }
-                }
-            }
-
-            stackHtmlMetadataNodes.Add(metdatalinkChild);
-
+            HtmlElementHeap hapLinkChild = CalculateHtmlNode(metadataTree.ActualData.HtmlPath, hapLinkParent);
+            metadataSegmentElementStack.Push(hapLinkChild);
+            
             if (metadataTree.Nodes != null)
             {
                 scrapMetadata.Nodes = new List<List<ScrapMetadata>>();
 
                 // This is where the difference with collection and single node happens
-                if (metdatalinkChild.Collection != null)
+                if (hapLinkChild.Collection != null)
                 {
-                    List<ScrapMetadata> scrapMetadataChildList = new List<ScrapMetadata>();
-                    for (int indxRow = 0; indxRow < metadataTree.Nodes.Count; ++indxRow)
-                    {
-                        for (int indx = 0; indx < metadataTree.Nodes.Count; ++indx)
-                        {
-                            ScrapMetadata metadataChild = new ScrapMetadata();
-                            OnSegmentMetadataTreeVisitorBFSTraversal(metadataTree.Nodes[indx], metadataChild);
-                            scrapMetadataChildList.Add(metadataChild);
-                        }
-                    }
-                    scrapMetadata.Nodes.Add(scrapMetadataChildList);
+                    scrapMetadata.Nodes.Add(CalculateRowData<SegmentMetadataTree, ScrapMetadata>(metadataTree.Nodes,
+                            hapLinkChild.Single, webSegmentElementStack, OnSegmentMetadataTreeVisitorBFSTraversal));
                 }
                 else
                 {
-                    for (int indxRow = 0; indxRow < metdatalinkChild.Collection.Count; ++indxRow)
+                    hapLinkChild.Collection.ForLoop((hapLinkNodeChild, indxRow) =>
                     {
-                        List<ScrapMetadata> scrapMetadataChildList = new List<ScrapMetadata>();
-
-                        for (int indx = 0; indx < metadataTree.Nodes.Count; ++indx)
-                        {
-                            ScrapMetadata metadataChild = new ScrapMetadata();
-
-                            HAPTemp hapTemp = new HAPTemp();
-                            hapTemp.Single = metdatalinkChild.Collection[indxRow];
-
-                            stackHtmlMetadataNodes.Add(hapTemp);
-
-                            OnSegmentMetadataTreeVisitorBFSTraversal(metadataTree.Nodes[indx], metadataChild);
-
-                            stackHtmlMetadataNodes.Remove(hapTemp);
-                            scrapMetadataChildList.Add(metadataChild);
-                        }
-                        scrapMetadata.Nodes.Add(scrapMetadataChildList);
-                    }
+                        scrapMetadata.Nodes.Add(CalculateRowData<SegmentMetadataTree, ScrapMetadata>(metadataTree.Nodes,
+                            hapLinkChild.Single, webSegmentElementStack, OnSegmentMetadataTreeVisitorBFSTraversal));
+                    });
                 }
             }
             else
             {
-                if (metdatalinkChild.Attribute != null)
-                    scrapMetadata.Text = metdatalinkChild.Attribute.Value;
-                else if (metdatalinkChild.Single != null)
-                    scrapMetadata.Text = metdatalinkChild.Single.InnerText;
-                else if (metdatalinkChild.Collection != null && metdatalinkChild.CollectionIndex >= 0)
-                    scrapMetadata.Text = metdatalinkChild.Collection[metdatalinkChild.CollectionIndex].InnerText;
-                else
-                    throw new Exception("Error on setting path for Grammer");
-
-                if (metadataTree.ActualData.Custom != null)
-                {
-                    if (metadataTree.ActualData.Custom.IsPath)
-                    {
-                        if (metadataTree.ActualData.Custom.DoAppendToHtmlHint)
-                        {
-                            Uri result;
-                            Uri.TryCreate(new Uri(scrapMetadata.Text), metadataTree.ActualData.Custom.Text, out result);
-                            scrapMetadata.Text = result.AbsoluteUri;
-                        }
-                        else
-                        {
-                            Uri result;
-                            Uri.TryCreate(new Uri(metadataTree.ActualData.Custom.Text), scrapMetadata.Text, out result);
-                            scrapMetadata.Text = result.AbsoluteUri;
-                        }
-                    }
-                    else
-                    {
-                        if (metadataTree.ActualData.Custom.DoAppendToHtmlHint)
-                            scrapMetadata.Text += metadataTree.ActualData.Custom.Text;
-                        else
-                            scrapMetadata.Text = metadataTree.ActualData.Custom.Text + scrapMetadata.Text;
-                    }
-                }
+                scrapMetadata.Text = CalculateScrappedData(metadataTree.ActualData, hapLinkChild);
             }
         }
     }

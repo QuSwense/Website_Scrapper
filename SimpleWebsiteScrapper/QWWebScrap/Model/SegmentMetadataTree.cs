@@ -13,11 +13,19 @@ namespace QWWebScrap.Model
     /// </summary>
     public class SegmentMetadataTree
     {
-        public static event Action<SegmentMetadataVisitorEventArgs> HandleVisitorData;
-
+        /// <summary>
+        /// Refers to the Parent Main Webtree node
+        /// </summary>
         public WebSegmentTree ParentWebTree { get; set; }
+
+        /// <summary>
+        /// Refers to the parent node
+        /// </summary>
         public SegmentMetadataTree Parent { get; set; }
 
+        /// <summary>
+        /// The unique id
+        /// </summary>
         public string Id { get; set; }
 
         /// <summary>
@@ -48,11 +56,6 @@ namespace QWWebScrap.Model
             return metadataTree;
         }
 
-        public static void ResetEvent()
-        {
-            HandleVisitorData = null;
-        }
-
         /// <summary>
         /// Add data node
         /// </summary>
@@ -61,25 +64,6 @@ namespace QWWebScrap.Model
         {
             if (ActualData == null) ActualData = new SegmentMetadata();
             return ActualData;
-        }
-
-        /// <summary>
-        /// A breadth first Travsersal implementation
-        /// </summary>
-        /// <param name="siblingIndx"></param>
-        public void BFSTraversal(int siblingIndx)
-        {
-            HandleVisitorData?.Invoke(new SegmentMetadataVisitorEventArgs(this));
-
-            // Child
-            if (Nodes != null)
-            {
-                for (int indx = 0; indx < Nodes.Count; ++indx)
-                {
-                    SegmentMetadataTree metadataTree = Nodes[indx];
-                    metadataTree.BFSTraversal(indx);
-                }
-            }
         }
     }
 }

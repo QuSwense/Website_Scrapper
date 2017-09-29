@@ -170,46 +170,5 @@ namespace QWWebScrap.Model
 
             return childNode;
         }
-
-        /// <summary>
-        /// A breadth traversal of the nodes. Order of traversal is:
-        /// 1. Copyrights
-        /// 2. references
-        /// 3. Child Nodes
-        /// </summary>
-        public void BFSTraversal()
-        {
-            HandleVisitorData?.Invoke(new WebSegmentVisitorEventArgs(this));
-
-            // Copyrights
-            if (Copyrights != null)
-            {
-                for (int indx = 0; indx < Copyrights.Count; ++indx)
-                {
-                    SegmentMetadataTree Copyright = Copyrights[indx];
-                    Copyright.BFSTraversal(indx);
-                }
-            }
-
-            // references
-            if (References != null)
-            {
-                for (int indx = 0; indx < References.Count; ++indx)
-                {
-                    SegmentMetadataTree Reference = References[indx];
-                    Reference.BFSTraversal(indx);
-                }
-            }
-
-            // Child Nodes
-            if(Nodes != null)
-            {
-                for(int indx = 0; indx < Nodes.Count; ++indx)
-                {
-                    WebSegmentTree childNode = Nodes[indx];
-                    childNode.BFSTraversal();
-                }
-            }
-        }
     }
 }

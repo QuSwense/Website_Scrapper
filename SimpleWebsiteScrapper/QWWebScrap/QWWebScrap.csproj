@@ -50,7 +50,6 @@
     <Compile Include="Model\HtmlPathHint.cs" />
     <Compile Include="Model\SegmentMetadata.cs" />
     <Compile Include="Model\SegmentMetadataTree.cs" />
-    <Compile Include="Model\SegmentMetadataVisitorEventArgs.cs" />
     <Compile Include="Model\UriHint.cs" />
     <Compile Include="Model\WebSegmentTree.cs" />
     <Compile Include="Model\WebSegmentVisitorEventArgs.cs" />
