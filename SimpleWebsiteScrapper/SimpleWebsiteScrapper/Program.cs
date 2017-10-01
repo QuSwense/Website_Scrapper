@@ -1,4 +1,5 @@
-﻿using QWScrapEngine.Wikipedia.FIFA;
+﻿using QWScrapEngine;
+using QWScrapEngine.Wikipedia.FIFA;
 
 namespace SimpleWebsiteScrapper
 {
@@ -8,6 +9,10 @@ namespace SimpleWebsiteScrapper
         {
             MembersAndListOfCodes wikiFifaCodeEngine = new MembersAndListOfCodes();
             wikiFifaCodeEngine.Parse();
+
+            BaseOutputEngine outputEngine = new BaseOutputEngine(wikiFifaCodeEngine.ProcessedWebData,
+                wikiFifaCodeEngine.GetType());
+            outputEngine.Output();
         }
     }
 }

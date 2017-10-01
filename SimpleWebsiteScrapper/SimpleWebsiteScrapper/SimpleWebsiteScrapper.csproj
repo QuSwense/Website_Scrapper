@@ -64,6 +64,10 @@
       <Project>{59444680-521c-40dc-87f0-5037ec0f2ab2}</Project>
       <Name>QWScrapEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\QWWebScrap\QWWebScrap.csproj">
+      <Project>{525DDA55-CF35-4CC0-804E-A967D849071D}</Project>
+      <Name>QWWebScrap</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

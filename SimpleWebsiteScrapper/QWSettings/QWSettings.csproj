@@ -51,13 +51,13 @@
     <Compile Include="UrlSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="PathSettings.xml">
+    <None Include="PathSettings.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="UrlSettings.xml">
+    </None>
+    <None Include="UrlSettings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
