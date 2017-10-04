@@ -109,6 +109,23 @@ namespace QWWebScrap.Model
         /// <param name="collIndex"></param>
         /// <param name="attribute"></param>
         /// <returns></returns>
+        public SegmentMetadataTree AddReference(string url, string xPath, int collIndex = -1, string attribute = null,
+            EUriResourceType resType = EUriResourceType.HTML, bool isonline = true)
+        {
+            if (References == null) References = new List<SegmentMetadataTree>();
+            SegmentMetadataTree reference = AddReference();
+            reference.AddData().AddUrl(url, resType, isonline);
+            reference.AddData().AddPath(xPath, collIndex, attribute);
+            return reference;
+        }
+
+        /// <summary>
+        /// Add xpath data to reference
+        /// </summary>
+        /// <param name="xpath"></param>
+        /// <param name="collIndex"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
         public SegmentMetadataTree AddCopyrightPath(string xpath, int collIndex = -1, string attribute = null)
         {
             if (Copyrights == null) Copyrights = new List<SegmentMetadataTree>();

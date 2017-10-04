@@ -65,21 +65,33 @@ namespace QWScrapEngine
                     GenerateWebData(scrapWebData, indx);
 
                     // Generate Referecnes web data
-                    scrapWebData.References.ForLoop((reference, refIndx) =>
-                    {
-                        GenerateMetadata(reference, refIndx);
-                    });
+                    GenerateMetadata(scrapWebData, scrapWebData.References, "References");
 
                     // Generate Referecnes web data
-                    scrapWebData.Copyrights.ForLoop((copyright, cIndx) =>
-                    {
-                        GenerateMetadata(copyright, cIndx);
-                    });
+                    GenerateMetadata(scrapWebData, scrapWebData.Copyrights, "Copyrights");
                 });
             }
             finally
             {
                 Cleanup();
+            }
+        }
+
+        private void GenerateMetadata(ScrapWebData scrapWebData, List<ScrapMetadata> metadataList, string type)
+        {
+            string altTextFile = string.Format("{0}_{1}", scrapWebData.id, type);
+
+            if(metadataList != null && metadataList.Count > 0)
+            {
+                string fullName = Path.Combine(folderPath, altTextFile + ".csv");
+                using (TextWriter txtWriter = new StreamWriter(fullName))
+                {
+                    txtWriter.WriteLine(GetColumnForNodes(metadataList));
+                    metadataList.ForLoop((metadata, indx) =>
+                    {
+                        txtWriter.WriteLine(string.Format("\"{0}\",", GenerateMetadata(metadata, indx)));
+                    });
+                }
             }
         }
 
@@ -90,6 +102,12 @@ namespace QWScrapEngine
         protected string GenerateWebData(ScrapWebData scrapWebData, int indx)
         {
             string altTextFile = string.Format("{0}_{1}", scrapWebData.id, indx);
+
+            // Generate Referecnes web data
+            GenerateMetadata(scrapWebData, scrapWebData.References, "References");
+
+            // Generate Referecnes web data
+            GenerateMetadata(scrapWebData, scrapWebData.Copyrights, "Copyrights");
 
             // If the node contains children then create a file and save it on stack
             if (scrapWebData.Nodes != null)
@@ -116,18 +134,6 @@ namespace QWScrapEngine
                     return altTextFile;
             }
 
-            // Generate Referecnes web data
-            scrapWebData.References.ForLoop((reference, refIndx) =>
-            {
-                GenerateMetadata(reference, refIndx);
-            });
-
-            // Generate Referecnes web data
-            scrapWebData.Copyrights.ForLoop((copyright, cIndx) =>
-            {
-                GenerateMetadata(copyright, cIndx);
-            });
-
             return altTextFile;
         }
 
@@ -141,9 +147,46 @@ namespace QWScrapEngine
             return columnHeader;
         }
 
-        protected void GenerateMetadata(ScrapMetadata reference, int refIndx)
+        protected string GetColumnForNodes(List<ScrapMetadata> scrapWebDataRows)
         {
-            //throw new NotImplementedException();
+            string columnHeader = "";
+            scrapWebDataRows.ForLoop((scrapWebDataChild, indxChild) => {
+                columnHeader += string.Format("\"{0}\",", scrapWebDataChild.Id);
+            });
+
+            return columnHeader;
+        }
+
+        protected string GenerateMetadata(ScrapMetadata reference, int refIndx)
+        {
+            string altTextFile = string.Format("{0}_{1}", reference.Id, refIndx);
+
+            // If the node contains children then create a file and save it on stack
+            if (reference.Nodes != null && reference.Nodes.Count > 0)
+            {
+                string fullName = Path.Combine(folderPath, altTextFile + ".csv");
+                using (TextWriter txtWriter = new StreamWriter(fullName))
+                {
+                    txtWriter.WriteLine(GetColumnForNodes(reference.Nodes[refIndx]));
+                    reference.Nodes.ForLoop((scrapMetadataRows, indxRow) =>
+                    {
+                        scrapMetadataRows.ForLoop((scrapMetadataChild, indxChild) =>
+                        {
+                            txtWriter.Write(string.Format("\"{0}\",", GenerateMetadata(scrapMetadataChild, indxChild)));
+                        });
+                        txtWriter.WriteLine();
+                    });
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(reference.Text))
+                    return reference.Text;
+                else
+                    return altTextFile;
+            }
+
+            return altTextFile;
         }
 
         /// <summary>

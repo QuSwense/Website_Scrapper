@@ -33,6 +33,11 @@ namespace QWWebScrap.Model
         public EUriResourceType ResourceType { get; protected set; }
 
         /// <summary>
+        /// A Url template using format like <see cref="string.Format(string, object)"/>
+        /// </summary>
+        public string UrlTemplate { get; set; }
+
+        /// <summary>
         /// Default constructor required for any list operation.
         /// A parameterless constructor is different to Default constructor
         /// </summary>

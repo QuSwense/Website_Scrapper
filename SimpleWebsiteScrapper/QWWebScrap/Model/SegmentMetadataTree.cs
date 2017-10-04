@@ -65,5 +65,20 @@ namespace QWWebScrap.Model
             if (ActualData == null) ActualData = new SegmentMetadata();
             return ActualData;
         }
+
+        /// <summary>
+        /// Add xpath data to reference
+        /// </summary>
+        /// <param name="xpath"></param>
+        /// <param name="collIndex"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        public SegmentMetadataTree AddChildPath(string xpath, int collIndex = -1, string attribute = null)
+        {
+            if (Nodes == null) Nodes = new List<SegmentMetadataTree>();
+            SegmentMetadataTree node = AddChild();
+            node.AddData().AddPath(xpath, collIndex, attribute);
+            return node;
+        }
     }
 }
