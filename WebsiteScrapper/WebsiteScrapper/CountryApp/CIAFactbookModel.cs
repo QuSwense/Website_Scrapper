@@ -9,5 +9,8 @@ namespace WebsiteScrapper.CountryApp
 {
     public class CIAFactbookModel : ScrapObject<object>
     {
+        public List<CIAWorldFactbookCountryGeographyModel> CountriesGeography { get; set; }
+        public List<CIAWorldFactbookCountryPeopleAndSocietyModel> CountriesPeopleAndSociety { get; set; }
+        public List<CIAWorldFactbookCountryGovernmentModel> CountriesGovernment { get; set; }
     }
 }

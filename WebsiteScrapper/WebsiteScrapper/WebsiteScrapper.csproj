@@ -50,6 +50,10 @@
   <ItemGroup>
     <Compile Include="CountryAppEngine.cs" />
     <Compile Include="CountryApp\CIAFactbookModel.cs" />
+    <Compile Include="CountryApp\CIAFactbookTransportationModel.cs" />
+    <Compile Include="CountryApp\CIAWorldFactbookCountryGeographyModel.cs" />
+    <Compile Include="CountryApp\CIAWorldFactbookCountryGovernmentModel.cs" />
+    <Compile Include="CountryApp\CIAWorldFactbookCountryPeopleAndSocietyModel.cs" />
     <Compile Include="CountryApp\ISO31661Alpha2Model.cs" />
     <Compile Include="CountryApp\UNSDModel.cs" />
     <Compile Include="CountryApp\ISO3166CountryCodeModel.cs" />
