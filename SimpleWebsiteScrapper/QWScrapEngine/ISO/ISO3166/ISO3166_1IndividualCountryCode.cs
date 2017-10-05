@@ -14,7 +14,7 @@ namespace QWScrapEngine.ISO.ISO3166
         {
             WebSegmentTree root = AddRoot("ISO3166_1:2013_CountryInfo");
 
-            using (TextReader txtReader = new StreamReader(@"Wikipedia\ISO\ISO3166_1_Alpha_2"))
+            using (TextReader txtReader = new StreamReader(@"Wikipedia\ISO\ISO3166_1_Alpha_2.csv"))
             {
                 string line = null;
                 int row = 0;
@@ -27,7 +27,7 @@ namespace QWScrapEngine.ISO.ISO3166
                     WebSegmentTree child = root.AddChild(split[1]);
                     child.AddUrl(string.Format("https://www.iso.org/obp/ui/#iso:code:3166:{0}", split[0]));
 
-
+                    child.AddChild("Alpha2Code").AddPath("//div[@class='code-view-container']/div[@class='core-view-header']/div[@class='core-view-summary']/div[@class='core-view-line' and div[@class='core-view-field-name']='Alpha-2 code']/div[@class='core-view-field-value']");
 
                     row++;
                 }
