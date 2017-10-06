@@ -54,9 +54,16 @@
     <Compile Include="CountryApp\CIAWorldFactbookCountryGeographyModel.cs" />
     <Compile Include="CountryApp\CIAWorldFactbookCountryGovernmentModel.cs" />
     <Compile Include="CountryApp\CIAWorldFactbookCountryPeopleAndSocietyModel.cs" />
+    <Compile Include="CountryApp\GeoNamesCountryInfoModel.cs" />
+    <Compile Include="CountryApp\GeoNamesDatabaseModel.cs" />
     <Compile Include="CountryApp\ISO31661Alpha2Model.cs" />
+    <Compile Include="CountryApp\ISO3166CountryDetailsModel.cs" />
+    <Compile Include="CountryApp\UNDataCountryProfileModel.cs" />
     <Compile Include="CountryApp\UNSDModel.cs" />
     <Compile Include="CountryApp\ISO3166CountryCodeModel.cs" />
+    <Compile Include="CountryApp\QuickgsLegislatureModel.cs" />
+    <Compile Include="CountryApp\QuickgsLegislaturesModel.cs" />
+    <Compile Include="CountryApp\WikiCurrentHeadOfStatesAndGovModel.cs" />
     <Compile Include="HtmlScrapperHelper.cs" />
     <Compile Include="Model\ScrapList.cs" />
     <Compile Include="Model\ScrapObject.cs" />

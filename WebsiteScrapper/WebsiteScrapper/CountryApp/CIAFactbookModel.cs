@@ -12,5 +12,6 @@ namespace WebsiteScrapper.CountryApp
         public List<CIAWorldFactbookCountryGeographyModel> CountriesGeography { get; set; }
         public List<CIAWorldFactbookCountryPeopleAndSocietyModel> CountriesPeopleAndSociety { get; set; }
         public List<CIAWorldFactbookCountryGovernmentModel> CountriesGovernment { get; set; }
+        public List<CIAFactbookTransportationModel> CountriesTransportation { get; set; }
     }
 }

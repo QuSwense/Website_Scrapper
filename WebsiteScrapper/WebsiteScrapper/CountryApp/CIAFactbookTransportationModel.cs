@@ -12,5 +12,11 @@ namespace WebsiteScrapper.CountryApp
         public ScrapString NoOfRegisteredAirCarriers { get; set; }
         public ScrapString InventoryOfRegisteredAircraftOperatedByAirCarriers { get; set; }
         public ScrapString CivilAircraftRegCountryCodePrefix { get; set; }
+        public ScrapString Airports { get; set; }
+        public ScrapString AirportsWithPavedRunWaysTotal { get; set; }
+        public List<ScrapString> AirportsWithPavedRunWays { get; set; }
+        public ScrapString AirportsWithUnPavedRunWaysTotal { get; set; }
+        public List<ScrapString> AirportsWithUnPavedRunWays{ get; set; }
+        public ScrapString Heliports { get; set; }
     }
 }

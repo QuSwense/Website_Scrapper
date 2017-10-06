@@ -13,5 +13,6 @@ namespace WebsiteScrapper.CountryApp
         public ScrapString WhatisISO3166 { get; set; }
         public ScrapString ISO3166CountryCode { get; set; }
         public ISO31661Alpha2Model ISO31661Alpha2 { get; set; }
+        public List<ISO3166CountryDetailsModel> ISO3166CountryDetails { get; set; }
     }
 }
