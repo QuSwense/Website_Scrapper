@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CountryAppDataSet" targetNamespace="http://tempuri.org/DataSet1.xsd" xmlns:mstns="http://tempuri.org/DataSet1.xsd" xmlns="http://tempuri.org/DataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="qsca_country_app_dbConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="qsca_country_app_dbConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.WebsiteScrapper.Properties.Settings.GlobalReference.Default.qsca_country_app_dbConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CountryAppDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="CountryAppDataSet" msprop:Generator_UserDSName="CountryAppDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="qsca_region_sovreign" msprop:Generator_TableClassName="qsca_region_sovreignDataTable" msprop:Generator_TableVarName="tableqsca_region_sovreign" msprop:Generator_TablePropName="qsca_region_sovreign" msprop:Generator_RowDeletingName="qsca_region_sovreignRowDeleting" msprop:Generator_RowChangingName="qsca_region_sovreignRowChanging" msprop:Generator_RowEvHandlerName="qsca_region_sovreignRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_region_sovreignRowDeleted" msprop:Generator_UserTableName="qsca_region_sovreign" msprop:Generator_RowChangedName="qsca_region_sovreignRowChanged" msprop:Generator_RowEvArgName="qsca_region_sovreignRowChangeEvent" msprop:Generator_RowClassName="qsca_region_sovreignRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+              <xs:element name="nm" msprop:Generator_ColumnVarNameInTable="columnnm" msprop:Generator_ColumnPropNameInRow="nm" msprop:Generator_ColumnPropNameInTable="nmColumn" msprop:Generator_UserColumnName="nm" type="xs:string" />
+              <xs:element name="m49p" msprop:Generator_ColumnVarNameInTable="columnm49p" msprop:Generator_ColumnPropNameInRow="m49p" msprop:Generator_ColumnPropNameInTable="m49pColumn" msprop:Generator_UserColumnName="m49p" type="xs:unsignedInt" minOccurs="0" />
+              <xs:element name="btyp" msprop:Generator_ColumnVarNameInTable="columnbtyp" msprop:Generator_ColumnPropNameInRow="btyp" msprop:Generator_ColumnPropNameInTable="btypColumn" msprop:Generator_UserColumnName="btyp" type="xs:unsignedByte" minOccurs="0" />
+              <xs:element name="iso31661a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31661a3" msprop:Generator_ColumnVarNameInTable="columniso31661a3" msprop:Generator_ColumnPropNameInRow="iso31661a3" msprop:Generator_ColumnPropNameInTable="iso31661a3Column" msprop:Generator_UserColumnName="iso31661a3" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31661a2_year_entry" msprop:Generator_ColumnVarNameInTable="columniso31661a2_year_entry" msprop:Generator_ColumnPropNameInRow="iso31661a2_year_entry" msprop:Generator_ColumnPropNameInTable="iso31661a2_year_entryColumn" msprop:Generator_UserColumnName="iso31661a2_year_entry" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="cctld" msprop:Generator_ColumnVarNameInTable="columncctld" msprop:Generator_ColumnPropNameInRow="cctld" msprop:Generator_ColumnPropNameInTable="cctldColumn" msprop:Generator_UserColumnName="cctld" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="genc_2a" msprop:Generator_ColumnVarNameInTable="columngenc_2a" msprop:Generator_ColumnPropNameInRow="genc_2a" msprop:Generator_ColumnPropNameInTable="genc_2aColumn" msprop:Generator_UserColumnName="genc_2a" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="genc_3a" msprop:Generator_ColumnVarNameInTable="columngenc_3a" msprop:Generator_ColumnPropNameInRow="genc_3a" msprop:Generator_ColumnPropNameInTable="genc_3aColumn" msprop:Generator_UserColumnName="genc_3a" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="longitude" msprop:Generator_ColumnVarNameInTable="columnlongitude" msprop:Generator_ColumnPropNameInRow="longitude" msprop:Generator_ColumnPropNameInTable="longitudeColumn" msprop:Generator_UserColumnName="longitude" type="xs:double" />
+              <xs:element name="latitude" msprop:Generator_ColumnVarNameInTable="columnlatitude" msprop:Generator_ColumnPropNameInRow="latitude" msprop:Generator_ColumnPropNameInTable="latitudeColumn" msprop:Generator_UserColumnName="latitude" type="xs:double" />
+              <xs:element name="high_point_km" msprop:Generator_ColumnVarNameInTable="columnhigh_point_km" msprop:Generator_ColumnPropNameInRow="high_point_km" msprop:Generator_ColumnPropNameInTable="high_point_kmColumn" msprop:Generator_UserColumnName="high_point_km" type="xs:decimal" minOccurs="0" />
+              <xs:element name="high_point_name" msprop:Generator_ColumnVarNameInTable="columnhigh_point_name" msprop:Generator_ColumnPropNameInRow="high_point_name" msprop:Generator_ColumnPropNameInTable="high_point_nameColumn" msprop:Generator_UserColumnName="high_point_name" type="xs:string" minOccurs="0" />
+              <xs:element name="low_point_km" msprop:Generator_ColumnVarNameInTable="columnlow_point_km" msprop:Generator_ColumnPropNameInRow="low_point_km" msprop:Generator_ColumnPropNameInTable="low_point_kmColumn" msprop:Generator_UserColumnName="low_point_km" type="xs:decimal" minOccurs="0" />
+              <xs:element name="low_point_name" msprop:Generator_ColumnVarNameInTable="columnlow_point_name" msprop:Generator_ColumnPropNameInRow="low_point_name" msprop:Generator_ColumnPropNameInTable="low_point_nameColumn" msprop:Generator_UserColumnName="low_point_name" type="xs:string" minOccurs="0" />
+              <xs:element name="primary_subdiv_name" msprop:Generator_ColumnVarNameInTable="columnprimary_subdiv_name" msprop:Generator_ColumnPropNameInRow="primary_subdiv_name" msprop:Generator_ColumnPropNameInTable="primary_subdiv_nameColumn" msprop:Generator_UserColumnName="primary_subdiv_name" type="xs:string" minOccurs="0" />
+              <xs:element name="primary_subdiv_count" msprop:Generator_ColumnVarNameInTable="columnprimary_subdiv_count" msprop:Generator_ColumnPropNameInRow="primary_subdiv_count" msprop:Generator_ColumnPropNameInTable="primary_subdiv_countColumn" msprop:Generator_UserColumnName="primary_subdiv_count" type="xs:string" minOccurs="0" />
+              <xs:element name="area_km2" msprop:Generator_ColumnVarNameInTable="columnarea_km2" msprop:Generator_ColumnPropNameInRow="area_km2" msprop:Generator_ColumnPropNameInTable="area_km2Column" msprop:Generator_UserColumnName="area_km2" type="xs:double" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_unsd_ldc" msprop:Generator_TableClassName="qsca_unsd_ldcDataTable" msprop:Generator_TableVarName="tableqsca_unsd_ldc" msprop:Generator_TablePropName="qsca_unsd_ldc" msprop:Generator_RowDeletingName="qsca_unsd_ldcRowDeleting" msprop:Generator_RowChangingName="qsca_unsd_ldcRowChanging" msprop:Generator_RowEvHandlerName="qsca_unsd_ldcRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_unsd_ldcRowDeleted" msprop:Generator_UserTableName="qsca_unsd_ldc" msprop:Generator_RowChangedName="qsca_unsd_ldcRowChanged" msprop:Generator_RowEvArgName="qsca_unsd_ldcRowChangeEvent" msprop:Generator_RowClassName="qsca_unsd_ldcRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_unsd_lldc" msprop:Generator_TableClassName="qsca_unsd_lldcDataTable" msprop:Generator_TableVarName="tableqsca_unsd_lldc" msprop:Generator_TablePropName="qsca_unsd_lldc" msprop:Generator_RowDeletingName="qsca_unsd_lldcRowDeleting" msprop:Generator_RowChangingName="qsca_unsd_lldcRowChanging" msprop:Generator_RowEvHandlerName="qsca_unsd_lldcRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_unsd_lldcRowDeleted" msprop:Generator_UserTableName="qsca_unsd_lldc" msprop:Generator_RowChangedName="qsca_unsd_lldcRowChanged" msprop:Generator_RowEvArgName="qsca_unsd_lldcRowChangeEvent" msprop:Generator_RowClassName="qsca_unsd_lldcRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_unsd_sids" msprop:Generator_TableClassName="qsca_unsd_sidsDataTable" msprop:Generator_TableVarName="tableqsca_unsd_sids" msprop:Generator_TablePropName="qsca_unsd_sids" msprop:Generator_RowDeletingName="qsca_unsd_sidsRowDeleting" msprop:Generator_RowChangingName="qsca_unsd_sidsRowChanging" msprop:Generator_RowEvHandlerName="qsca_unsd_sidsRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_unsd_sidsRowDeleted" msprop:Generator_UserTableName="qsca_unsd_sids" msprop:Generator_RowChangedName="qsca_unsd_sidsRowChanged" msprop:Generator_RowEvArgName="qsca_unsd_sidsRowChangeEvent" msprop:Generator_RowClassName="qsca_unsd_sidsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_unsd_developed" msprop:Generator_TableClassName="qsca_unsd_developedDataTable" msprop:Generator_TableVarName="tableqsca_unsd_developed" msprop:Generator_TablePropName="qsca_unsd_developed" msprop:Generator_RowDeletingName="qsca_unsd_developedRowDeleting" msprop:Generator_RowChangingName="qsca_unsd_developedRowChanging" msprop:Generator_RowEvHandlerName="qsca_unsd_developedRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_unsd_developedRowDeleted" msprop:Generator_UserTableName="qsca_unsd_developed" msprop:Generator_RowChangedName="qsca_unsd_developedRowChanged" msprop:Generator_RowEvArgName="qsca_unsd_developedRowChangeEvent" msprop:Generator_RowClassName="qsca_unsd_developedRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_unsd_developing" msprop:Generator_TableClassName="qsca_unsd_developingDataTable" msprop:Generator_TableVarName="tableqsca_unsd_developing" msprop:Generator_TablePropName="qsca_unsd_developing" msprop:Generator_RowDeletingName="qsca_unsd_developingRowDeleting" msprop:Generator_RowChangingName="qsca_unsd_developingRowChanging" msprop:Generator_RowEvHandlerName="qsca_unsd_developingRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_unsd_developingRowDeleted" msprop:Generator_UserTableName="qsca_unsd_developing" msprop:Generator_RowChangedName="qsca_unsd_developingRowChanged" msprop:Generator_RowEvArgName="qsca_unsd_developingRowChangeEvent" msprop:Generator_RowClassName="qsca_unsd_developingRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49" msprop:Generator_ColumnVarNameInTable="columnm49" msprop:Generator_ColumnPropNameInRow="m49" msprop:Generator_ColumnPropNameInTable="m49Column" msprop:Generator_UserColumnName="m49" type="xs:unsignedInt" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_region_non_sovreign" msprop:Generator_TableClassName="qsca_region_non_sovreignDataTable" msprop:Generator_TableVarName="tableqsca_region_non_sovreign" msprop:Generator_TablePropName="qsca_region_non_sovreign" msprop:Generator_RowDeletingName="qsca_region_non_sovreignRowDeleting" msprop:Generator_RowChangingName="qsca_region_non_sovreignRowChanging" msprop:Generator_RowEvHandlerName="qsca_region_non_sovreignRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_region_non_sovreignRowDeleted" msprop:Generator_UserTableName="qsca_region_non_sovreign" msprop:Generator_RowChangedName="qsca_region_non_sovreignRowChanged" msprop:Generator_RowEvArgName="qsca_region_non_sovreignRowChangeEvent" msprop:Generator_RowClassName="qsca_region_non_sovreignRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="m49_country_code" msprop:Generator_ColumnVarNameInTable="columnm49_country_code" msprop:Generator_ColumnPropNameInRow="m49_country_code" msprop:Generator_ColumnPropNameInTable="m49_country_codeColumn" msprop:Generator_UserColumnName="m49_country_code" type="xs:unsignedInt" minOccurs="0" />
+              <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" type="xs:string" />
+              <xs:element name="m49_parent_code" msprop:Generator_ColumnVarNameInTable="columnm49_parent_code" msprop:Generator_ColumnPropNameInRow="m49_parent_code" msprop:Generator_ColumnPropNameInTable="m49_parent_codeColumn" msprop:Generator_UserColumnName="m49_parent_code" type="xs:unsignedInt" minOccurs="0" />
+              <xs:element name="flag_region_type" msprop:Generator_ColumnVarNameInTable="columnflag_region_type" msprop:Generator_ColumnPropNameInRow="flag_region_type" msprop:Generator_ColumnPropNameInTable="flag_region_typeColumn" msprop:Generator_UserColumnName="flag_region_type" type="xs:unsignedByte" minOccurs="0" />
+              <xs:element name="iso31661a2" msdata:Caption="iso_3166_1_a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31661a3" msdata:Caption="iso_3166_1_a3" msprop:Generator_ColumnVarNameInTable="columniso31661a3" msprop:Generator_ColumnPropNameInRow="iso31661a3" msprop:Generator_ColumnPropNameInTable="iso31661a3Column" msprop:Generator_UserColumnName="iso31661a3" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31661a2_year_introduced" msdata:Caption="iso_3166_1_year_introduced" msprop:Generator_ColumnVarNameInTable="columniso31661a2_year_introduced" msprop:Generator_ColumnPropNameInRow="iso31661a2_year_introduced" msprop:Generator_ColumnPropNameInTable="iso31661a2_year_introducedColumn" msprop:Generator_UserColumnName="iso31661a2_year_introduced" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="cctld" msprop:Generator_ColumnVarNameInTable="columncctld" msprop:Generator_ColumnPropNameInRow="cctld" msprop:Generator_ColumnPropNameInTable="cctldColumn" msprop:Generator_UserColumnName="cctld" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="genc_2a" msprop:Generator_ColumnVarNameInTable="columngenc_2a" msprop:Generator_ColumnPropNameInRow="genc_2a" msprop:Generator_ColumnPropNameInTable="genc_2aColumn" msprop:Generator_UserColumnName="genc_2a" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="genc_3a" msprop:Generator_ColumnVarNameInTable="columngenc_3a" msprop:Generator_ColumnPropNameInRow="genc_3a" msprop:Generator_ColumnPropNameInTable="genc_3aColumn" msprop:Generator_UserColumnName="genc_3a" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="longitude" msprop:Generator_ColumnVarNameInTable="columnlongitude" msprop:Generator_ColumnPropNameInRow="longitude" msprop:Generator_ColumnPropNameInTable="longitudeColumn" msprop:Generator_UserColumnName="longitude" type="xs:double" />
+              <xs:element name="latitude" msprop:Generator_ColumnVarNameInTable="columnlatitude" msprop:Generator_ColumnPropNameInRow="latitude" msprop:Generator_ColumnPropNameInTable="latitudeColumn" msprop:Generator_UserColumnName="latitude" type="xs:double" />
+              <xs:element name="high_point_km" msprop:Generator_ColumnVarNameInTable="columnhigh_point_km" msprop:Generator_ColumnPropNameInRow="high_point_km" msprop:Generator_ColumnPropNameInTable="high_point_kmColumn" msprop:Generator_UserColumnName="high_point_km" type="xs:decimal" minOccurs="0" />
+              <xs:element name="high_point_name" msprop:Generator_ColumnVarNameInTable="columnhigh_point_name" msprop:Generator_ColumnPropNameInRow="high_point_name" msprop:Generator_ColumnPropNameInTable="high_point_nameColumn" msprop:Generator_UserColumnName="high_point_name" type="xs:string" minOccurs="0" />
+              <xs:element name="low_point_km" msprop:Generator_ColumnVarNameInTable="columnlow_point_km" msprop:Generator_ColumnPropNameInRow="low_point_km" msprop:Generator_ColumnPropNameInTable="low_point_kmColumn" msprop:Generator_UserColumnName="low_point_km" type="xs:decimal" minOccurs="0" />
+              <xs:element name="low_point_name" msprop:Generator_ColumnVarNameInTable="columnlow_point_name" msprop:Generator_ColumnPropNameInRow="low_point_name" msprop:Generator_ColumnPropNameInTable="low_point_nameColumn" msprop:Generator_UserColumnName="low_point_name" type="xs:string" minOccurs="0" />
+              <xs:element name="primary_subdiv_name" msprop:Generator_ColumnVarNameInTable="columnprimary_subdiv_name" msprop:Generator_ColumnPropNameInRow="primary_subdiv_name" msprop:Generator_ColumnPropNameInTable="primary_subdiv_nameColumn" msprop:Generator_UserColumnName="primary_subdiv_name" type="xs:string" minOccurs="0" />
+              <xs:element name="primary_subdiv_count" msprop:Generator_ColumnVarNameInTable="columnprimary_subdiv_count" msprop:Generator_ColumnPropNameInRow="primary_subdiv_count" msprop:Generator_ColumnPropNameInTable="primary_subdiv_countColumn" msprop:Generator_UserColumnName="primary_subdiv_count" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_capitals" msprop:Generator_TableClassName="qsca_capitalsDataTable" msprop:Generator_TableVarName="tableqsca_capitals" msprop:Generator_TablePropName="qsca_capitals" msprop:Generator_RowDeletingName="qsca_capitalsRowDeleting" msprop:Generator_RowChangingName="qsca_capitalsRowChanging" msprop:Generator_RowEvHandlerName="qsca_capitalsRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_capitalsRowDeleted" msprop:Generator_UserTableName="qsca_capitals" msprop:Generator_RowChangedName="qsca_capitalsRowChanged" msprop:Generator_RowEvArgName="qsca_capitalsRowChangeEvent" msprop:Generator_RowClassName="qsca_capitalsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="en_name" msprop:Generator_ColumnVarNameInTable="columnen_name" msprop:Generator_ColumnPropNameInRow="en_name" msprop:Generator_ColumnPropNameInTable="en_nameColumn" msprop:Generator_UserColumnName="en_name" type="xs:string" />
+              <xs:element name="iso31661a2" msdata:Caption="iso3166a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="longitude" msprop:Generator_ColumnVarNameInTable="columnlongitude" msprop:Generator_ColumnPropNameInRow="longitude" msprop:Generator_ColumnPropNameInTable="longitudeColumn" msprop:Generator_UserColumnName="longitude" type="xs:double" />
+              <xs:element name="latitude" msprop:Generator_ColumnVarNameInTable="columnlatitude" msprop:Generator_ColumnPropNameInRow="latitude" msprop:Generator_ColumnPropNameInTable="latitudeColumn" msprop:Generator_UserColumnName="latitude" type="xs:double" />
+              <xs:element name="capital_type" msprop:Generator_ColumnVarNameInTable="columncapital_type" msprop:Generator_ColumnPropNameInRow="capital_type" msprop:Generator_ColumnPropNameInTable="capital_typeColumn" msprop:Generator_UserColumnName="capital_type" type="xs:unsignedByte" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_country_names" msprop:Generator_TableClassName="qsca_country_namesDataTable" msprop:Generator_TableVarName="tableqsca_country_names" msprop:Generator_TablePropName="qsca_country_names" msprop:Generator_RowDeletingName="qsca_country_namesRowDeleting" msprop:Generator_RowChangingName="qsca_country_namesRowChanging" msprop:Generator_RowEvHandlerName="qsca_country_namesRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_country_namesRowDeleted" msprop:Generator_UserTableName="qsca_country_names" msprop:Generator_RowChangedName="qsca_country_namesRowChanged" msprop:Generator_RowEvArgName="qsca_country_namesRowChangeEvent" msprop:Generator_RowClassName="qsca_country_namesRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso31661a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso6391code" msprop:Generator_ColumnVarNameInTable="columniso6391code" msprop:Generator_ColumnPropNameInRow="iso6391code" msprop:Generator_ColumnPropNameInTable="iso6391codeColumn" msprop:Generator_UserColumnName="iso6391code" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_legislature" msprop:Generator_TableClassName="qsca_legislatureDataTable" msprop:Generator_TableVarName="tableqsca_legislature" msprop:Generator_TablePropName="qsca_legislature" msprop:Generator_RowDeletingName="qsca_legislatureRowDeleting" msprop:Generator_RowChangingName="qsca_legislatureRowChanging" msprop:Generator_RowEvHandlerName="qsca_legislatureRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_legislatureRowDeleted" msprop:Generator_UserTableName="qsca_legislature" msprop:Generator_RowChangedName="qsca_legislatureRowChanged" msprop:Generator_RowEvArgName="qsca_legislatureRowChangeEvent" msprop:Generator_RowClassName="qsca_legislatureRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso3166a2" msprop:Generator_ColumnVarNameInTable="columniso3166a2" msprop:Generator_ColumnPropNameInRow="iso3166a2" msprop:Generator_ColumnPropNameInTable="iso3166a2Column" msprop:Generator_UserColumnName="iso3166a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="parliament_name" msprop:Generator_ColumnVarNameInTable="columnparliament_name" msprop:Generator_ColumnPropNameInRow="parliament_name" msprop:Generator_ColumnPropNameInTable="parliament_nameColumn" msprop:Generator_UserColumnName="parliament_name" type="xs:string" minOccurs="0" />
+              <xs:element name="type" msprop:Generator_ColumnVarNameInTable="columntype" msprop:Generator_ColumnPropNameInRow="type" msprop:Generator_ColumnPropNameInTable="typeColumn" msprop:Generator_UserColumnName="type" type="xs:unsignedByte" minOccurs="0" />
+              <xs:element name="lower_house" msprop:Generator_ColumnVarNameInTable="columnlower_house" msprop:Generator_ColumnPropNameInRow="lower_house" msprop:Generator_ColumnPropNameInTable="lower_houseColumn" msprop:Generator_UserColumnName="lower_house" type="xs:string" minOccurs="0" />
+              <xs:element name="upper_house" msprop:Generator_ColumnVarNameInTable="columnupper_house" msprop:Generator_ColumnPropNameInRow="upper_house" msprop:Generator_ColumnPropNameInTable="upper_houseColumn" msprop:Generator_UserColumnName="upper_house" type="xs:string" minOccurs="0" />
+              <xs:element name="lower_count" msprop:Generator_ColumnVarNameInTable="columnlower_count" msprop:Generator_ColumnPropNameInRow="lower_count" msprop:Generator_ColumnPropNameInTable="lower_countColumn" msprop:Generator_UserColumnName="lower_count" type="xs:string" minOccurs="0" />
+              <xs:element name="upper_count" msprop:Generator_ColumnVarNameInTable="columnupper_count" msprop:Generator_ColumnPropNameInRow="upper_count" msprop:Generator_ColumnPropNameInTable="upper_countColumn" msprop:Generator_UserColumnName="upper_count" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_currency" msprop:Generator_TableClassName="qsca_currencyDataTable" msprop:Generator_TableVarName="tableqsca_currency" msprop:Generator_TablePropName="qsca_currency" msprop:Generator_RowDeletingName="qsca_currencyRowDeleting" msprop:Generator_RowChangingName="qsca_currencyRowChanging" msprop:Generator_RowEvHandlerName="qsca_currencyRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_currencyRowDeleted" msprop:Generator_UserTableName="qsca_currency" msprop:Generator_RowChangedName="qsca_currencyRowChanged" msprop:Generator_RowEvArgName="qsca_currencyRowChangeEvent" msprop:Generator_RowClassName="qsca_currencyRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso4217" msprop:Generator_ColumnVarNameInTable="columniso4217" msprop:Generator_ColumnPropNameInRow="iso4217" msprop:Generator_ColumnPropNameInTable="iso4217Column" msprop:Generator_UserColumnName="iso4217">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" type="xs:string" minOccurs="0" />
+              <xs:element name="symbol" msprop:Generator_ColumnVarNameInTable="columnsymbol" msprop:Generator_ColumnPropNameInRow="symbol" msprop:Generator_ColumnPropNameInTable="symbolColumn" msprop:Generator_UserColumnName="symbol" type="xs:string" minOccurs="0" />
+              <xs:element name="minor_unit_name" msprop:Generator_ColumnVarNameInTable="columnminor_unit_name" msprop:Generator_ColumnPropNameInRow="minor_unit_name" msprop:Generator_ColumnPropNameInTable="minor_unit_nameColumn" msprop:Generator_UserColumnName="minor_unit_name" type="xs:string" minOccurs="0" />
+              <xs:element name="central_bank" msprop:Generator_ColumnVarNameInTable="columncentral_bank" msprop:Generator_ColumnPropNameInRow="central_bank" msprop:Generator_ColumnPropNameInTable="central_bankColumn" msprop:Generator_UserColumnName="central_bank" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_capital_names" msprop:Generator_TableClassName="qsca_capital_namesDataTable" msprop:Generator_TableVarName="tableqsca_capital_names" msprop:Generator_TablePropName="qsca_capital_names" msprop:Generator_RowDeletingName="qsca_capital_namesRowDeleting" msprop:Generator_RowChangingName="qsca_capital_namesRowChanging" msprop:Generator_RowEvHandlerName="qsca_capital_namesRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_capital_namesRowDeleted" msprop:Generator_UserTableName="qsca_capital_names" msprop:Generator_RowChangedName="qsca_capital_namesRowChanged" msprop:Generator_RowEvArgName="qsca_capital_namesRowChangeEvent" msprop:Generator_RowClassName="qsca_capital_namesRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="en_name" msprop:Generator_ColumnVarNameInTable="columnen_name" msprop:Generator_ColumnPropNameInRow="en_name" msprop:Generator_ColumnPropNameInTable="en_nameColumn" msprop:Generator_UserColumnName="en_name" type="xs:string" />
+              <xs:element name="iso6391code" msdata:Caption="iso_lang_code" msprop:Generator_ColumnVarNameInTable="columniso6391code" msprop:Generator_ColumnPropNameInRow="iso6391code" msprop:Generator_ColumnPropNameInTable="iso6391codeColumn" msprop:Generator_UserColumnName="iso6391code">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_primary_subdivs" msprop:Generator_TableClassName="qsca_primary_subdivsDataTable" msprop:Generator_TableVarName="tableqsca_primary_subdivs" msprop:Generator_TablePropName="qsca_primary_subdivs" msprop:Generator_RowDeletingName="qsca_primary_subdivsRowDeleting" msprop:Generator_RowChangingName="qsca_primary_subdivsRowChanging" msprop:Generator_RowEvHandlerName="qsca_primary_subdivsRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_primary_subdivsRowDeleted" msprop:Generator_UserTableName="qsca_primary_subdivs" msprop:Generator_RowChangedName="qsca_primary_subdivsRowChanged" msprop:Generator_RowEvArgName="qsca_primary_subdivsRowChangeEvent" msprop:Generator_RowClassName="qsca_primary_subdivsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso31661a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31662a3" msprop:Generator_ColumnVarNameInTable="columniso31662a3" msprop:Generator_ColumnPropNameInRow="iso31662a3" msprop:Generator_ColumnPropNameInTable="iso31662a3Column" msprop:Generator_UserColumnName="iso31662a3">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="hasc" msprop:Generator_ColumnVarNameInTable="columnhasc" msprop:Generator_ColumnPropNameInRow="hasc" msprop:Generator_ColumnPropNameInTable="hascColumn" msprop:Generator_UserColumnName="hasc" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="6" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="postalcode_format" msprop:Generator_ColumnVarNameInTable="columnpostalcode_format" msprop:Generator_ColumnPropNameInRow="postalcode_format" msprop:Generator_ColumnPropNameInTable="postalcode_formatColumn" msprop:Generator_UserColumnName="postalcode_format" type="xs:string" minOccurs="0" />
+              <xs:element name="en_name" msprop:Generator_ColumnVarNameInTable="columnen_name" msprop:Generator_ColumnPropNameInRow="en_name" msprop:Generator_ColumnPropNameInTable="en_nameColumn" msprop:Generator_UserColumnName="en_name" type="xs:string" />
+              <xs:element name="en_center_name" msprop:Generator_ColumnVarNameInTable="columnen_center_name" msprop:Generator_ColumnPropNameInRow="en_center_name" msprop:Generator_ColumnPropNameInTable="en_center_nameColumn" msprop:Generator_UserColumnName="en_center_name" type="xs:string" minOccurs="0" />
+              <xs:element name="area_km2" msprop:Generator_ColumnVarNameInTable="columnarea_km2" msprop:Generator_ColumnPropNameInRow="area_km2" msprop:Generator_ColumnPropNameInTable="area_km2Column" msprop:Generator_UserColumnName="area_km2" type="xs:double" minOccurs="0" />
+              <xs:element name="secondary_subdiv_name" msprop:Generator_ColumnVarNameInTable="columnsecondary_subdiv_name" msprop:Generator_ColumnPropNameInRow="secondary_subdiv_name" msprop:Generator_ColumnPropNameInTable="secondary_subdiv_nameColumn" msprop:Generator_UserColumnName="secondary_subdiv_name" type="xs:string" minOccurs="0" />
+              <xs:element name="secondary_subdiv_count" msprop:Generator_ColumnVarNameInTable="columnsecondary_subdiv_count" msprop:Generator_ColumnPropNameInRow="secondary_subdiv_count" msprop:Generator_ColumnPropNameInTable="secondary_subdiv_countColumn" msprop:Generator_UserColumnName="secondary_subdiv_count" type="xs:unsignedInt" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_postal" msprop:Generator_TableClassName="qsca_postalDataTable" msprop:Generator_TableVarName="tableqsca_postal" msprop:Generator_TablePropName="qsca_postal" msprop:Generator_RowDeletingName="qsca_postalRowDeleting" msprop:Generator_RowChangingName="qsca_postalRowChanging" msprop:Generator_RowEvHandlerName="qsca_postalRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_postalRowDeleted" msprop:Generator_UserTableName="qsca_postal" msprop:Generator_RowChangedName="qsca_postalRowChanged" msprop:Generator_RowEvArgName="qsca_postalRowChangeEvent" msprop:Generator_RowClassName="qsca_postalRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso31661a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="format" msprop:Generator_ColumnVarNameInTable="columnformat" msprop:Generator_ColumnPropNameInRow="format" msprop:Generator_ColumnPropNameInTable="formatColumn" msprop:Generator_UserColumnName="format" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="qsca_curr_country" msprop:Generator_TableClassName="qsca_curr_countryDataTable" msprop:Generator_TableVarName="tableqsca_curr_country" msprop:Generator_RowChangedName="qsca_curr_countryRowChanged" msprop:Generator_TablePropName="qsca_curr_country" msprop:Generator_RowDeletingName="qsca_curr_countryRowDeleting" msprop:Generator_RowChangingName="qsca_curr_countryRowChanging" msprop:Generator_RowEvHandlerName="qsca_curr_countryRowChangeEventHandler" msprop:Generator_RowDeletedName="qsca_curr_countryRowDeleted" msprop:Generator_RowClassName="qsca_curr_countryRow" msprop:Generator_UserTableName="qsca_curr_country" msprop:Generator_RowEvArgName="qsca_curr_countryRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="iso4217" msprop:Generator_ColumnVarNameInTable="columniso4217" msprop:Generator_ColumnPropNameInRow="iso4217" msprop:Generator_ColumnPropNameInTable="iso4217Column" msprop:Generator_UserColumnName="iso4217">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="iso31661a2" msprop:Generator_ColumnVarNameInTable="columniso31661a2" msprop:Generator_ColumnPropNameInRow="iso31661a2" msprop:Generator_ColumnPropNameInTable="iso31661a2Column" msprop:Generator_UserColumnName="iso31661a2">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_region_sovreign" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="Constraint2">
+      <xs:selector xpath=".//mstns:qsca_region_sovreign" />
+      <xs:field xpath="mstns:nm" />
+    </xs:unique>
+    <xs:unique name="Constraint3">
+      <xs:selector xpath=".//mstns:qsca_region_sovreign" />
+      <xs:field xpath="mstns:longitude" />
+    </xs:unique>
+    <xs:unique name="Constraint4">
+      <xs:selector xpath=".//mstns:qsca_region_sovreign" />
+      <xs:field xpath="mstns:latitude" />
+    </xs:unique>
+    <xs:unique name="qsca_unsd_ldc_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_unsd_ldc" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="qsca_unsd_lldc_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_unsd_lldc" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="qsca_unsd_sids_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_unsd_sids" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="qsca_unsd_developed_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_unsd_developed" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="qsca_unsd_developing_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_unsd_developing" />
+      <xs:field xpath="mstns:m49" />
+    </xs:unique>
+    <xs:unique name="qsca_region_non_sovreign_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_region_non_sovreign" />
+      <xs:field xpath="mstns:m49_country_code" />
+    </xs:unique>
+    <xs:unique name="qsca_region_non_sovreign_Constraint2" msdata:ConstraintName="Constraint2">
+      <xs:selector xpath=".//mstns:qsca_region_non_sovreign" />
+      <xs:field xpath="mstns:name" />
+    </xs:unique>
+    <xs:unique name="qsca_region_non_sovreign_Constraint3" msdata:ConstraintName="Constraint3">
+      <xs:selector xpath=".//mstns:qsca_region_non_sovreign" />
+      <xs:field xpath="mstns:longitude" />
+    </xs:unique>
+    <xs:unique name="Constraint41">
+      <xs:selector xpath=".//mstns:qsca_region_non_sovreign" />
+      <xs:field xpath="mstns:latitude" />
+    </xs:unique>
+    <xs:unique name="qsca_capitals_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_capitals" />
+      <xs:field xpath="mstns:en_name" />
+    </xs:unique>
+    <xs:unique name="Constraint31">
+      <xs:selector xpath=".//mstns:qsca_capitals" />
+      <xs:field xpath="mstns:longitude" />
+    </xs:unique>
+    <xs:unique name="qsca_capitals_Constraint41" msdata:ConstraintName="Constraint41">
+      <xs:selector xpath=".//mstns:qsca_capitals" />
+      <xs:field xpath="mstns:latitude" />
+    </xs:unique>
+    <xs:unique name="qsca_currency_Constraint1" msdata:ConstraintName="Constraint1">
+      <xs:selector xpath=".//mstns:qsca_currency" />
+      <xs:field xpath="mstns:iso4217" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

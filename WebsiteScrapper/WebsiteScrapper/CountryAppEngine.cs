@@ -18,8 +18,6 @@ namespace WebsiteScrapper
     {
         public static ILog logger = LogManager.GetLogger(typeof(HtmlScrapperHelper));
 
-        private List<HtmlDocument> htmlDocs;
-
         public ISO3166CountryCodeModel ISO3166CountryCode { get; set; }
         public UNSDModel UNSD { get; set; }
         public CIAFactbookModel CIAFactbook { get; set; }
@@ -27,6 +25,7 @@ namespace WebsiteScrapper
         public ScrapObject<List<WikiCurrentHeadOfStatesAndGovModel>> WikiCurrentHeadOfStatesAndGov { get; set; }
         public ScrapObject<List<UNDataCountryProfileModel>> UNDataList { get; set; }
         public GeoNamesDatabaseModel GeoNamesDatabase { get; set; }
+        public WikiCountryCapitalsModel WikiCountryCapitals { get; set; }
 
         public CountryAppEngine() { }
 
@@ -704,6 +703,48 @@ namespace WebsiteScrapper
                 }
                 );
             }
+        }
+
+        private void FetchWikiCountryCapitals()
+        {
+            WikiCountryCapitals = new WikiCountryCapitalsModel()
+            {
+                Url = "https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order"
+            };
+
+            HtmlNode listOfCapitalsPageNode = WikiCountryCapitals.Load();
+            HtmlNode capitalsTableNode = listOfCapitalsPageNode.SelectSingleNode("//div[@id='mw-content-text']/div/table[3]");
+            HtmlNodeCollection trNodes = capitalsTableNode.SelectNodes(".//tr[position() > 1]");
+
+            WikiCountryCapitals.Capitals = new List<List<string>>();
+            for(int rowNode = 0; rowNode < trNodes.Count; ++rowNode)
+            {
+                List<string> capitalData = new List<string>();
+                HtmlNodeCollection dataNodes = trNodes[rowNode].SelectNodes("td");
+
+                capitalData.Add(dataNodes[1].InnerText);
+            }
+            //WikiCountryCapitals.Capitals = HtmlScrapperHelper.FetchTable(capitalsTableNode, new string[][]
+            //    {
+            //    new string[] { "tr[1]/th[1]" },
+            //    new string[] { "tr[1]/th[1]", null, " Url" },
+            //    new string[] { "tr[1]/th[2]" },
+            //    },
+            //    ,
+            //    new string[][]
+            //    {
+            //    new string[] { "td[1]//a", "title" },
+            //    new string[] { "td[1]//a", "href", "https://en.wikipedia.org" },
+            //    new string[] { "td[2]" },
+            //    });
+
+            //for(int indx = 0; indx < WikiCountryCapitals.Capitals.Value.Count; ++indx)
+            //{
+            //    List<string> capitalRow = WikiCountryCapitals.Capitals.Value[indx];
+
+            //    HtmlNode capitalPageNode = HtmlScrapperHelper.Load(capitalRow[0]);
+            //    HtmlNode CoordinatesTrNode = capitalPageNode.SelectSingleNode("//div[@id='mw-content-text']//table[@class='infobox geography vcard']//tr[contains(text(), 'Coordinates: ')]");
+            //}
         }
     }
 }

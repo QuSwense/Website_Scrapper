@@ -11,6 +11,21 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,11 +64,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CountryAppEngine.cs" />
+    <Compile Include="CountryApp\CIAFactbookCountryCapitalsModel.cs" />
     <Compile Include="CountryApp\CIAFactbookModel.cs" />
     <Compile Include="CountryApp\CIAFactbookTransportationModel.cs" />
     <Compile Include="CountryApp\CIAWorldFactbookCountryGeographyModel.cs" />
     <Compile Include="CountryApp\CIAWorldFactbookCountryGovernmentModel.cs" />
     <Compile Include="CountryApp\CIAWorldFactbookCountryPeopleAndSocietyModel.cs" />
+    <Compile Include="CountryApp\CountryAppDataSet.cs">
+      <DependentUpon>CountryAppDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CountryApp\CountryAppDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CountryAppDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CountryApp\ECapitalTypeFlag.cs" />
+    <Compile Include="CountryApp\ECountryRegionFlag.cs" />
     <Compile Include="CountryApp\GeoNamesCountryInfoModel.cs" />
     <Compile Include="CountryApp\GeoNamesDatabaseModel.cs" />
     <Compile Include="CountryApp\ISO31661Alpha2Model.cs" />
@@ -63,7 +89,10 @@
     <Compile Include="CountryApp\ISO3166CountryCodeModel.cs" />
     <Compile Include="CountryApp\QuickgsLegislatureModel.cs" />
     <Compile Include="CountryApp\QuickgsLegislaturesModel.cs" />
+    <Compile Include="CountryApp\WikiCapitalsModel.cs" />
+    <Compile Include="CountryApp\WikiCountryCapitalsModel.cs" />
     <Compile Include="CountryApp\WikiCurrentHeadOfStatesAndGovModel.cs" />
+    <Compile Include="DBMetadataScriptGenerator.cs" />
     <Compile Include="HtmlScrapperHelper.cs" />
     <Compile Include="Model\ScrapList.cs" />
     <Compile Include="Model\ScrapObject.cs" />
@@ -71,11 +100,65 @@
     <Compile Include="Model\ScrapTable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="QuestionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QuestionDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="ScrapStringHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="CountryApp\CountryAppDataSet.xsc">
+      <DependentUpon>CountryAppDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="CountryApp\CountryAppDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CountryAppDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="CountryApp\CountryAppDataSet.xss">
+      <DependentUpon>CountryAppDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="CountryApp\XMLSchema1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="QuestionDataSet.xsc">
+      <DependentUpon>QuestionDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="QuestionDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QuestionDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="QuestionDataSet.xss">
+      <DependentUpon>QuestionDataSet.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CountryApp\dbscripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

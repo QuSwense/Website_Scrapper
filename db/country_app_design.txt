@@ -1,0 +1,63 @@
+Which country lies in ____ hemisphere? - Fill in the blanks, multiple choice (2-4), multiple selection
+____ country lies in which hemisphere? - Fill in the blanks, multiple choice (2-4), multiple selection
+____ country lies in ____ hemisphere? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+____ country lies in both hemisphere? - Fill in the blanks, multiple choice (2-4), multiple selection
+	> Hemisphere
+	> TimeZone
+	> CirclesOfLatitude
+	> Coordinates (exact), range, single latitude, single longitude
+	> Continents
+
+Which lakes/rivers lies in ____ country? - Fill in the blanks, multiple choice (2-4), multiple selection
+____ lakes/rivers lies in which country? - Fill in the blanks, multiple choice (2-4), multiple selection
+____ lakes/rivers lies in ____ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+which lakes/rivers lies in 2/3/... country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+	> lakes/rivers
+	> Mountain
+	> Monument
+	> Historical Places
+	
+What is the capital of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ is the capital of which country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ is the capital of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+	> Capital
+	> Currency / Currency Fractional Unit
+	> National Animal
+	> National Bird
+	> National Tree
+	> National Aquatic Animal
+	> National Flower
+	> National Motto
+	> National Anthem
+	> National Instrument
+	> National Sport
+	> Postal Code Format
+	> ISD Code
+	> Flag
+	> Emblem
+	> National Language
+	> ISD Code
+	> ccTLD
+	> Land Area / Water Area / Rank by Area
+	> Border Length
+	> M49 Code
+	> Type of Legislature
+	> Stock Exchange
+	> FIFA Code
+	
+What are the neighbours of ___ country? - Fill in the blanks, multiple selection
+___ is the neighbour of which country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ is the neighbour of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+which country has 1/2/3/... neighbours? - Fill in the blanks, multiple choice (2-4), multiple selection
+
+which oceans form border of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ ocean form border of which country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ ocean form border of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+
+which country got independence on ___ year from ... country? - Fill in the blanks, multiple choice (2-4)
+____ country got independence on ... year from ... country? - Fill in the blanks, multiple choice (2-4)
+... country got independence on ... year from ___ country? - Fill in the blanks, multiple choice (2-4)
+
+which color is in the flag of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ color is in the flag of which country? - Fill in the blanks, multiple choice (2-4), multiple selection
+___ color is in the flag of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false

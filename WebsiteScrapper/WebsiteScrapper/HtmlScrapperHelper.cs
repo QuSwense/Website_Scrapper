@@ -55,6 +55,46 @@ namespace WebsiteScrapper
             return document.DocumentNode;
         }
 
+        internal static HtmlNode Load(string Url)
+        {
+            WebRequest webRequestObj = WebRequest.Create(Url);
+
+            if (Url.Contains("http:/"))
+            {
+                HttpWebRequest httpWebRequestObj = (HttpWebRequest)webRequestObj;
+                httpWebRequestObj.Method = "GET";
+                httpWebRequestObj.Proxy.Credentials = CredentialCache.DefaultCredentials;
+            }
+
+            WebResponse webResponseObj = webRequestObj.GetResponse();
+
+            if (webResponseObj == null)
+            {
+                logger.Error("No web response found for " + Url);
+                return null;
+            }
+            else if (Url.Contains("http:/"))
+            {
+                HttpWebResponse httpResponse = (HttpWebResponse)webResponseObj;
+                if (httpResponse.StatusCode != HttpStatusCode.OK)
+                {
+                    logger.ErrorFormat("Http web response for url {0} status code {1}", Url, httpResponse.StatusCode);
+                    return null;
+                }
+            }
+
+            string htmlText = "";
+            using (StreamReader reader = new StreamReader(webResponseObj.GetResponseStream()))
+            {
+                htmlText = reader.ReadToEnd();
+            }
+
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(htmlText);
+
+            return document.DocumentNode;
+        }
+
         internal static HtmlNode FetchSingle(HtmlNode htmlnode, string xPath)
         {
             return htmlnode.SelectSingleNode(xPath);
