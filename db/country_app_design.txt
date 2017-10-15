@@ -61,3 +61,52 @@ ____ country got independence on ... year from ... country? - Fill in the blanks
 which color is in the flag of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection
 ___ color is in the flag of which country? - Fill in the blanks, multiple choice (2-4), multiple selection
 ___ color is in the flag of ___ country? - Fill in the blanks, multiple choice (2-4), multiple selection, true/false
+
+===================================================
+Logo Page -- Earth Regions
+	Knowledge
+		By Category (asending order/descending order, filter)
+			Hemisphere
+			TimeZone
+			CirclesOfLatitude
+			Coordinates
+				Range
+				single latitude, single longitude, both latitude/longitude
+			Continents
+			lakes/rivers (famous)
+			Mountain(famous)
+			Monument(famous)
+			Historical Places(famous)
+			Capital
+			Currency / Currency Fractional Unit
+			National Animal
+			National Bird
+			National Tree
+			National Aquatic Animal
+			National Flower
+			National Motto
+			National Anthem
+			National Instrument
+			National Sport
+			Postal Code Format
+			ISD Code
+			Flag
+			Emblem
+			National Language
+			ISD Code
+			ccTLD
+			Land Area / Water Area / Rank by Area
+			Border Length
+			M49 Code
+			Type of Legislature
+			Stock Exchange
+			FIFA Code
+			ISO Code
+			Neighbour
+	Quiz
+	Statistics
+	Settings
+	Themes
+	Print
+==============================================================
+

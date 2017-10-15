@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<AppConfig>
+  <key name="db" value="sqlite"></key>
+</AppConfig>

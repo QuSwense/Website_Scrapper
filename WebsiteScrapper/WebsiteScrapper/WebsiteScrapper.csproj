@@ -55,6 +55,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="common\WebScrapperException.cs" />
     <Compile Include="CountryAppEngine.cs" />
     <Compile Include="CountryApp\CIAFactbookCountryCapitalsModel.cs" />
     <Compile Include="CountryApp\CIAFactbookModel.cs" />
@@ -93,6 +97,14 @@
     <Compile Include="CountryApp\WikiCountryCapitalsModel.cs" />
     <Compile Include="CountryApp\WikiCurrentHeadOfStatesAndGovModel.cs" />
     <Compile Include="DBMetadataScriptGenerator.cs" />
+    <Compile Include="db\ColumnDbConfigModel.cs" />
+    <Compile Include="db\DbConfig.cs" />
+    <Compile Include="db\EDataTypeDbConfigModel.cs" />
+    <Compile Include="db\EnumConfigModel.cs" />
+    <Compile Include="db\EnumValueConfigModel.cs" />
+    <Compile Include="db\SqlliteDbGenerator.cs" />
+    <Compile Include="db\TableDbConfigModel.cs" />
+    <Compile Include="db\TableMetadataModel.cs" />
     <Compile Include="HtmlScrapperHelper.cs" />
     <Compile Include="Model\ScrapList.cs" />
     <Compile Include="Model\ScrapObject.cs" />
@@ -125,6 +137,9 @@
     <None Include="CountryApp\CountryAppDataSet.xss">
       <DependentUpon>CountryAppDataSet.xsd</DependentUpon>
     </None>
+    <None Include="CountryApp\dbscripts\table_enum.csv" />
+    <None Include="CountryApp\dbscripts\table_metadata.csv" />
+    <None Include="CountryApp\dbscripts\table_columns.csv" />
     <None Include="CountryApp\XMLSchema1.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -157,8 +172,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CountryApp\dbscripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
