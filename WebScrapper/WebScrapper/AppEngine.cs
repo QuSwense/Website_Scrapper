@@ -12,6 +12,9 @@ using WebScrapper.common;
 
 namespace WebScrapper.country
 {
+    /// <summary>
+    /// The application engine class
+    /// </summary>
     public class AppEngine
     {
         public string AppTopic { get; protected set; }
