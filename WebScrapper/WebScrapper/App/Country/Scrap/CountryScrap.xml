@@ -29,36 +29,47 @@
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
   <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="tablehref" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
-    <Column name="iso31661a2" xpath="//body/div[2]/table/tr[2]/td[2]">
+    <Scrap xpath="//body/div[2]/table[1]">
+    <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
       <Manipulate>
         <Split data="," index="2"></Split>
       </Manipulate>
     </Column>
-    <Column name="iso6391" xpath="td[3]"></Column>
+    <Column name="iso6391" xpath=".//tr[2]/td[2]"></Column>
+    </Scrap>
   </Scrap>
   <Scrap name="cntrylang" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]">
     <Column name="iso4217" xpath="td[1]"></Column>
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
-  <Scrap name="crncy" url="http://www.xe.com/iso4217.php" type="tablehref" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
-    <Column name="symbl" xpath="//div[@id='contentL']/div[3]/div[1]/p[2]/text()[2]"></Column>
-    <Column name="mnrunm" xpath="//div[@id='contentL']/div[3]/div[1]/p[3]/text()[2]">
-      <Manipulate>
-        <Split data="=" index="1"></Split>
-      </Manipulate>
-    </Column>
-    <Column name="cntrlbnk" xpath="//div[@id='contentL']/div[3]/div[2]/p[4]/text()[2]"></Column>
+  <Scrap name="crncy" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
+    <Scrap xpath="//div[@id='contentL']/div[3]">
+      <Column name="symbl" xpath="./div[1]/p[2]/text()[2]"></Column>
+      <Column name="mnrunm" xpath="./div[1]/p[3]/text()[2]">
+        <Manipulate>
+          <Split data="=" index="1"></Split>
+        </Manipulate>
+      </Column>
+      <Column name="cntrlbnk" xpath="./div[2]/p[4]/text()[2]"></Column>
+    </Scrap>
   </Scrap>
-  <Scrap name="crncycntry" url="http://www.xe.com/iso4217.php" type="tablehref" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
-    <Column name="iso4217" xpath="//div[@id='contentL']/div[3]/div/div">
-      <Manipulate>
-        <Split data=" " index="0"></Split>
-      </Manipulate>
-    </Column>
-    <Column name="m49" xpath="//div[@id='contentL']/div[3]/div[2]/p[6]/text()[2]">
-      <Manipulate>
-        <XtarctToCol></XtarctToCol>
-      </Manipulate>
-    </Column>
+  <Scrap name="crncycntry" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
+    <Scrap xpath="//div[@id='contentL']/div[3]">
+      <Column name="iso4217" xpath="./div/div">
+        <Manipulate>
+          <Split data=" " index="0"></Split>
+        </Manipulate>
+      </Column>
+      <Column name="iso31661a2" xpath="./div[2]/p[6]/text()[2]" ispk="1">
+      </Column>
+    </Scrap>
+  </Scrap>
+  <Scrap name="cntrynm" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
+    <Scrap xpath="//body/div[2]/table[1]//tr[1]/td[2]/a/@href">
+      <Scrap type="table" xpath="//table[@id='altnametable']//tr[position()>1]">
+        <Column name="nm" xpath="td[1]"></Column>
+        <Column name="iso6391" xpath="td[3]"></Column>
+      </Scrap>
+    </Scrap>
   </Scrap>
 </ScrapWebDataConfig>

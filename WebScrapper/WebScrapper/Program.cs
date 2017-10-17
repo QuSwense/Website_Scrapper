@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using WebScrapper.country;
 
 namespace WebScrapper
 {
     class Program
     {
+        /// <summary>
+        /// Pass argument for generating
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
-            // Execute an engine
-            AppEngine appEngine = new AppEngine("country");
+            AppEngine appEngine = new AppEngine(args[0]);
             appEngine.Run();
         }
     }

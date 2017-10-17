@@ -1,16 +1,14 @@
-﻿using WebScrapper.config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
-using WebScrapper.db;
-using WebScrapper.scrap;
-using WebScrapper.common;
+using WebScrapper.Config;
+using WebScrapper.Db;
+using WebScrapper.Web;
 
-namespace WebScrapper.country
+namespace WebScrapper
 {
     /// <summary>
     /// The application engine class
@@ -32,7 +30,7 @@ namespace WebScrapper.country
         public void Run()
         {
             // Read Config
-            Config = ConfigHelper.Read<AppConfig>(Path.Combine(AppTopic, AppTopic + "Config.xml"));
+            Config = ConfigHelper.Read<AppConfig>(ConfigHelper.GetAppConfigPath(AppTopic));
 
             // Db config
             DbConfig = new DbConfigModel(AppTopic);
@@ -43,7 +41,7 @@ namespace WebScrapper.country
             DbGenerator.Generate();
 
             // Web scrapper
-            ScrapConfig = ConfigHelper.Read<ScrapWebDataConfig>(Path.Combine(AppTopic, "scrap", AppTopic + "Scrap.xml"));
+            ScrapConfig = ConfigHelper.Read<ScrapWebDataConfig>(ConfigHelper.GetScrapConfigPath(AppTopic));
             WebScrapper = WebScrapperFactory.GetScrapper(AppTopic, DbGenerator, Config, ScrapConfig);
             WebScrapper.Run();
         }

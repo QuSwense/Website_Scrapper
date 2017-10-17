@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace WebScrapper.config
+namespace WebScrapper.Config
 {
 
     /// <remarks/>
@@ -15,10 +14,11 @@ namespace WebScrapper.config
     public partial class AppConfig
     {
 
-        private AppConfigKey keyField;
+        private AppConfigKey[] keyField;
 
         /// <remarks/>
-        public AppConfigKey key
+        [System.Xml.Serialization.XmlElementAttribute("Key")]
+        public AppConfigKey[] Key
         {
             get
             {

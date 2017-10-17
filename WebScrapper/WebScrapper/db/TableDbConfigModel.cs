@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebScrapper.db
+namespace WebScrapper.Db
 {
     public class TableDbConfigModel
     {
         public string Name { get; set; }
         public Dictionary<string, ColumnDbConfigModel> Columns { get; set; }
-        public TableMetadataModel Metadata { get; set; }
+        public TableMetadataConfigModel Metadata { get; set; }
 
         public TableDbConfigModel()
         {

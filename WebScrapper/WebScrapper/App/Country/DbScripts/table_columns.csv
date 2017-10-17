@@ -37,9 +37,8 @@ cptl,m49,M49 Code,number,3,,,
 cptl,lng,Longitude,decimal,10,6,,
 cptl,lat,Latitude,decimal,10,6,,
 cptl,typ,Capital Type,enum,1,,,
-cntrynm,m49,M49 Code,number,3,,,1
-cntrynm,iso6391,ISO 639-1 Language,string,2,,,1
-cntrynm,nm,Name,string,200,,,
+cntrynm,nm,Country Name,string,50,,,1
+cntrynm,iso6391,ISO 639-1 Code,string,2,,,1
 lgstr,m49,M49 Code,number,3,,,
 lgstr,prlnm,Parliament Name,string,200,,,
 lgstr,btyp,House Type,enum,1,,,
@@ -68,7 +67,7 @@ prmsbdv,scndsbdvct,Seconday Subdivision Count,number,2,,,
 pc,m49,M49 Code,number,3,,,1
 pc,fmt,Postal Code Format,string,15,,,
 crncycntry,iso4217,ISO 4217,string,2,,,
-crncycntry,m49,M49 Code,number,3,,,
+crncycntry,iso31661a2,ISO 3166-1 A 2,string,3,,,
 lang,iso6391,ISO 639-1 Code,string,2,,,1
 lang,nm,English Name of Language,string,2,,,1
 cntrylang,iso31661a2,ISO 3166-1 Alpha 2,string,2,,1,

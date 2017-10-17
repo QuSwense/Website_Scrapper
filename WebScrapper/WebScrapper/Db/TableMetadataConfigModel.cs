@@ -7,12 +7,12 @@ using WebScrapper.Reader.Meta;
 
 namespace WebScrapper.Db
 {
-    public class EnumValueConfigModel
+    public class TableMetadataConfigModel
     {
         [SplitIndex(1)]
-        public int Value { get; set; }
+        public string Display { get; set; }
 
         [SplitIndex(2)]
-        public string Description { get; set; }
+        public string Reference { get; set; }
     }
 }

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace WebScrapper.scrap
+namespace WebScrapper.Web
 {
     public class ColumnScrapModel
     {
         public bool IsPk { get; set; }
         public string Value { get; set; }
+        public string ActualColumn { get; set; }
+        public string ActualTable { get; set; }
     }
 }

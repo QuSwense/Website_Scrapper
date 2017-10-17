@@ -5,10 +5,13 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebScrapper.scrap;
+using WebScrapper.Web;
 
-namespace WebScrapper.db
+namespace WebScrapper.Db
 {
+    /// <summary>
+    /// https://www.techonthenet.com/sqlite/datatypes.php
+    /// </summary>
     public class SqlliteDbGeneratorBL : DbGeneratorBL
     {
         private SQLiteConnection dbConnection;
@@ -17,13 +20,13 @@ namespace WebScrapper.db
 
         protected override void CreateDbFile()
         {
-            SQLiteConnection.CreateFile(DbConfig.FolderName + ".sqlite");
+            SQLiteConnection.CreateFile(DbConfig.AppTopic + ".sqlite");
         }
 
         public override void OpenConnection()
         {
-            dbConnection = new SQLiteConnection(string.Format(
-                "Data Source={0}.sqlite;Version=3;", DbConfig.FolderName));
+            connectionString = string.Format("Data Source={0}.sqlite;Version=3;", DbConfig.AppTopic);
+            dbConnection = new SQLiteConnection(connectionString);
             dbConnection.Open();
         }
 
@@ -34,34 +37,19 @@ namespace WebScrapper.db
 
         protected override void GenerateTables()
         {
-            foreach(KeyValuePair<string, TableDbConfigModel> kv in DbConfig.TableDbConfigs)
-            {
-                TableDbConfigModel tableDb = kv.Value;
-
-                string tableCreate = "CREATE TABLE " + kv.Key + "(";
-
-                foreach(KeyValuePair<string, ColumnDbConfigModel> kvcol in tableDb.Columns)
-                {
-                    ColumnDbConfigModel colConfig = kvcol.Value;
-                    tableCreate += colConfig.Name + " " + GetDataType(colConfig) + " " + GetConstraints(colConfig) + ",";
-                }
-
-                tableCreate = tableCreate.Remove(tableCreate.Length - 1);
-                tableCreate += ")";
-                ExecuteDML(tableCreate);
-            }
+            base.GenerateTables();
         }
 
         private string GetConstraints(ColumnDbConfigModel colConfig)
         {
             string constraints = "";
             if (colConfig.Unique) constraints = "UNIQUE";
-            if (colConfig.PrimaryKey) constraints += " PRIMARY KEY";
+            if (colConfig.IsPrimaryKey) constraints += " PRIMARY KEY";
 
             return constraints;
         }
 
-        private string GetDataType(ColumnDbConfigModel colConfig)
+        internal override string GetDataType(ColumnDbConfigModel colConfig)
         {
             switch(colConfig.DataType)
             {
@@ -79,7 +67,7 @@ namespace WebScrapper.db
             }
         }
 
-        private void ExecuteDML(string sql)
+        protected override void ExecuteDDL(string sql)
         {
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             command.ExecuteNonQuery();
@@ -95,27 +83,24 @@ namespace WebScrapper.db
                 sqlDML = CreateUpdateDDL(name, rowData);
             else
                 sqlDML = CreateInsertDDL(name, rowData);
-            ExecuteDML(sqlDML);
+            ExecuteDDL(sqlDML);
         }
 
         private string CreateUpdateDDL(string name, Dictionary<string, ColumnScrapModel> rowData)
         {
-            string sqlDML = "UPDATE " + name + " SET ";
-            string wheres = " WHERE ";
+            List<string> setDMLs = new List<string>();
+            List<string> whereDMLs = new List<string>();
 
             foreach (KeyValuePair<string, ColumnScrapModel> kv in rowData)
             {
-                sqlDML += kv.Key + " = " + kv.Value + ",";
+                setDMLs.Add(kv.Key + " = " + kv.Value);
                 if (kv.Value.IsPk)
-                    wheres += kv.Key + " = " + kv.Value + " AND ";
+                {
+                    whereDMLs.Add(kv.Key + " = " + kv.Value);
+                }
             }
 
-            sqlDML.Remove(sqlDML.Length - 1);
-            wheres.Remove(wheres.Length - " AND ".Length);
-
-            sqlDML += wheres;
-
-            return sqlDML;
+            return "UPDATE " + name + " SET " + string.Join(",", setDMLs) + " WHERE " + string.Join(" AND ", whereDMLs);
         }
 
         private string CreateInsertDDL(string name, Dictionary<string, ColumnScrapModel> rowData)
@@ -140,19 +125,20 @@ namespace WebScrapper.db
         private int CheckRow(string name, Dictionary<string, ColumnScrapModel> rowData)
         {
             string sqlDDL = "SELECT COUNT(*) FROM " + name + " WHERE ";
+            List<string> whereDMLs = new List<string>();
             int count = 0;
 
             foreach (KeyValuePair<string, ColumnScrapModel> kv in rowData)
             {
                 if (kv.Value.IsPk)
-                    sqlDDL += kv.Key + " = " + kv.Value + " AND ";
+                {
+                    whereDMLs.Add(kv.Key + " = " + kv.Value);
+                }
             }
-
-            sqlDDL.Remove(sqlDDL.Length - " AND ".Length);
-
+            
             using (SQLiteCommand fmd = dbConnection.CreateCommand())
             {
-                fmd.CommandText = sqlDDL;
+                fmd.CommandText = "SELECT COUNT(*) FROM " + name + " WHERE " + string.Join(" AND ", whereDMLs);
                 fmd.CommandType = CommandType.Text;
                 SQLiteDataReader r = fmd.ExecuteReader();
                 if (r.HasRows)
@@ -163,6 +149,20 @@ namespace WebScrapper.db
             }
 
             return count;
+        }
+
+        internal override string GetDataType(Type propertyType)
+        {
+            if (propertyType == typeof(string))
+                return "TEXT";
+            else if (propertyType == typeof(int))
+                return "INTEGER";
+            else if (propertyType == typeof(double))
+                return "REAL";
+            else if (propertyType == typeof(DateTime))
+                return "NUMERIC";
+            else
+                return "TEXT";
         }
     }
 }

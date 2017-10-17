@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebScrapper.db
+namespace WebScrapper.Db
 {
     public enum EDataTypeDbConfigModel
     {
@@ -12,6 +12,7 @@ namespace WebScrapper.db
         STRING,
         BOOLEAN,
         DECIMAL,
+        DATETIME,
         ENUM
     }
 }
