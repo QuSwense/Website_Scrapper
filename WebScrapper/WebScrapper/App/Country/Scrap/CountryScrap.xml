@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ScrapWebDataConfig>
+<WebData name="country">
   <Scrap name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
     <Column name="m49" xpath="td[1]" ispk="1"></Column>
     <Column name="nm" xpath="./data-tt-id"></Column>
@@ -24,11 +24,11 @@
     <Column name="fips" xpath="td[4]"></Column>
     <Column name="areakm2" xpath="td[7]"></Column>
   </Scrap>
-  <Scrap name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" type="table" xpath="//body/p[4]/table//table//tr[position() > 1]" tableinsfresh="1">
+  <Scrap name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" type="table" xpath="//body/p[4]/table//table//tr[position() > 1]">
     <Column name="iso6391" xpath="td[1]"></Column>
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
-  <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="tablehref" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
+  <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
     <Scrap xpath="//body/div[2]/table[1]">
     <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
       <Manipulate>
@@ -72,4 +72,4 @@
       </Scrap>
     </Scrap>
   </Scrap>
-</ScrapWebDataConfig>
+</WebData>

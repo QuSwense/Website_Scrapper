@@ -74,7 +74,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppEngine.cs" />
-    <Compile Include="Config\AppConfig.cs" />
+    <Compile Include="Config\ApplicationConfig.cs" />
+    <Compile Include="Config\ApplicationConfigKey.cs" />
     <Compile Include="Config\ConfigHelper.cs" />
     <Compile Include="Db\ColumnDbConfigModel.cs" />
     <Compile Include="Db\DbConfigModel.cs" />
@@ -104,8 +105,13 @@
     <Compile Include="Reader\CSVReader.cs" />
     <Compile Include="Reader\Meta\SplitIndexAttribute.cs" />
     <Compile Include="Web\ColumnScrapModel.cs" />
+    <Compile Include="Web\Config\EWebDataConfigType.cs" />
+    <Compile Include="Web\Config\WebDataConfigColumn.cs" />
+    <Compile Include="Web\Config\WebDataConfigMetadata.cs" />
+    <Compile Include="Web\Config\WebDataConfigScrap.cs" />
+    <Compile Include="Web\Config\WebDataConfigSplit.cs" />
     <Compile Include="Web\HtmlScrapperHelper.cs" />
-    <Compile Include="Web\ScrapWebDataConfig.cs" />
+    <Compile Include="Web\Config\WebDataConfig.cs" />
     <Compile Include="Web\WebScrapperBL.cs" />
     <Compile Include="Web\WebScrapperFactory.cs" />
   </ItemGroup>
