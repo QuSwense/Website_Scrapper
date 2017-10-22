@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebScrapper.Reader.Meta;
 
-namespace WebScrapper.Db
+namespace WebScrapper.Db.Config
 {
     public class TableMetadataConfigModel
     {

@@ -5,11 +5,11 @@ using System.Text;
 
 namespace WebScrapper.Web
 {
-    public class ColumnScrapModel
+    public class TableDataColumnModel
     {
+        public string Name { get; set; }
         public bool IsPk { get; set; }
         public string Value { get; set; }
-        public string ActualColumn { get; set; }
-        public string ActualTable { get; set; }
+        public int RowIndex { get; set; }
     }
 }

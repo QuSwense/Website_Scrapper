@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebScrapper.Db.Config;
 
 namespace WebScrapper.Db
 {
     public class DbFactory
     {
-        public static DbGeneratorBL GetGenerator(string dbType, DbConfigModel configModel)
+        public static DbGeneratorBL GetGenerator(string dbType, DbConfig configModel)
         {
             switch(dbType)
             {

@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using WebScrapper.Db.Meta;
 
-namespace WebScrapper.Db
+namespace WebScrapper.Db.Model
 {
-    [DDTable("tblcols")]
-    public class TableColumnsModel
+    [DDTable("mtblcol")]
+    public class DbMetaTableColumnsModel
     {
         [DDPrimaryKey]
         [DDColumn("tnm")]
@@ -18,13 +18,13 @@ namespace WebScrapper.Db
         [DDColumn("col")]
         public string ColumnName { get; set; }
 
-        [DDColumn("rurl")]
-        public string ReferenceUrl { get; set; }
+        [DDColumn("desc")]
+        public string Description { get; set; }
 
-        [DDColumn("rxpath")]
-        public string ReferenceXPath { get; set; }
+        [DDColumn("url")]
+        public string Url { get; set; }
 
-        [DDColumn("typ")]
-        public string TypeOfDataExtract { get; set; }
+        [DDColumn("xpath")]
+        public string XPath { get; set; }
     }
 }

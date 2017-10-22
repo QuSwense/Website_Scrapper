@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebScrapper.Config;
 using WebScrapper.Db;
+using WebScrapper.Db.Config;
 using WebScrapper.Web;
 using WebScrapper.Web.Config;
 
@@ -30,7 +31,7 @@ namespace WebScrapper
         /// <summary>
         /// Database config model. It contains the list of config files related to database
         /// </summary>
-        public DbConfigModel DbConfig { get; protected set; }
+        public DbConfig DbConfig { get; protected set; }
 
         /// <summary>
         /// A class which helps generating and maipulating application database
@@ -65,19 +66,17 @@ namespace WebScrapper
             Config = ConfigHelper.Read<ApplicationConfig>(ConfigHelper.GetAppConfigPath(AppTopic));
 
             // Db config
-            DbConfig = new DbConfigModel(AppTopic);
+            DbConfig = new DbConfig(AppTopic);
             DbConfig.Read();
 
             // Db Generator
-            DbGenerator = DbFactory.GetGenerator(AppTopic, DbConfig);
+            DbGenerator = DbFactory.GetGenerator(Config.Key("db"), DbConfig);
             DbGenerator.Generate();
-            DbGenerator.OpenConnection();
 
             // Web scrapper
             ScrapConfig = ConfigHelper.Read<WebDataConfig>(ConfigHelper.GetScrapConfigPath(AppTopic));
             WebScrapper = WebScrapperFactory.GetScrapper(AppTopic, DbGenerator, Config, ScrapConfig);
             WebScrapper.Run();
-            DbGenerator.CloseConnection();
         }
     }
 }

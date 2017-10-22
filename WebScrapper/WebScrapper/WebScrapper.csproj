@@ -9,9 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WebScrapper</RootNamespace>
     <AssemblyName>WebScrapper</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,63 +55,111 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.6.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.6.0\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net40\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.6.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.6.1\lib\Net40\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <HintPath>..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>lib\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.105.2\lib\net40\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.105.2\lib\net40\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.105.2\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.0.0\lib\net40\Unity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.0.0.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.0.0\lib\net40\Unity.Container.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppEngine.cs" />
+    <Compile Include="Common\TypeExtensionMethods.cs" />
     <Compile Include="Config\ApplicationConfig.cs" />
     <Compile Include="Config\ApplicationConfigKey.cs" />
     <Compile Include="Config\ConfigHelper.cs" />
-    <Compile Include="Db\ColumnDbConfigModel.cs" />
-    <Compile Include="Db\DbConfigModel.cs" />
+    <Compile Include="Db\Config\ColumnDbConfig.cs" />
+    <Compile Include="Db\Config\DbConfig.cs" />
+    <Compile Include="Db\Ctx\Db\DColumn.cs" />
+    <Compile Include="Db\Ctx\Db\DColumnMetadata.cs" />
+    <Compile Include="Db\Ctx\Db\DDbCommand.cs" />
+    <Compile Include="Db\Ctx\Db\DTable.cs" />
+    <Compile Include="Db\Ctx\DynamicDbCommand.cs" />
+    <Compile Include="Db\Ctx\IDbContext.cs" />
+    <Compile Include="Db\Ctx\sqlite\SqliteColumnMetadata.cs" />
+    <Compile Include="Db\Ctx\sqlite\SqliteDbCommand.cs" />
+    <Compile Include="Db\Ctx\sqlite\SqliteDbContext.cs" />
+    <Compile Include="Db\Ctx\DbCharDataType.cs" />
+    <Compile Include="Db\Ctx\DbDataType.cs" />
+    <Compile Include="Db\Ctx\DbDateTimeDataType.cs" />
+    <Compile Include="Db\Ctx\DbDoubleDataType.cs" />
+    <Compile Include="Db\Ctx\DbIntDataType.cs" />
+    <Compile Include="Db\Ctx\DynamicColumn.cs" />
+    <Compile Include="Db\Ctx\DynamicColumnMetadata.cs" />
+    <Compile Include="Db\Ctx\DynamicDbConnection.cs" />
+    <Compile Include="Db\Ctx\DynamicDbContext.cs" />
+    <Compile Include="Db\Ctx\DynamicRow.cs" />
+    <Compile Include="Db\Ctx\DynamicTable.cs" />
+    <Compile Include="Db\Ctx\EColumnConstraint.cs" />
     <Compile Include="Db\DbFactory.cs" />
     <Compile Include="Db\DbGeneratorBL.cs" />
-    <Compile Include="Db\EDataTypeDbConfigModel.cs" />
-    <Compile Include="Db\EnumConfigModel.cs" />
-    <Compile Include="Db\EnumValueConfigModel.cs" />
+    <Compile Include="Db\Config\EDataTypeDbConfig.cs" />
     <Compile Include="Db\Meta\DDColumnAttribute.cs" />
     <Compile Include="Db\Meta\DDNotNullAttribute.cs" />
     <Compile Include="Db\Meta\DDPrimaryKeyAttribute.cs" />
     <Compile Include="Db\Meta\DDTableAttribute.cs" />
+    <Compile Include="Db\Meta\DDUniqueAttribute.cs" />
     <Compile Include="Db\Meta\DTDateTimeAttribute.cs" />
     <Compile Include="Db\Meta\DTDoubleAttribute.cs" />
     <Compile Include="Db\Meta\DTIntegerAttribute.cs" />
     <Compile Include="Db\Meta\DTNumericAttribute.cs" />
     <Compile Include="Db\Meta\DTVarcharAttribute.cs" />
+    <Compile Include="Db\Model\DbMetaTableRowModel.cs" />
+    <Compile Include="Db\QueryExecutor.cs" />
+    <Compile Include="Db\QueryGenerator.cs" />
     <Compile Include="Db\SqlliteDbGeneratorBL.cs" />
-    <Compile Include="Db\TableColumnsModel.cs" />
-    <Compile Include="Db\TableColumnsReferenceModel.cs" />
-    <Compile Include="Db\TableDbConfigModel.cs" />
-    <Compile Include="Db\TableMetadataConfigModel.cs" />
-    <Compile Include="Db\TableMetadataModel.cs" />
+    <Compile Include="Db\Model\DbMetaTableColumnsModel.cs" />
+    <Compile Include="Db\Config\TableMetadataConfig.cs" />
+    <Compile Include="Db\Model\DbMetaTableModel.cs" />
     <Compile Include="Error\WebScrapperException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reader\CSVReader.cs" />
     <Compile Include="Reader\Meta\SplitIndexAttribute.cs" />
-    <Compile Include="Web\ColumnScrapModel.cs" />
+    <Compile Include="Web\Ctx\WebScrapperContext.cs" />
+    <Compile Include="Web\TableDataColumnModel.cs" />
     <Compile Include="Web\Config\EWebDataConfigType.cs" />
     <Compile Include="Web\Config\WebDataConfigColumn.cs" />
-    <Compile Include="Web\Config\WebDataConfigMetadata.cs" />
+    <Compile Include="Web\Config\WebDataConfigManipulate.cs" />
     <Compile Include="Web\Config\WebDataConfigScrap.cs" />
     <Compile Include="Web\Config\WebDataConfigSplit.cs" />
+    <Compile Include="Web\Config\WebDataConfigTrim.cs" />
     <Compile Include="Web\HtmlScrapperHelper.cs" />
     <Compile Include="Web\Config\WebDataConfig.cs" />
     <Compile Include="Web\WebScrapperBL.cs" />
@@ -136,7 +186,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App\Country\Static\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

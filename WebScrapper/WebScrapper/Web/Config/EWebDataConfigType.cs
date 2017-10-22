@@ -8,7 +8,7 @@ namespace WebScrapper.Web.Config
 {
     public enum EWebDataConfigType
     {
-        Table,
-        Csv
+        TABLE,
+        CSV
     }
 }

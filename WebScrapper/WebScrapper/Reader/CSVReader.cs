@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using WebScrapper.Reader.Meta;
+using WebScrapper.Common;
 
 namespace WebScrapper.Reader
 {
@@ -77,17 +78,14 @@ namespace WebScrapper.Reader
             }
         }
 
-        public static object ChangeType(object value, Type type)
+        public static object ChangeType(string value, Type type)
         {
+            object result = null;
             if (type == typeof(bool))
             {
-                if (value == null)
+                if (string.IsNullOrEmpty(value))
                 {
-                    value = false;
-                }
-                else if (value is bool)
-                {
-                    value = (bool)value;
+                    result = false;
                 }
                 else
                 {
@@ -98,55 +96,44 @@ namespace WebScrapper.Reader
                     // y/n
                     // yes/no
                     // <>0/0
-                    if (s.StartsWith("F", StringComparison.OrdinalIgnoreCase) || s.StartsWith("N", StringComparison.OrdinalIgnoreCase))
+                    if (string.Compare("False", s, true) == 0 || string.Compare("No", s, true) == 0)
                     {
-                        value = false;
+                        result = false;
                     }
                     else if (double.TryParse(s, out d) && d == 0) // numeric zero
                     {
-                        value = false;
+                        result = false;
+                    }
+                    else if (string.Compare("True", s, true) == 0 || string.Compare("Yes", s, true) == 0)
+                    {
+                        result = true;
                     }
                     else
                     {
-                        value = true;
+                        result = true;
                     }
                 }
             }
             else if (type.IsEnum)
             {
-                value = Enum.Parse(type, value.ToString(), true);
-            }
-            else if (type == typeof(Guid))
-            {
-                // If it's already a guid, return it.
-                if (!(value is Guid))
-                {
-                    if (value is string)
-                    {
-                        value = new Guid(value.ToString());
-                    }
-                    else
-                    {
-                        value = new Guid((byte[])value);
-                    }
-                }
+                result = Enum.Parse(type, value.ToString(), true);
             }
             else if(type == typeof(int))
             {
-                if (string.IsNullOrEmpty(value.ToString())) value = 0;
-                else value = Convert.ChangeType(value, type);
+                if (string.IsNullOrEmpty(value.ToString())) result = 0;
+                else result = Convert.ChangeType(value, type);
             }
             else if (type == typeof(double))
             {
-                if (string.IsNullOrEmpty(value.ToString())) value = 0.0;
-                else value = Convert.ChangeType(value, type);
+                if (string.IsNullOrEmpty(value.ToString())) result = 0.0;
+                else result = Convert.ChangeType(value, type);
             }
             else
             {
-                value = Convert.ChangeType(value, type);
+                result = Convert.ChangeType(value, type);
             }
 
-            return value;
+            return result;
         }
     }
 }

@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 using System.Reflection;
 using WebScrapper.Web;
 using WebScrapper.Db.Meta;
+using WebScrapper.Common;
+using WebScrapper.Db.Config;
+using WebScrapper.Db.Model;
+using System.Data.Common;
 
 namespace WebScrapper.Db
 {
     public abstract class DbGeneratorBL
     {
-        public DbConfigModel DbConfig { get; protected set; }
+        public DbConfig DbConfig { get; protected set; }
         protected string connectionString;
+        protected string dbFile;
 
-        public DbGeneratorBL(DbConfigModel dbconfig)
+        public DbGeneratorBL(DbConfig dbconfig)
         {
             DbConfig = dbconfig;
         }
@@ -37,31 +42,38 @@ namespace WebScrapper.Db
         protected virtual void GenerateTables()
         {
             // Create Metadata tables
-            CreateTable<TableMetadataModel>();
-            CreateTable<TableColumnsModel>();
-            CreateTable<TableColumnsReferenceModel>();
+            CreateTable<DbMetaTableModel>();
+            CreateTable<DbMetaTableColumnsModel>();
+            CreateTable<DbMetaTableRowModel>();
 
-            foreach (KeyValuePair<string, Dictionary<string, ColumnDbConfigModel>> kv in DbConfig.TableDbConfigs)
+            QueryGenerator queryGenerator;
+
+            // Create App specific tables
+            foreach (KeyValuePair<string, Dictionary<string, ColumnDbConfig>> kv in DbConfig.TableDbConfigs)
             {
-                Dictionary<string, ColumnDbConfigModel> colDbModel = kv.Value;
-
-                string tableName = kv.Key;
-                List<string> pks = new List<string>();
-                List<string> ddlQueryCols = new List<string>();
-
-                foreach (KeyValuePair<string, ColumnDbConfigModel> colconfig in colDbModel)
+                queryGenerator = new QueryGenerator();
+                queryGenerator.CreateTable(kv.Key);
+                
+                foreach (KeyValuePair<string, ColumnDbConfig> colconfig in kv.Value)
                 {
-                    string colName = colconfig.Key;
-                    string colProp = GetDataType(colconfig.Value);
-                    
-                    if (colconfig.Value.Unique) colProp += " UNQIUE";
-
-                    if (colconfig.Value.IsPrimaryKey) pks.Add(colName);
-
-                    ddlQueryCols.Add(colName + " " + colProp);
+                    queryGenerator.Column(colconfig.Key, GetDataType(colconfig.Value),
+                        colconfig.Value.Unique, false, colconfig.Value.IsPrimaryKey);
                 }
 
-                CreateTable(tableName, pks, ddlQueryCols);
+                ExecuteDDL(queryGenerator.ToString());
+            }
+
+            // Add table metadata
+            queryGenerator = new QueryGenerator();
+            queryGenerator.Insert("mtbl");
+
+            foreach (KeyValuePair<string, TableMetadataConfigModel> item in DbConfig.TableMetadata)
+            {
+                queryGenerator.Set("tnm");
+                queryGenerator.Filter(typeof(string), item.Key);
+
+                queryGenerator.Set("desc");
+                queryGenerator.Filter(typeof(string), item.Value.Display);
             }
         }
 
@@ -80,7 +92,7 @@ namespace WebScrapper.Db
             throw new NotImplementedException();
         }
 
-        public virtual void AddRow(string name, Dictionary<string, ColumnScrapModel> rowData)
+        public virtual void SaveOrUpdate(string name, List<TableDataColumnModel> rowData)
         {
             throw new NotImplementedException();
         }
@@ -88,47 +100,38 @@ namespace WebScrapper.Db
         protected void CreateTable<T>()
         {
             Type tableType = typeof(T);
-
-            string tableName = "";
-            List<string> pks = new List<string>();
-            List<string> ddlQueryCols = new List<string>();
+            QueryGenerator queryGenerator = new QueryGenerator();
 
             DDTableAttribute tableattr = tableType.GetCustomAttribute<DDTableAttribute>();
-            tableName = (tableattr != null)? tableattr.Name : tableType.Name;
+            queryGenerator.CreateTable((tableattr != null)? tableattr.Name : tableType.Name);
 
-            PropertyInfo[] classProperties = tableType.GetProperties(BindingFlags.Public);
+            PropertyInfo[] classProperties = tableType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (PropertyInfo prop in classProperties)
             {
-                string colName = "";
-                string colProp = "";
-
                 DDColumnAttribute colAttr = prop.GetCustomAttribute<DDColumnAttribute>();
-                colName = (colAttr != null) ? colAttr.Name : prop.Name;
-
-                colProp += GetDataType(prop.PropertyType);
-
                 DDNotNullAttribute notNullAttr = prop.GetCustomAttribute<DDNotNullAttribute>();
-                if (notNullAttr != null) colProp += " NOT NULL";
-
                 DDPrimaryKeyAttribute pkAttr = prop.GetCustomAttribute<DDPrimaryKeyAttribute>();
-                if (pkAttr != null) pks.Add(colName);
+                DDUniqueAttribute uniqueAttr = prop.GetCustomAttribute<DDUniqueAttribute>();
 
-                ddlQueryCols.Add(colName + " " + colProp);
+                queryGenerator.Column((colAttr != null) ? colAttr.Name : prop.Name,
+                    GetDataType(prop.PropertyType), uniqueAttr != null,
+                    notNullAttr != null, pkAttr != null);
             }
 
-            CreateTable(tableName, pks, ddlQueryCols);
+            ExecuteDDL(queryGenerator.ToString());
         }
 
-        protected void CreateTable(string tableName, List<string> pks, List<string> ddlQueryCols)
+        public EDataTypeDbConfig GetDataType(string table, string col)
         {
-            string sqlDdl = "CREATE TABLE " + tableName + " ( " + string.Join(",", ddlQueryCols) +
-                ", PRIMARY KEY (" + string.Join(",", pks) + "))";
-            ExecuteDDL(sqlDdl);
+            return DbConfig.TableDbConfigs[table][col].DataType;
         }
+
+        public abstract void InsertTableMetadata(string name);
 
         internal abstract string GetDataType(Type propertyType);
-        protected abstract void ExecuteDDL(string sql);
-        internal abstract string GetDataType(ColumnDbConfigModel colConfig);
+        public abstract DbDataReader ExecuteDML(string sql);
+        public abstract void ExecuteDDL(string sql);
+        internal abstract string GetDataType(ColumnDbConfig colConfig);
     }
 }

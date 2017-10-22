@@ -1,4 +1,5 @@
 rgn,World Regions,
+rgn_gec,World Regions whichdo not have ISO 3166 code,
 ebtyp,Enumeration Constants,
 nsvgn,Non Sovereign Country,
 unsdldc,UNSD Least Developed Country,

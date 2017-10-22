@@ -1,41 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData name="country">
   <Scrap name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
-    <Column name="m49" xpath="td[1]" ispk="1"></Column>
-    <Column name="nm" xpath="./data-tt-id"></Column>
-    <Column name="m49p" xpath="./data-tt-parent-id"></Column>
+    <Column name="m49" xpath="./@data-tt-id" ispk="1"></Column>
+    <Column name="nm" xpath="td[1]"></Column>
+    <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
     <Column name="iso31661a3" xpath="td[3]"></Column>
   </Scrap>
-  <Scrap name="rgn" url="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" xpath="//div[@class='mw-parser-output']/table[3]" type="table">
-    <Column name="iso31661a2" xpath="td[1]"></Column>
-    <Column name="nm" ispk="1" xpath="td[2]"></Column>
-    <Column name="tld" xpath="td[4]"></Column>
+  <Scrap name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="//ul[@id='GetAppendix_D']/li//tr[position() = 1 and /td[3]/table//tr[1]/td[1] != '-']" type="table">
+    <Column name="genc_2a" xpath="td[2]"></Column>
+    <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]"></Column>
+    <Column name="iso3166_no" xpath="td[3]/table//tr[1]/td[3]"></Column>
+    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]" ispk="1"></Column>
+    <Column name="stanag" xpath="td[4]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="tld" xpath="td[5]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+        <Split data="." index="1"></Split>
+      </Manipulate>
+    </Column>
+  </Scrap>
+  <Scrap name="rgn_gec" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="//ul[@id='GetAppendix_D']/li//tr[position() = 1 and /td[3]/table//tr[1]/td[1] = '-']" type="table">
+    <Column name="nm" xpath="td[1]/a"></Column>
+    <Column name="genc_2a" xpath="td[2]" ispk="1"></Column>
+    <Column name="stanag" xpath="td[4]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+  </Scrap>
+  <Scrap name="rgn" url="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" xpath="//div[@class='mw-parser-output']/table[3]//tr[position()>1]" type="table">
+    <Column name="iso31661a2" xpath="td[1]" ispk="1"></Column>
     <Column name="iso31661a2yrentr" xpath="td[3]"></Column>
   </Scrap>
   <Scrap name="rgn" url="https://evs.nci.nih.gov/ftp1/FDA/GENC/NCIt-GENC_Terminology.txt" type="csv">
-    <Column name="nm" index="1" ispk="1"></Column>
-    <Column name="genc_2a" index="3"></Column>
+    <Column name="genc_2a" index="3" ispk="1"></Column>
     <Column name="genc_3a" index="4"></Column>
     <Column name="genc_no" index="5"></Column>
   </Scrap>
-  <Scrap name="rgn" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']">
+  <Scrap name="rgn" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position() > 1]">
     <Column name="iso31661a2" xpath="td[1]" ispk="1"></Column>
     <Column name="iso3166_no" xpath="td[3]"></Column>
     <Column name="fips" xpath="td[4]"></Column>
-    <Column name="areakm2" xpath="td[7]"></Column>
+    <Column name="ttlareakm2_geonm" xpath="td[7]"></Column>
   </Scrap>
   <Scrap name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" type="table" xpath="//body/p[4]/table//table//tr[position() > 1]">
     <Column name="iso6391" xpath="td[1]"></Column>
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
-  <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
-    <Scrap xpath="//body/div[2]/table[1]">
-    <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
-      <Manipulate>
-        <Split data="," index="2"></Split>
-      </Manipulate>
-    </Column>
-    <Column name="iso6391" xpath=".//tr[2]/td[2]"></Column>
+  <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]/td[5]/@href">
+    <Scrap xpath="//body/div[2]/table[1]" type="table">
+      <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
+        <Manipulate>
+          <Split data="," index="2"></Split>
+        </Manipulate>
+      </Column>
+      <Column name="iso6391" xpath=".//tr[2]/td[2]"></Column>
     </Scrap>
   </Scrap>
   <Scrap name="cntrylang" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]">
@@ -43,7 +66,7 @@
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
   <Scrap name="crncy" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
-    <Scrap xpath="//div[@id='contentL']/div[3]">
+    <Scrap xpath="//div[@id='contentL']/div[3]" type="table">
       <Column name="symbl" xpath="./div[1]/p[2]/text()[2]"></Column>
       <Column name="mnrunm" xpath="./div[1]/p[3]/text()[2]">
         <Manipulate>
@@ -54,7 +77,7 @@
     </Scrap>
   </Scrap>
   <Scrap name="crncycntry" url="http://www.xe.com/iso4217.php" type="table" xpath="//table[@id='currencyTable']//tr[position()>1]/a/@href">
-    <Scrap xpath="//div[@id='contentL']/div[3]">
+    <Scrap xpath="//div[@id='contentL']/div[3]" type="table">
       <Column name="iso4217" xpath="./div/div">
         <Manipulate>
           <Split data=" " index="0"></Split>
@@ -65,7 +88,7 @@
     </Scrap>
   </Scrap>
   <Scrap name="cntrynm" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]//td[5]/@href">
-    <Scrap xpath="//body/div[2]/table[1]//tr[1]/td[2]/a/@href">
+    <Scrap xpath="//body/div[2]/table[1]//tr[1]/td[2]/a/@href" type="table">
       <Scrap type="table" xpath="//table[@id='altnametable']//tr[position()>1]">
         <Column name="nm" xpath="td[1]"></Column>
         <Column name="iso6391" xpath="td[3]"></Column>

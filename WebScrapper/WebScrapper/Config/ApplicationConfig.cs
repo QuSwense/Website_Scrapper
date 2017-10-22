@@ -11,6 +11,11 @@ namespace WebScrapper.Config
     public class ApplicationConfig
     {
         [XmlElement("Key")]
-        private ApplicationConfigKey[] Keys { get; set; }
+        public ApplicationConfigKey[] Keys { get; set; }
+
+        public string Key(string name)
+        {
+            return Keys.Where(item => item.Name == "db").First().Value;
+        }
     }
 }

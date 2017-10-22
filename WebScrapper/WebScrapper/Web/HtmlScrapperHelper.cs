@@ -17,11 +17,12 @@ namespace WebScrapper.Web
         {
             WebRequest webRequestObj = WebRequest.Create(url);
 
-            if (url.Contains("http:/"))
+            if (url.Contains("http:/") || url.Contains("https:/"))
             {
                 HttpWebRequest httpWebRequestObj = (HttpWebRequest)webRequestObj;
                 httpWebRequestObj.Method = "GET";
                 httpWebRequestObj.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                httpWebRequestObj.AuthenticationLevel = System.Net.Security.AuthenticationLevel.None;
             }
 
             WebResponse webResponseObj = webRequestObj.GetResponse();
@@ -31,7 +32,7 @@ namespace WebScrapper.Web
                 logger.Error("No web response found for " + url);
                 return null;
             }
-            else if (url.Contains("http:/"))
+            else if (url.Contains("http:/") || url.Contains("https:/"))
             {
                 HttpWebResponse httpResponse = (HttpWebResponse)webResponseObj;
                 if (httpResponse.StatusCode != HttpStatusCode.OK)
@@ -82,6 +83,15 @@ namespace WebScrapper.Web
             }
 
             return new StreamReader(webResponseObj.GetResponseStream());
+        }
+
+        internal static HtmlNode LoadOnline(string url)
+        {
+            var htmlWeb = new HtmlWeb();
+            htmlWeb.OverrideEncoding = Encoding.UTF8;
+            var doc = htmlWeb.Load(url);
+
+            return doc.DocumentNode;
         }
 
         //internal static HtmlNode FetchSingle(HtmlNode htmlnode, string xPath)

@@ -6,6 +6,7 @@ using System.Linq;
 using HtmlAgilityPack;
 using System.IO;
 using WebScrapper.Web.Config;
+using System.Xml.XPath;
 
 namespace WebScrapper.Web
 {
@@ -68,108 +69,107 @@ namespace WebScrapper.Web
             // Loop through the instances of table to be modified
             foreach (WebDataConfigScrap scrapConfig in scraps)
             {
-                if (scrapConfig.Type == EWebDataConfigType.Table)
+                if (scrapConfig.Type == EWebDataConfigType.TABLE)
                     UpdateUsingHtmlTable(scrapConfig);
-                else if (scrapConfig.Type == EWebDataConfigType.Csv)
+                else if (scrapConfig.Type == EWebDataConfigType.CSV)
                     UpdateUsingCSV(scrapConfig);
             }
         }
 
         private void UpdateUsingHtmlTable(WebDataConfigScrap scrapConfig)
         {
-            HtmlNode htmlDoc = HtmlScrapperHelper.Load(scrapConfig.Url);
+            HtmlNode htmlDoc = HtmlScrapperHelper.LoadOnline(scrapConfig.Url);
+            var navigator = (HtmlNodeNavigator)htmlDoc.CreateNavigator();
+            var tableTrNodes = navigator.Select(scrapConfig.XPath);
 
-            if(scrapConfig.Scraps != null)
+            //dbGenerator
+
+            int count = 0;
+            foreach (HtmlNodeNavigator node in tableTrNodes)
             {
-
-            }
-            HtmlNodeCollection tableTrNodes = htmlDoc.SelectNodes(scrapConfig.XPath);
-
-            foreach (HtmlNode node in tableTrNodes)
-            {
-                ColumnScrapIterator(scrapConfig,
-                    (columnConfig) => Manipulate(columnConfig, node.SelectSingleNode(columnConfig.xpath).InnerText));
-            }
-        }
-
-        private void UpdateUsingConfig(WebDataConfigScrap scrapConfig)
-        {
-
-        }
-
-        
-
-        private void UpdateUsingTableRef(WebDataConfigScrap scrapConfig)
-        {
-            HtmlNode htmlDoc = HtmlScrapperHelper.Load(scrapConfig.Url);
-            HtmlNodeCollection hrefCollection = htmlDoc.SelectNodes(scrapConfig.XPath);
-
-            foreach(HtmlNode node in hrefCollection)
-            {
-                // Get full url
-                Uri baseUrl = new Uri(scrapConfig.Url);
-                Uri hrefUrl = new Uri(baseUrl, node.InnerText);
-                HtmlNode htmlDoc1 = HtmlScrapperHelper.Load(hrefUrl.AbsoluteUri);
-
-                if (!string.IsNullOrEmpty(scrapConfig.XPath))
+                if (scrapConfig.Scraps != null)
                 {
-                    HtmlNodeCollection href1Collection = htmlDoc1.SelectNodes(scrapConfig.XPath);
-                    foreach (HtmlNode node1 in href1Collection)
-                    {
-                        // Get full url
-                        Uri baseUrl1 = new Uri(scrapConfig.Url);
-                        Uri hrefUrl1 = new Uri(baseUrl, node.InnerText);
-                        HtmlNode htmlDoc2 = HtmlScrapperHelper.Load(hrefUrl.AbsoluteUri);
-                    }
+                    RunMainScrap(scrapConfig.Scraps);
                 }
                 else
-                ColumnScrapIterator(scrapConfig,
-                    (columnConfig) => Manipulate(columnConfig, htmlDoc.SelectSingleNode(columnConfig.xpath).InnerText));
+                {
+                    ColumnScrapIterator(count, scrapConfig,
+                    (columnConfig) => Manipulate(columnConfig, node.SelectSingleNode(columnConfig.XPath)));
+                }
+                count++;
             }
         }
 
+        /// <summary>
+        /// For now assume that when the type='Csv" there is no Scrap child element.
+        /// When it is Csv ignore other attributes except index
+        /// </summary>
+        /// <param name="scrapConfig"></param>
         private void UpdateUsingCSV(WebDataConfigScrap scrapConfig)
         {
             using (StreamReader reader = HtmlScrapperHelper.LoadFile(scrapConfig.Url))
             {
+                int count = 0;
                 string line = "";
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] split = line.Split(new char[] { '\t' });
 
-                    ColumnScrapIterator(scrapConfig, (columnConfig) => split[columnConfig.index]);
+                    ColumnScrapIterator(count, scrapConfig, (columnConfig) => split[columnConfig.Index]);
+                    count++;
                 }
             }
         }
 
-        private string Manipulate(WebDataConfigColumn columnConfig, string data)
+        private string Manipulate(WebDataConfigColumn columnConfig, XPathNavigator dataNode)
         {
-            string text = data;
-            if (columnConfig.Manipulate != null)
+            string text = "", data = "";
+            if (dataNode != null) data = dataNode.Value;
+            if (columnConfig.Manipulations != null)
             {
-                if (columnConfig.Manipulate.Split != null)
+                foreach(WebDataConfigManipulate manipulate in columnConfig.Manipulations)
                 {
-                    string[] split = data.Split(columnConfig.Manipulate.Split.data.ToArray());
-                    text = split[columnConfig.Manipulate.Split.index];
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        if (manipulate.Trim != null)
+                        {
+                            data = data.Trim(manipulate.Trim.Data.ToCharArray());
+                        }
+                        if (manipulate.Splits != null)
+                        {
+                            foreach (WebDataConfigSplit splitConfig in manipulate.Splits)
+                            {
+                                string[] split = data.Split(splitConfig.Data.ToArray());
+                                text += split[splitConfig.Index];
+                            }
+                        }
+                    }
                 }
             }
-
-            return text;
-        }
-
-        private void ColumnScrapIterator(ScrapWebDataConfigScrap tableScrapConfig, Func<ScrapWebDataConfigScrapColumn, string> getValue)
-        {
-            Dictionary<string, ColumnScrapModel> rowData = new Dictionary<string, ColumnScrapModel>();
-            for (int indx = 0; indx < tableScrapConfig.Column.Length; ++indx)
+            else
             {
-                ScrapWebDataConfigScrapColumn columnConfig = tableScrapConfig.Column[indx];
-                ColumnScrapModel colScrap = new ColumnScrapModel();
-                colScrap.IsPk = Convert.ToBoolean(columnConfig.ispk);
-                colScrap.Value = getValue(columnConfig);
-                rowData.Add(columnConfig.name, colScrap);
+                text = data;
             }
 
-            dbGenerator.AddRow(tableScrapConfig.name, rowData);
+            return HtmlEntity.DeEntitize(text);
+        }
+
+        private void ColumnScrapIterator(int count, WebDataConfigScrap scrapConfig, Func<WebDataConfigColumn, string> GetValue)
+        {
+            List<TableDataColumnModel> row = new List<TableDataColumnModel>();
+            for (int indx = 0; indx < scrapConfig.Columns.Length; ++indx)
+            {
+                WebDataConfigColumn columnConfig = scrapConfig.Columns[indx];
+                row.Add(new TableDataColumnModel()
+                {
+                    Name = columnConfig.Name,
+                    IsPk = columnConfig.IsPk,
+                    Value = GetValue(columnConfig),
+                    RowIndex = count
+                });
+            }
+
+            dbGenerator.SaveOrUpdate(scrapConfig.Name, row);
         }
     }
 }

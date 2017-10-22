@@ -5,7 +5,10 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebScrapper.Config;
 using WebScrapper.Web;
+using WebScrapper.Db.Config;
+using System.Data.Common;
 
 namespace WebScrapper.Db
 {
@@ -16,16 +19,17 @@ namespace WebScrapper.Db
     {
         private SQLiteConnection dbConnection;
 
-        public SqlliteDbGeneratorBL(DbConfigModel config) : base(config) { }
+        public SqlliteDbGeneratorBL(DbConfig config) : base(config) { }
 
         protected override void CreateDbFile()
         {
-            SQLiteConnection.CreateFile(DbConfig.AppTopic + ".sqlite");
+            dbFile = ConfigHelper.GetDbConfigPath(DbConfig.AppTopic, ".sqlite");
+            connectionString = string.Format("Data Source={0};Version=3;", dbFile);
+            SQLiteConnection.CreateFile(dbFile);
         }
 
         public override void OpenConnection()
         {
-            connectionString = string.Format("Data Source={0}.sqlite;Version=3;", DbConfig.AppTopic);
             dbConnection = new SQLiteConnection(connectionString);
             dbConnection.Open();
         }
@@ -40,7 +44,7 @@ namespace WebScrapper.Db
             base.GenerateTables();
         }
 
-        private string GetConstraints(ColumnDbConfigModel colConfig)
+        private string GetConstraints(ColumnDbConfig colConfig)
         {
             string constraints = "";
             if (colConfig.Unique) constraints = "UNIQUE";
@@ -49,106 +53,54 @@ namespace WebScrapper.Db
             return constraints;
         }
 
-        internal override string GetDataType(ColumnDbConfigModel colConfig)
+        internal override string GetDataType(ColumnDbConfig colConfig)
         {
             switch(colConfig.DataType)
             {
-                case EDataTypeDbConfigModel.BOOLEAN:
+                case EDataTypeDbConfig.BOOLEAN:
                     return "BOOLEAN";
-                case EDataTypeDbConfigModel.DECIMAL:
+                case EDataTypeDbConfig.DECIMAL:
                     return "DECIMAL(" + colConfig.Size + ", " + colConfig.Precision + ")";
-                case EDataTypeDbConfigModel.ENUM:
-                case EDataTypeDbConfigModel.NUMBER:
+                case EDataTypeDbConfig.ENUM:
+                case EDataTypeDbConfig.NUMBER:
                     return "INTEGER";
-                case EDataTypeDbConfigModel.STRING:
+                case EDataTypeDbConfig.STRING:
                     return "VARCHAR(" + colConfig.Size + ")";
                 default:
                     return "TEXT";
             }
         }
 
-        protected override void ExecuteDDL(string sql)
+        public override void ExecuteDDL(string sql)
         {
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            command.ExecuteNonQuery();
-        }
-
-        public override void AddRow(string name, Dictionary<string, ColumnScrapModel> rowData)
-        {
-            // Check if the primary key data exists
-            int isexists = CheckRow(name, rowData);
-            string sqlDML;
-
-            if (isexists == 1)
-                sqlDML = CreateUpdateDDL(name, rowData);
-            else
-                sqlDML = CreateInsertDDL(name, rowData);
-            ExecuteDDL(sqlDML);
-        }
-
-        private string CreateUpdateDDL(string name, Dictionary<string, ColumnScrapModel> rowData)
-        {
-            List<string> setDMLs = new List<string>();
-            List<string> whereDMLs = new List<string>();
-
-            foreach (KeyValuePair<string, ColumnScrapModel> kv in rowData)
+            if(!string.IsNullOrEmpty(sql))
             {
-                setDMLs.Add(kv.Key + " = " + kv.Value);
-                if (kv.Value.IsPk)
+                SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public override DbDataReader ExecuteDML(string sql)
+        {
+            if (!string.IsNullOrEmpty(sql))
+            {
+                using (SQLiteCommand fmd = dbConnection.CreateCommand())
                 {
-                    whereDMLs.Add(kv.Key + " = " + kv.Value);
+                    fmd.CommandText = sql;
+                    fmd.CommandType = CommandType.Text;
+                    return fmd.ExecuteReader();
                 }
             }
 
-            return "UPDATE " + name + " SET " + string.Join(",", setDMLs) + " WHERE " + string.Join(" AND ", whereDMLs);
+            return null;
         }
 
-        private string CreateInsertDDL(string name, Dictionary<string, ColumnScrapModel> rowData)
+        public override void SaveOrUpdate(string name, List<TableDataColumnModel> rowData)
         {
-            string sqlDML = "INSERT INTO " + name + "(";
-            string values = " VALUES(";
-
-            foreach (KeyValuePair<string, ColumnScrapModel> kv in rowData)
-            {
-                sqlDML += kv.Key + ",";
-                values += kv.Value.Value + ",";
-            }
-
-            sqlDML = sqlDML.Remove(sqlDML.Length - 1);
-            values = values.Remove(values.Length - 1);
-
-            sqlDML += ") " + values + ")";
-
-            return sqlDML;
-        }
-
-        private int CheckRow(string name, Dictionary<string, ColumnScrapModel> rowData)
-        {
-            string sqlDDL = "SELECT COUNT(*) FROM " + name + " WHERE ";
-            List<string> whereDMLs = new List<string>();
-            int count = 0;
-
-            foreach (KeyValuePair<string, ColumnScrapModel> kv in rowData)
-            {
-                if (kv.Value.IsPk)
-                {
-                    whereDMLs.Add(kv.Key + " = " + kv.Value);
-                }
-            }
-            
-            using (SQLiteCommand fmd = dbConnection.CreateCommand())
-            {
-                fmd.CommandText = "SELECT COUNT(*) FROM " + name + " WHERE " + string.Join(" AND ", whereDMLs);
-                fmd.CommandType = CommandType.Text;
-                SQLiteDataReader r = fmd.ExecuteReader();
-                if (r.HasRows)
-                {
-                    r.Read();
-                    count = r.GetInt32(0);
-                }
-            }
-
-            return count;
+            QueryExecutor queryExecutor = new QueryExecutor(this);
+            queryExecutor.SetTable(name);
+            queryExecutor.SetRow(rowData);
+            queryExecutor.SaveOrUpdate();
         }
 
         internal override string GetDataType(Type propertyType)
@@ -164,5 +116,24 @@ namespace WebScrapper.Db
             else
                 return "TEXT";
         }
+
+        public override void InsertTableMetadata(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        //internal override EDataTypeDbConfig GetDataType(Type propertyType)
+        //{
+        //    if (propertyType == typeof(string))
+        //        return "TEXT";
+        //    else if (propertyType == typeof(int))
+        //        return "INTEGER";
+        //    else if (propertyType == typeof(double))
+        //        return "REAL";
+        //    else if (propertyType == typeof(DateTime))
+        //        return "NUMERIC";
+        //    else
+        //        return "TEXT";
+        //}
     }
 }

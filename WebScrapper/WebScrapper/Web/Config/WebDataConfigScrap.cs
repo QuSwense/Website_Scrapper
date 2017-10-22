@@ -31,7 +31,7 @@ namespace WebScrapper.Web.Config
             }
             set
             {
-                Type = (EWebDataConfigType)Enum.Parse(typeof(EWebDataConfigType), value);
+                Type = (EWebDataConfigType)Enum.Parse(typeof(EWebDataConfigType), value.ToUpper());
             }
         }
 

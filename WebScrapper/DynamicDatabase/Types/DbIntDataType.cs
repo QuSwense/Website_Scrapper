@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace DynamicDatabase.Types
+{
+    /// <summary>
+    /// A class which represents a numeric data type
+    /// </summary>
+    public class DbIntDataType : DbDataType
+    {
+        /// <summary>
+        /// The size of the numeric data
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public DbIntDataType() { }
+
+        /// <summary>
+        /// Constructor with size
+        /// </summary>
+        /// <param name="count"></param>
+        public DbIntDataType(int count)
+        {
+            this.Count = count;
+        }
+    }
+}

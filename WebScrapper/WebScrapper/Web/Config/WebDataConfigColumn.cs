@@ -19,7 +19,10 @@ namespace WebScrapper.Web.Config
         [XmlAttribute("index")]
         public int Index { get; set; }
 
-        [XmlElement("Column")]
-        public WebDataConfigMetadata[] Metadatas { get; set; }
+        [XmlAttribute("xpath")]
+        public string XPath { get; set; }
+
+        [XmlElement("Manipulate")]
+        public WebDataConfigManipulate[] Manipulations { get; set; }
     }
 }
