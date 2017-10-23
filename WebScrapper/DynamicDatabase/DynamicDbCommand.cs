@@ -1,10 +1,10 @@
-﻿using DynamicDatabase.Interfaces;
+﻿using DynamicDatabase.Config;
+using DynamicDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
-using WebScrapper.Db.Config;
 
 namespace DynamicDatabase
 {
@@ -17,25 +17,19 @@ namespace DynamicDatabase
     /// <typeparam name="TDynRow">Reference to the row of the table</typeparam>
     /// <typeparam name="TDynColMetadata">The column metadata class</typeparam>
     /// <typeparam name="TDbConnection">The database connection class</typeparam>
-    /// <typeparam name="TColDbConfig">The column database configuration data</typeparam>
     /// <typeparam name="TDynCol">The Column data</typeparam>
-    public class DynamicDbCommand<TDynTable,
-        TDynRow,
-            TDynColMetadata,
-            TDbConnection,
-            TColDbConfig,
-            TDynCol>
-        where TDynTable : DynamicTable<
+    public class DynamicDbCommand<
+            TDynTable,
             TDynRow,
             TDynColMetadata,
-            TColDbConfig,
-            TDynCol
+            TDbConnection> : IDisposable
+        where TDynTable : DynamicTable<
+            TDynRow,
+            TDynColMetadata
             >, new()
         where TDbConnection : DbConnection
         where TDynRow : DynamicRow, new()
         where TDynColMetadata : DynamicColumnMetadata, new()
-        where TColDbConfig : ColumnDbConfig
-        where TDynCol : DynamicColumn<TDynColMetadata>, new()
     {
         /// <summary>
         /// The reference to the database context
@@ -131,5 +125,36 @@ namespace DynamicDatabase
         public virtual DbDataReader ExecuteDML() { return null; }
 
         public virtual DbDataReader LoadMetadata(string name) { return null; }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (ConnectionCtx != null)
+                    {
+                        ConnectionCtx.Dispose();
+                    }
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using DynamicDatabase;
+using DynamicDatabase.Config;
+using DynamicDatabase.Default;
+using DynamicDatabase.Types;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebScrapper.Db.Config;
-using WebScrapper.Db.Ctx.Db;
 
 namespace WebScrapper.Db.Ctx
 {
@@ -18,30 +20,20 @@ namespace WebScrapper.Db.Ctx
         SqliteDbCommand,
         SQLiteConnection,
         DynamicRow,
-        DColumnMetadata,
-        ColumnDbConfig,
-        DColumn
+        DColumnMetadata
         >
     {
         /// <summary>
-        /// The name of the sqlite database
+        /// The extension of the database file
         /// </summary>
-        public string DbName { get; protected set; }
-
-        /// <summary>
-        /// The full local path of the database file
-        /// </summary>
-        public string FullPath { get; protected set; }
+        public override string FileExtension { get { return "sqlite"; } }
 
         /// <summary>
         /// Get the full path of the sqlite file path
         /// </summary>
-        public string FullDbFileName
+        public override string FullDbFileName
         {
-            get
-            {
-                return Path.Combine(FullPath, DbName) + ".sqlite";
-            }
+            get { return Path.Combine(FullPath, DbName) + "." + FileExtension; }
         }
 
         /// <summary>
@@ -49,13 +41,13 @@ namespace WebScrapper.Db.Ctx
         /// </summary>
         /// <param name="dbfilepath"></param>
         /// <param name="name"></param>
-        public SqliteDbContext(string dbfilepath, string name)
+        public SqliteDbContext(string dbfilepath, string name) 
+            : base(dbfilepath, name)
         {
-            DbName = name;
-            FullPath = dbfilepath;
-            string connection = string.Format("Data Source={0}.sqlite", Path.Combine(FullPath, DbName));
-            ConnectionCtx = new SQLiteConnection();
-            DbCommand = new SqliteDbCommand(this, (SQLiteConnection)ConnectionCtx);
+            string connection = string.Format("Data Source={0}.{1}", 
+                Path.Combine(FullPath, DbName), FileExtension);
+            ConnectionCtx = new SQLiteConnection(connection);
+            DbCommand = new SqliteDbCommand(this, ConnectionCtx);
         }
 
         /// <summary>

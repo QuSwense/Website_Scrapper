@@ -7,13 +7,14 @@ using System.Data.Common;
 using DynamicDatabase.Types;
 using DynamicDatabase.Config;
 using DynamicDatabase.Meta;
+using WebCommon.Extn;
 
 namespace DynamicDatabase
 {
     /// <summary>
     /// Class represents metdata of a column
     /// </summary>
-    public class DynamicColumnMetadata
+    public class DynamicColumnMetadata : IDisposable
     {
         /// <summary>
         /// The name
@@ -36,22 +37,31 @@ namespace DynamicDatabase
         public EColumnConstraint Constraint { get; protected set; }
 
         /// <summary>
+        /// Get the index of the column
+        /// </summary>
+        public int Index { get; protected set; }
+
+        /// <summary>
         /// Parse the column configuration object
         /// </summary>
         /// <param name="colname"></param>
         /// <param name="colConfig"></param>
-        public void Parse(string colname, ColumnDbConfig colConfig)
+        public void Parse(string colname, ConfigDbColumn colConfig)
         {
             ColumnName = colname;
-            DataType = ParseDataType(colConfig);
+            DataType = DbDataTypeHelper.ParseDataType(colConfig);
             Constraint = ParseConstraint(colConfig);
         }
 
         /// <summary>
-        /// Parse the database reader
+        /// Parse the database reader.
+        /// It is assumed that all Database Meta column info query will follow the same format
+        /// Column 2 - name
+        /// Column 3 - Data Type
+        /// Column Rest - Constraints
         /// </summary>
         /// <param name="reader"></param>
-        public void Parse(DbDataReader reader)
+        public virtual void Parse(DbDataReader reader)
         {
             ColumnName = reader.GetString(1);
             DataType = ParseDataType(reader.GetString(2));
@@ -80,7 +90,7 @@ namespace DynamicDatabase
             DDUniqueAttribute uniqueAttr = prop.GetCustomAttribute<DDUniqueAttribute>();
 
             ColumnName = colAttr.Name;
-            DataType = ParseDataType(prop.PropertyType);
+            DataType = DbDataTypeHelper.ParseDataType(prop.PropertyType);
 
             if (notNullAttr != null) Constraint |= EColumnConstraint.UNQIUE;
             if (pkAttr != null) Constraint |= EColumnConstraint.PRIMARYKEY;
@@ -92,7 +102,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="colConfig"></param>
         /// <returns></returns>
-        private EColumnConstraint ParseConstraint(ColumnDbConfig colConfig)
+        private EColumnConstraint ParseConstraint(ConfigDbColumn colConfig)
         {
             EColumnConstraint constraint = EColumnConstraint.NONE;
 
@@ -103,54 +113,38 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Parse the data type from column configuration object
-        /// </summary>
-        /// <param name="colConfig"></param>
-        /// <returns></returns>
-        private DbDataType ParseDataType(ColumnDbConfig colConfig)
-        {
-            switch (colConfig.DataType)
-            {
-                case EDataTypeDbConfig.BOOLEAN:
-                    return new DbIntDataType(1);
-                case EDataTypeDbConfig.DATETIME:
-                    return new DbDateTimeDataType();
-                case EDataTypeDbConfig.DECIMAL:
-                    return new DbDoubleDataType(colConfig.Size, colConfig.Precision);
-                case EDataTypeDbConfig.ENUM:
-                case EDataTypeDbConfig.NUMBER:
-                    return new DbIntDataType(colConfig.Size > 0 ? colConfig.Size : 4);
-                case EDataTypeDbConfig.STRING:
-                    return new DbCharDataType(colConfig.Size > 0 ? colConfig.Size : 1);
-                default:
-                    return new DbCharDataType(colConfig.Size > 0 ? colConfig.Size : 200);
-            }
-        }
-
-        /// <summary>
         /// Parse data type from the string typename
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
         protected virtual DbDataType ParseDataType(string typeName) { return null; }
 
-        /// <summary>
-        /// Parse data type from the type
-        /// </summary>
-        /// <param name="propertyType"></param>
-        /// <returns></returns>
-        private DbDataType ParseDataType(Type propertyType)
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
-            if (propertyType == typeof(bool))
-                return new DbIntDataType(1);
-            else if (propertyType == typeof(DateTime))
-                return new DbDateTimeDataType();
-            else if (propertyType == typeof(double) || propertyType == typeof(decimal))
-                return new DbDoubleDataType();
-            else if (propertyType == typeof(Enum) || propertyType == typeof(int) || propertyType == typeof(short))
-                return new DbIntDataType();
-            else
-                return new DbCharDataType();
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    DataType = null;
+                }
+
+                disposedValue = true;
+            }
         }
+
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

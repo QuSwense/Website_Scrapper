@@ -11,5 +11,9 @@ namespace DynamicDatabase.Types
     /// </summary>
     public abstract class DbDataType
     {
+        /// <summary>
+        /// The actual data for the data type
+        /// </summary>
+        public object Value { get; set; }
     }
 }

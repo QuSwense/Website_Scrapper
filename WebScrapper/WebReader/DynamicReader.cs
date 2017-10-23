@@ -11,7 +11,7 @@ namespace WebReader
     /// The class is the base reader for reading any kind of file.
     /// This class contains basic functionalities to read a file.
     /// </summary>
-    public abstract class DynamicReader
+    public abstract class DynamicReader : IDisposable
     {
         /// <summary>
         /// The full file path of the file. It can be a network file.
@@ -49,11 +49,12 @@ namespace WebReader
         /// Constructor with file path
         /// </summary>
         /// <param name="fullfile"></param>
-        public DynamicReader(string fullfile)
+        public DynamicReader(string fullfile, object store)
         {
             FileInfo fi = new FileInfo(fullfile);
             FullPath = fi.Directory.FullName;
             FileName = fi.Name;
+            Store = store;
         }
 
         /// <summary>
@@ -86,5 +87,29 @@ namespace WebReader
         /// This is a protected method which is overriden in derived class
         /// </summary>
         protected virtual void ReadLineOverride(string line) { }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Store = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }

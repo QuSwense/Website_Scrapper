@@ -1,12 +1,14 @@
-﻿using System;
+﻿using DynamicDatabase;
+using DynamicDatabase.Config;
+using DynamicDatabase.Default;
+using DynamicDatabase.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
-using WebScrapper.Db.Config;
-using WebScrapper.Db.Ctx.Db;
 
 namespace WebScrapper.Db.Ctx
 {
@@ -14,9 +16,7 @@ namespace WebScrapper.Db.Ctx
         DTable,
         DynamicRow,
         DColumnMetadata,
-        SQLiteConnection,
-        ColumnDbConfig,
-        DColumn
+        SQLiteConnection
         >
     {
         public SqliteDbCommand() { }

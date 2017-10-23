@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DynamicDatabase.Config;
+using DynamicDatabase.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using WebScrapper.Db.Config;
 
 namespace DynamicDatabase
 {
@@ -13,14 +14,13 @@ namespace DynamicDatabase
     /// </summary>
     /// <typeparam name="TDynRow"></typeparam>
     /// <typeparam name="TDynColMetadata"></typeparam>
-    /// <typeparam name="TColDbConfig"></typeparam>
     /// <typeparam name="TDynCol"></typeparam>
-    public class DynamicTable<TDynRow, TDynColMetadata, TColDbConfig, 
-        TDynCol>
+    public class DynamicTable<
+        TDynRow,
+        TDynColMetadata
+        > : IDisposable, IDbTable
         where TDynRow : DynamicRow, new()
         where TDynColMetadata : DynamicColumnMetadata, new()
-        where TColDbConfig : ColumnDbConfig
-        where TDynCol : DynamicColumn<TDynColMetadata>, new()
     {
         /// <summary>
         /// The name of the table
@@ -30,12 +30,12 @@ namespace DynamicDatabase
         /// <summary>
         /// The rows in the table. The data key is RowId.
         /// </summary>
-        public Dictionary<string, TDynRow> Rows { get; protected set; }
+        public List<TDynRow> Rows { get; protected set; }
 
         /// <summary>
         /// The list of column headers
         /// </summary>
-        public Dictionary<string, TDynColMetadata> Headers { get; protected set; }
+        public DynamicColumnHeaders<TDynColMetadata> Headers { get; protected set; }
 
         /// <summary>
         /// Constructor default
@@ -52,63 +52,142 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Add header to the table
+        /// Get the index from the column name
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="dynCol"></param>
-        public void AddHeader(string key, TDynColMetadata dynCol)
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int GetColumnIndex(string name)
         {
-            if (Headers == null) Headers = new Dictionary<string, TDynColMetadata>();
-            Headers.Add(key, dynCol);
+            return Headers.GetColumnIndex(name);
         }
 
         /// <summary>
         /// Loop through the column configuration and create a new table
         /// </summary>
         /// <param name="configCols"></param>
-        public void CreateTable(Dictionary<string, TColDbConfig> configCols)
+        public void CreateTable(Dictionary<string, ConfigDbColumn> configCols)
         {
-            foreach (var item in configCols)
-            {
-                TDynColMetadata colMetadata = new TDynColMetadata();
-                colMetadata.Parse(item.Key, item.Value);
-                AddHeader(item.Key, colMetadata);
-            }
+            // Reinitialize headers. It will destroy the previous loaded data
+            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers.Initialize(configCols);
         }
 
         /// <summary>
-        /// Create table from property type
+        /// Create table from property type (soft create in memory)
         /// </summary>
         /// <param name="classProperties"></param>
         public void CreateTable(PropertyInfo[] classProperties)
         {
-            foreach (PropertyInfo prop in classProperties)
-            {
-                TDynColMetadata colMetadata = new TDynColMetadata();
-                colMetadata.Parse(prop);
-                AddHeader(colMetadata.ColumnName, colMetadata);
-            }
+            // Reinitialize headers. It will destroy the previous loaded data
+            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers.Initialize(classProperties);
         }
 
         /// <summary>
-        /// Load table metadata
+        /// Load table metadata. This is the metadata query result
         /// </summary>
         /// <param name="reader"></param>
         public void LoadTableMetadata(DbDataReader reader)
         {
-            Headers = new Dictionary<string, TDynColMetadata>();
+            // Reinitialize headers. It will destroy the previous loaded data
+            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers.Initialize(reader);
+        }
+
+        /// <summary>
+        /// Load data in memory by Rowid
+        /// </summary>
+        /// <param name="reader"></param>
+        public void LoadData(DbDataReader reader)
+        {
+            if (Headers == null) throw new Exception("Table metadata must be loaded before data");
+
+            Rows = new List<TDynRow>();
 
             while (reader.Read())
             {
-                TDynColMetadata colMetadata = new TDynColMetadata();
-                colMetadata.Parse(reader);
-                Headers.Add(colMetadata.ColumnName, colMetadata);
+                TDynRow row = (TDynRow) Activator.CreateInstance(typeof(TDynRow), this);
+
+                foreach(var item in Headers)
+                {
+                    row.AddorUpdate(item.ColumnName, reader.GetValue(item.Index));
+                }
+                Rows.Add(row);
             }
         }
 
-        public void LoadData(DbDataReader reader)
+        /// <summary>
+        /// Add rows of metadata table
+        /// </summary>
+        /// <param name="tableMetas"></param>
+        public void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas)
         {
+            foreach (var item in tableMetas)
+            {
+                TDynRow row = (TDynRow)Rows.Where(r => r.ToStringByPK() == item.Key);
+                if (row == null) row = (TDynRow)Activator.CreateInstance<TDynRow>();
 
+                row.AddorUpdate(0, item.Key);
+                row.AddorUpdate(1, item.Value.Display);
+                row.AddorUpdate(2, item.Value.Reference);
+            }
         }
+
+        /// <summary>
+        /// Get the list of Primary keys by name
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetPKNames()
+        {
+            List<TDynColMetadata> pkColumns = Headers.GetPKs();
+
+            if (pkColumns != null || pkColumns.Count > 0)
+                return pkColumns.Select(p => p.ColumnName).ToList();
+            else
+                return null;
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (Rows != null)
+                    {
+                        foreach (var item in Rows)
+                        {
+                            item.Dispose();
+                        }
+                    }
+
+                    if (Headers != null)
+                    {
+                        foreach (var item in Headers)
+                        {
+                            item.Dispose();
+                        }
+                    }
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }

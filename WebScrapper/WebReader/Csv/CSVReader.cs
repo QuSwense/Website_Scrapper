@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using WebCommon.Extn;
 
 namespace WebReader.Csv
 {
@@ -19,6 +20,10 @@ namespace WebReader.Csv
     /// </summary>
     public class CSVReader : DynamicReader
     {
+        public CSVReader() { }
+
+        public CSVReader(string fullfile, object store) : base(fullfile, store) { }
+
         /// <summary>
         /// This is a protected method which is overriden in derived class
         /// </summary>

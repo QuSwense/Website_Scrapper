@@ -1,9 +1,11 @@
-﻿using System;
+﻿using DynamicDatabase.Config;
+using DynamicDatabase.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
-using WebScrapper.Db.Config;
 
 namespace DynamicDatabase.Default
 {
@@ -11,9 +13,7 @@ namespace DynamicDatabase.Default
         DTable,
         DynamicRow,
         DColumnMetadata,
-        SQLiteConnection,
-        ColumnDbConfig,
-        DColumn
+        DbConnection
         >
     {
         public DDbCommand()

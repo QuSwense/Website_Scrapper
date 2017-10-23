@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DynamicDatabase.Meta;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WebScrapper.Db.Meta;
 
 namespace DynamicDatabase.Model
 {
@@ -20,6 +20,9 @@ namespace DynamicDatabase.Model
         [DDPrimaryKey]
         [DDColumn("rid")]
         public string RowId { get; set; }
+
+        [DDColumn("url")]
+        public string Url { get; set; }
 
         [DDColumn("xpath")]
         public string XPath { get; set; }
