@@ -83,6 +83,7 @@
     <Compile Include="DynamicRow.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EColumnConstraint.cs" />
+    <Compile Include="Interfaces\IColumnMetadata.cs" />
     <Compile Include="Interfaces\IDbContext.cs" />
     <Compile Include="Interfaces\IDbRow.cs" />
     <Compile Include="Interfaces\IDbTable.cs" />

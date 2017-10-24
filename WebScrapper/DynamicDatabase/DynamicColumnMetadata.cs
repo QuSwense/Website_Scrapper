@@ -8,13 +8,14 @@ using DynamicDatabase.Types;
 using DynamicDatabase.Config;
 using DynamicDatabase.Meta;
 using WebCommon.Extn;
+using DynamicDatabase.Interfaces;
 
 namespace DynamicDatabase
 {
     /// <summary>
     /// Class represents metdata of a column
     /// </summary>
-    public class DynamicColumnMetadata : IDisposable
+    public class DynamicColumnMetadata : IDisposable, IColumnMetadata
     {
         /// <summary>
         /// The name
@@ -82,7 +83,7 @@ namespace DynamicDatabase
         /// Parse data from the property attributes
         /// </summary>
         /// <param name="prop"></param>
-        internal void Parse(PropertyInfo prop)
+        public void Parse(PropertyInfo prop)
         {
             DDColumnAttribute colAttr = prop.GetCustomAttribute<DDColumnAttribute>();
             DDNotNullAttribute notNullAttr = prop.GetCustomAttribute<DDNotNullAttribute>();

@@ -6,28 +6,30 @@ using System.Reflection;
 using System.Text;
 using DynamicDatabase.Config;
 using System.Collections;
+using DynamicDatabase.Interfaces;
 
 namespace DynamicDatabase
 {
-    public class DynamicColumnHeaders<TDynColMetadata> : IEnumerator<TDynColMetadata>, IEnumerable<TDynColMetadata>
-        where TDynColMetadata : DynamicColumnMetadata, new()
+    public class DynamicColumnHeaders : 
+        IEnumerator<IColumnMetadata>,
+        IEnumerable<IColumnMetadata>
     {
         /// <summary>
         /// The list of column headers by name
         /// </summary>
-        public Dictionary<string, TDynColMetadata> ByNames { get; protected set; }
+        public Dictionary<string, IColumnMetadata> ByNames { get; protected set; }
 
         /// <summary>
         /// The list of column headers by index
         /// </summary>
-        public List<TDynColMetadata> ByIndices { get; protected set; }
+        public List<IColumnMetadata> ByIndices { get; protected set; }
 
         /// <summary>
         /// An indexer to access data like array using index
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public TDynColMetadata this[int index]
+        public IColumnMetadata this[int index]
         {
             get
             {
@@ -46,7 +48,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public TDynColMetadata this[string name]
+        public IColumnMetadata this[string name]
         {
             get
             {
@@ -69,7 +71,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (var item in configCols)
             {
-                TDynColMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = new TDynColMetadata();
                 colMetadata.Parse(item.Key, item.Value);
                 AddHeader(index, item.Key, colMetadata);
                 index++;
@@ -85,7 +87,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (PropertyInfo prop in classProperties)
             {
-                TDynColMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = new TDynColMetadata();
                 colMetadata.Parse(prop);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;
@@ -113,7 +115,7 @@ namespace DynamicDatabase
             int index = 0;
             while (reader.Read())
             {
-                TDynColMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = new TDynColMetadata();
                 colMetadata.Parse(reader);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;
@@ -125,12 +127,12 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="key"></param>
         /// <param name="dynCol"></param>
-        protected void AddHeader(int index, string key, TDynColMetadata dynCol)
+        protected void AddHeader(int index, string key, IColumnMetadata dynCol)
         {
-            if (ByNames == null) ByNames = new Dictionary<string, TDynColMetadata>();
+            if (ByNames == null) ByNames = new Dictionary<string, IColumnMetadata>();
             ByNames.Add(key, dynCol);
 
-            if (ByIndices == null) ByIndices = new List<TDynColMetadata>();
+            if (ByIndices == null) ByIndices = new List<IColumnMetadata>();
             ByIndices.Insert(index, dynCol);
         }
 
@@ -138,9 +140,9 @@ namespace DynamicDatabase
         /// Get the list of PKs
         /// </summary>
         /// <returns></returns>
-        public List<TDynColMetadata> GetPKs()
+        public List<IColumnMetadata> GetPKs()
         {
-            List<TDynColMetadata> pkList = new List<TDynColMetadata>();
+            List<IColumnMetadata> pkList = new List<IColumnMetadata>();
 
             foreach(var item in ByIndices)
             {
@@ -154,7 +156,7 @@ namespace DynamicDatabase
         #region IEnumerator
         private int _position = -1;
 
-        public TDynColMetadata Current
+        public IColumnMetadata Current
         {
             get
             {
@@ -186,12 +188,12 @@ namespace DynamicDatabase
             
         }
 
-        IEnumerator<TDynColMetadata> GetEnumerator()
+        IEnumerator<IColumnMetadata> GetEnumerator()
         {
             return ByIndices.GetEnumerator();
         }
 
-        IEnumerator<TDynColMetadata> IEnumerable<TDynColMetadata>.GetEnumerator()
+        IEnumerator<IColumnMetadata> IEnumerable<IColumnMetadata>.GetEnumerator()
         {
             return ByIndices.GetEnumerator();
         }
