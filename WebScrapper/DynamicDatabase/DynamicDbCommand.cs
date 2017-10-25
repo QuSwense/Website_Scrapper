@@ -18,18 +18,7 @@ namespace DynamicDatabase
     /// <typeparam name="TDynColMetadata">The column metadata class</typeparam>
     /// <typeparam name="TDbConnection">The database connection class</typeparam>
     /// <typeparam name="TDynCol">The Column data</typeparam>
-    public class DynamicDbCommand<
-            TDynTable,
-            TDynRow,
-            TDynColMetadata,
-            TDbConnection> : IDisposable
-        where TDynTable : DynamicTable<
-            TDynRow,
-            TDynColMetadata
-            >, new()
-        where TDbConnection : DbConnection
-        where TDynRow : DynamicRow, new()
-        where TDynColMetadata : DynamicColumnMetadata, new()
+    public class DynamicDbCommand : IDbCommand
     {
         /// <summary>
         /// The reference to the database context
@@ -44,7 +33,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Connection context object
         /// </summary>
-        public TDbConnection ConnectionCtx { get; protected set; }
+        public IDynamicDbConnection Connection { get; protected set; }
 
         /// <summary>
         /// Default Constructor
@@ -56,24 +45,28 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="connectionCtx"></param>
-        public DynamicDbCommand(IDbContext dbContext, TDbConnection connectionCtx)
+        public DynamicDbCommand(IDbContext dbContext, IDynamicDbConnection connectionCtx = null)
         {
             this.dbContext = dbContext;
-            ConnectionCtx = connectionCtx;
+
+            if (connectionCtx == null)
+                connectionCtx = DynamicDbFactory.Create<IDynamicDbConnection>();
+            else
+                Connection = connectionCtx;
         }
 
         /// <summary>
         /// Create table command
         /// </summary>
         /// <param name="dynTable"></param>
-        public void CreateTable(TDynTable dynTable)
+        public void CreateTable(IDbTable dynTable)
         {
             List<string> colDefList = new List<string>();
             List<string> pkList = new List<string>();
 
-            foreach (var item in dynTable.Headers)
+            foreach (var item in dynTable.Headers.ByNames)
             {
-                TDynColMetadata header = item.Value;
+                IColumnMetadata header = item.Value;
 
                 colDefList.Add(header.ColumnName + " " +
                     dbContext.GetDataType(header.DataType.GetType()) +
@@ -135,9 +128,9 @@ namespace DynamicDatabase
             {
                 if (disposing)
                 {
-                    if (ConnectionCtx != null)
+                    if (Connection != null)
                     {
-                        ConnectionCtx.Dispose();
+                        Connection.Dispose();
                     }
                 }
 

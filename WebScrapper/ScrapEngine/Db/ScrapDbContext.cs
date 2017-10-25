@@ -9,7 +9,7 @@ namespace ScrapEngine.Db
     public class ScrapDbContext
     {
         public DynamicDbConfig MetaConfig { get; set; }
-        public SqliteDbContext
+        //public SqliteDbContext
 
         public ScrapDbContext() { }
 

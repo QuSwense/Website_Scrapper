@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScrapperApp", "WebScrapp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrapEngine", "ScrapEngine\ScrapEngine.csproj", "{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicDatabaseTests", "DynamicDatabaseTests\DynamicDatabaseTests.csproj", "{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|x86.Build.0 = Release|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Debug|x86.Build.0 = Debug|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Release|x86.ActiveCfg = Release|Any CPU
+		{CDBC3B0E-D1A8-4203-A54B-9DC681BD5414}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

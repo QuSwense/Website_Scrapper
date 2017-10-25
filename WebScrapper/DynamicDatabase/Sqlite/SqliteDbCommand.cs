@@ -1,6 +1,5 @@
 ﻿using DynamicDatabase;
 using DynamicDatabase.Config;
-using DynamicDatabase.Default;
 using DynamicDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,22 +11,17 @@ using System.Text;
 
 namespace WebScrapper.Db.Ctx
 {
-    public class SqliteDbCommand : DynamicDbCommand<
-        DTable,
-        DynamicRow,
-        DColumnMetadata,
-        SQLiteConnection
-        >
+    public class SqliteDbCommand : DynamicDbCommand
     {
         public SqliteDbCommand() { }
-        public SqliteDbCommand(IDbContext dbContext, SQLiteConnection connectionCtx) 
-            : base(dbContext, connectionCtx) { }
+        public SqliteDbCommand(IDbContext dbContext) 
+            : base(dbContext) { }
 
         public override void ExecuteDDL()
         {
             if (!string.IsNullOrEmpty(SQL))
             {
-                SQLiteCommand command = new SQLiteCommand(SQL, (SQLiteConnection)ConnectionCtx);
+                SQLiteCommand command = new SQLiteCommand(SQL, (SQLiteConnection)(Connection.Connection));
                 command.ExecuteNonQuery();
             }
         }
@@ -36,7 +30,7 @@ namespace WebScrapper.Db.Ctx
         {
             if (!string.IsNullOrEmpty(SQL))
             {
-                using (SQLiteCommand fmd = (SQLiteCommand)ConnectionCtx.CreateCommand())
+                using (SQLiteCommand fmd = ((SQLiteCommand)Connection.Connection.CreateCommand()))
                 {
                     fmd.CommandText = SQL;
                     fmd.CommandType = CommandType.Text;

@@ -73,96 +73,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppEngine.cs" />
-    <Compile Include="Common\TypeExtensionMethods.cs" />
-    <Compile Include="Config\ApplicationConfig.cs" />
-    <Compile Include="Config\ApplicationConfigKey.cs" />
-    <Compile Include="Config\ConfigHelper.cs" />
-    <Compile Include="Db\Config\ColumnDbConfig.cs" />
-    <Compile Include="Db\Config\DbConfig.cs" />
-    <Compile Include="Db\Ctx\Db\DColumn.cs" />
-    <Compile Include="Db\Ctx\Db\DColumnMetadata.cs" />
-    <Compile Include="Db\Ctx\Db\DDbCommand.cs" />
-    <Compile Include="Db\Ctx\Db\DTable.cs" />
-    <Compile Include="Db\Ctx\DynamicDbCommand.cs" />
-    <Compile Include="Db\Ctx\IDbContext.cs" />
-    <Compile Include="Db\Ctx\sqlite\SqliteColumnMetadata.cs" />
-    <Compile Include="Db\Ctx\sqlite\SqliteDbCommand.cs" />
-    <Compile Include="Db\Ctx\sqlite\SqliteDbContext.cs" />
-    <Compile Include="Db\Ctx\DbCharDataType.cs" />
-    <Compile Include="Db\Ctx\DbDataType.cs" />
-    <Compile Include="Db\Ctx\DbDateTimeDataType.cs" />
-    <Compile Include="Db\Ctx\DbDoubleDataType.cs" />
-    <Compile Include="Db\Ctx\DbIntDataType.cs" />
-    <Compile Include="Db\Ctx\DynamicColumn.cs" />
-    <Compile Include="Db\Ctx\DynamicColumnMetadata.cs" />
-    <Compile Include="Db\Ctx\DynamicDbConnection.cs" />
-    <Compile Include="Db\Ctx\DynamicDbContext.cs" />
-    <Compile Include="Db\Ctx\DynamicRow.cs" />
-    <Compile Include="Db\Ctx\DynamicTable.cs" />
-    <Compile Include="Db\Ctx\EColumnConstraint.cs" />
-    <Compile Include="Db\DbFactory.cs" />
-    <Compile Include="Db\DbGeneratorBL.cs" />
-    <Compile Include="Db\Config\EDataTypeDbConfig.cs" />
-    <Compile Include="Db\Meta\DDColumnAttribute.cs" />
-    <Compile Include="Db\Meta\DDNotNullAttribute.cs" />
-    <Compile Include="Db\Meta\DDPrimaryKeyAttribute.cs" />
-    <Compile Include="Db\Meta\DDTableAttribute.cs" />
-    <Compile Include="Db\Meta\DDUniqueAttribute.cs" />
-    <Compile Include="Db\Meta\DTDateTimeAttribute.cs" />
-    <Compile Include="Db\Meta\DTDoubleAttribute.cs" />
-    <Compile Include="Db\Meta\DTIntegerAttribute.cs" />
-    <Compile Include="Db\Meta\DTNumericAttribute.cs" />
-    <Compile Include="Db\Meta\DTVarcharAttribute.cs" />
-    <Compile Include="Db\Model\DbMetaTableRowModel.cs" />
-    <Compile Include="Db\QueryExecutor.cs" />
-    <Compile Include="Db\QueryGenerator.cs" />
-    <Compile Include="Db\SqlliteDbGeneratorBL.cs" />
-    <Compile Include="Db\Model\DbMetaTableColumnsModel.cs" />
-    <Compile Include="Db\Config\TableMetadataConfig.cs" />
-    <Compile Include="Db\Model\DbMetaTableModel.cs" />
-    <Compile Include="Error\WebScrapperException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reader\CSVReader.cs" />
-    <Compile Include="Reader\Meta\SplitIndexAttribute.cs" />
-    <Compile Include="Web\Ctx\WebScrapperContext.cs" />
-    <Compile Include="Web\TableDataColumnModel.cs" />
-    <Compile Include="Web\Config\EWebDataConfigType.cs" />
-    <Compile Include="Web\Config\WebDataConfigColumn.cs" />
-    <Compile Include="Web\Config\WebDataConfigManipulate.cs" />
-    <Compile Include="Web\Config\WebDataConfigScrap.cs" />
-    <Compile Include="Web\Config\WebDataConfigSplit.cs" />
-    <Compile Include="Web\Config\WebDataConfigTrim.cs" />
-    <Compile Include="Web\HtmlScrapperHelper.cs" />
-    <Compile Include="Web\Config\WebDataConfig.cs" />
-    <Compile Include="Web\WebScrapperBL.cs" />
-    <Compile Include="Web\WebScrapperFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="App\Country\DbScripts\table_columns.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="App\Country\DbScripts\table_enum.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="App\Country\DbScripts\table_metadata.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="App\Country\CountryConfig.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="App\Country\Scrap\CountryScrap.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App\Country\Static\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

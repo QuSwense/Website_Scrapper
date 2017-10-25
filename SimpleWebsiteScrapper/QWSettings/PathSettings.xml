@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<PathSettings>
-  <UnwantedPathChars>;\&amp;\%\$\@\.\&quot;\&apos;\&lt;\&gt;\*\^~`!\(\)</UnwantedPathChars>
-  <WebOfflineRootFolder>C:\</WebOfflineRootFolder>
-  <MapPath>
-    <Dns nameRegex="en.wikipedia.*" replace="Wikipedia" />
-    <Dns nameRegex="wikimedia*" replace="Wikimedia" />
-  </MapPath>
-</PathSettings>

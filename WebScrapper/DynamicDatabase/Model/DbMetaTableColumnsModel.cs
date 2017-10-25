@@ -11,10 +11,6 @@ namespace DynamicDatabase.Model
     public class DbMetaTableColumnsModel
     {
         [DDPrimaryKey]
-        [DDColumn("tnm")]
-        public string TableName { get; set; }
-
-        [DDPrimaryKey]
         [DDColumn("col")]
         public string ColumnName { get; set; }
 

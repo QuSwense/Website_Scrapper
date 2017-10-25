@@ -10,9 +10,7 @@ using DynamicDatabase.Interfaces;
 
 namespace DynamicDatabase
 {
-    public class DynamicColumnHeaders : 
-        IEnumerator<IColumnMetadata>,
-        IEnumerable<IColumnMetadata>
+    public class DynamicColumnHeaders : IColumnHeaders
     {
         /// <summary>
         /// The list of column headers by name
@@ -71,7 +69,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (var item in configCols)
             {
-                IColumnMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(item.Key, item.Value);
                 AddHeader(index, item.Key, colMetadata);
                 index++;
@@ -87,7 +85,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (PropertyInfo prop in classProperties)
             {
-                IColumnMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(prop);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;
@@ -115,7 +113,7 @@ namespace DynamicDatabase
             int index = 0;
             while (reader.Read())
             {
-                IColumnMetadata colMetadata = new TDynColMetadata();
+                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(reader);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;

@@ -12,7 +12,7 @@ namespace DynamicDatabase.Interfaces
     /// <summary>
     /// The interface for Column metadata class
     /// </summary>
-    public interface IColumnMetadata
+    public interface IColumnMetadata : IDisposable
     {
         /// <summary>
         /// The name

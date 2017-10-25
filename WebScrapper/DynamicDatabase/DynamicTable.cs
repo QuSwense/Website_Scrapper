@@ -15,12 +15,7 @@ namespace DynamicDatabase
     /// <typeparam name="TDynRow"></typeparam>
     /// <typeparam name="TDynColMetadata"></typeparam>
     /// <typeparam name="TDynCol"></typeparam>
-    public class DynamicTable<
-        TDynRow,
-        TDynColMetadata
-        > : IDisposable, IDbTable
-        where TDynRow : DynamicRow, new()
-        where TDynColMetadata : DynamicColumnMetadata, new()
+    public class DynamicTable : IDbTable
     {
         /// <summary>
         /// The name of the table
@@ -30,12 +25,12 @@ namespace DynamicDatabase
         /// <summary>
         /// The rows in the table. The data key is RowId.
         /// </summary>
-        public List<TDynRow> Rows { get; protected set; }
+        public List<IDbRow> Rows { get; protected set; }
 
         /// <summary>
         /// The list of column headers
         /// </summary>
-        public DynamicColumnHeaders<TDynColMetadata> Headers { get; protected set; }
+        public IColumnHeaders Headers { get; protected set; }
 
         /// <summary>
         /// Constructor default
@@ -68,8 +63,25 @@ namespace DynamicDatabase
         public void CreateTable(Dictionary<string, ConfigDbColumn> configCols)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers = DynamicDbFactory.Create<IColumnHeaders>();
             Headers.Initialize(configCols);
+        }
+
+        /// <summary>
+        /// Add rows of metadata table
+        /// </summary>
+        /// <param name="tableMetas"></param>
+        public void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas)
+        {
+            foreach (var item in tableMetas)
+            {
+                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
+                if (row == null) row = DynamicDbFactory.Create<IDbRow>(this);
+
+                row.AddorUpdate(0, item.Key);
+                row.AddorUpdate(1, item.Value.Display);
+                row.AddorUpdate(2, item.Value.Reference);
+            }
         }
 
         /// <summary>
@@ -79,7 +91,7 @@ namespace DynamicDatabase
         public void CreateTable(PropertyInfo[] classProperties)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers = DynamicDbFactory.Create<IColumnHeaders>();
             Headers.Initialize(classProperties);
         }
 
@@ -90,7 +102,7 @@ namespace DynamicDatabase
         public void LoadTableMetadata(DbDataReader reader)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = new DynamicColumnHeaders<TDynColMetadata>();
+            Headers = DynamicDbFactory.Create<IColumnHeaders>();
             Headers.Initialize(reader);
         }
 
@@ -102,11 +114,11 @@ namespace DynamicDatabase
         {
             if (Headers == null) throw new Exception("Table metadata must be loaded before data");
 
-            Rows = new List<TDynRow>();
+            Rows = new List<IDbRow>();
 
             while (reader.Read())
             {
-                TDynRow row = (TDynRow) Activator.CreateInstance(typeof(TDynRow), this);
+                var row = DynamicDbFactory.Create<IDbRow>(this);
 
                 foreach(var item in Headers)
                 {
@@ -117,29 +129,12 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Add rows of metadata table
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        public void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas)
-        {
-            foreach (var item in tableMetas)
-            {
-                TDynRow row = (TDynRow)Rows.Where(r => r.ToStringByPK() == item.Key);
-                if (row == null) row = (TDynRow)Activator.CreateInstance<TDynRow>();
-
-                row.AddorUpdate(0, item.Key);
-                row.AddorUpdate(1, item.Value.Display);
-                row.AddorUpdate(2, item.Value.Reference);
-            }
-        }
-
-        /// <summary>
         /// Get the list of Primary keys by name
         /// </summary>
         /// <returns></returns>
         public List<string> GetPKNames()
         {
-            List<TDynColMetadata> pkColumns = Headers.GetPKs();
+            List<IColumnMetadata> pkColumns = Headers.GetPKs();
 
             if (pkColumns != null || pkColumns.Count > 0)
                 return pkColumns.Select(p => p.ColumnName).ToList();

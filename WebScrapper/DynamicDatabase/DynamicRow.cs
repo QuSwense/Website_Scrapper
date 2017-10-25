@@ -9,7 +9,7 @@ namespace DynamicDatabase
     /// <summary>
     /// The class represents the row of a table
     /// </summary>
-    public class DynamicRow : IDisposable, IDbRow
+    public class DynamicRow : IDbRow
     {
         /// <summary>
         /// Refers to the parent table

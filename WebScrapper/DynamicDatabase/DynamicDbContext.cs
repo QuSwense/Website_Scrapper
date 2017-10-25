@@ -20,70 +20,24 @@ namespace DynamicDatabase
     /// the derived class.
     /// This Database context class is responsible for all sorts of database activities.
     /// </summary>
-    /// <typeparam name="TDynTable">Represents a table of the database</typeparam>
-    /// <typeparam name="TDbCommand">Used to issue command to database</typeparam>
-    /// <typeparam name="TDbConnection">Database connection class</typeparam>
-    /// <typeparam name="TDynRow">Represents a row of the table of the database</typeparam>
-    /// <typeparam name="TDynColMetadata">The metadata of a table which represents a single column information</typeparam>
-    public class DynamicDbContext<
-        TDynTable,
-        TDbCommand,
-        TDbConnection,
-        TDynRow, 
-        TDynColMetadata
-        > : IDisposable, IDbContext
-        where TDynTable : DynamicTable<
-            TDynRow,
-            TDynColMetadata
-            >, new()
-        where TDbCommand : DynamicDbCommand<
-            TDynTable,
-            TDynRow,
-            TDynColMetadata,
-            TDbConnection>, new()
-        where TDbConnection : DbConnection, new()
-        where TDynRow : DynamicRow, new()
-        where TDynColMetadata : DynamicColumnMetadata, new()
+    public class DynamicDbContext : IDbContext
     {
         /// <summary>
-        /// The name of the database
+        /// The connection object
         /// </summary>
-        public string DbName { get; protected set; }
-
-        /// <summary>
-        /// The full local path of the database file
-        /// </summary>
-        public string FullPath { get; set; }
-
-        /// <summary>
-        /// The extension of the database file
-        /// </summary>
-        public virtual string FileExtension { get; protected set; }
-
-        /// <summary>
-        /// Get the full path of the database file including the name
-        /// </summary>
-        public virtual string FullDbFileName
-        {
-            get { return Path.Combine(FullPath, DbName); }
-        }
+        public IDynamicDbConnection Connection { get; protected set; }
 
         /// <summary>
         /// The list of all tables in the database
         /// </summary>
-        public Dictionary<string, TDynTable> Tables { get; protected set; }
+        public Dictionary<string, IDbTable> Tables { get; protected set; }
 
         /// <summary>
         /// The object which builds and execute any database query of rthe database context.
         /// To retrieve the current sql query executed in the database use the <see cref="SQL"/>
         /// property
         /// </summary>
-        public TDbCommand DbCommand { get; protected set; }
-
-        /// <summary>
-        /// The database connection object
-        /// </summary>
-        public TDbConnection ConnectionCtx { get; protected set; }
+        public IDbCommand DbCommand { get; protected set; }
 
         /// <summary>
         /// Default constructor
@@ -97,8 +51,7 @@ namespace DynamicDatabase
         /// <param name="name"></param>
         public DynamicDbContext(string dbfilepath, string name)
         {
-            DbName = name;
-            FullPath = dbfilepath;
+            Connection = DynamicDbFactory.Create<IDynamicDbConnection>(dbfilepath, name);
         }
 
         /// <summary>
@@ -109,8 +62,7 @@ namespace DynamicDatabase
         /// <param name="connectionString"></param>
         public DynamicDbContext(string dbfilepath, string name, string connectionString)
         {
-            DbName = name;
-            FullPath = dbfilepath;
+            Connection = DynamicDbFactory.Create<IDynamicDbConnection>(dbfilepath, name, connectionString);
         }
 
         /// <summary>
@@ -118,46 +70,42 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="connectionCtx"></param>
-        public DynamicDbContext(string connection)
+        public DynamicDbContext(string connectionString)
         {
-            ConnectionCtx = (TDbConnection)Activator.CreateInstance(typeof(TDbConnection), connection);
+            Connection = DynamicDbFactory.Create<IDynamicDbConnection>(connectionString);
         }
 
         /// <summary>
         /// An empty virtual method whose purpose is to create database
         /// </summary>
-        public virtual void CreateDatabase() { }
-
-        /// <summary>
-        /// Create the database from the config file dynamically
-        /// </summary>
-        public virtual void CreateDatabase(
-            Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnConfigs)
+        public virtual void CreateDatabase()
         {
-            // Create App specific tables
-            foreach (var kv in TableColumnConfigs)
-            {
-                CreateTable(kv.Key, kv.Value);
-            }
+            Connection.CreateDatabase();
         }
 
         /// <summary>
         /// An empty virtual method whose purpose is to check if the database already exists or not
         /// </summary>
         /// <returns></returns>
-        public virtual bool DatabaseExists() { return false; }
+        public virtual bool DatabaseExists()
+        {
+            return Connection.DatabaseExists();
+        }
 
         /// <summary>
         /// An empty virtual method whose purpose is to delete database
         /// </summary>
-        public virtual void DeleteDatabase() { }
+        public virtual void DeleteDatabase()
+        {
+            Connection.DeleteDatabase();
+        }
 
         /// <summary>
         /// Use this method to open connection to the database
         /// </summary>
         public virtual void Open()
         {
-            ConnectionCtx.Open();
+            Connection.Open();
         }
 
         /// <summary>
@@ -165,31 +113,7 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void Close()
         {
-            ConnectionCtx.Close();
-        }
-
-        /// <summary>
-        /// Create a new table in the database. If the table exists then throw error.
-        /// </summary>
-        /// <param name="tableName">The name of the table</param>
-        /// <param name="configCols">The table column configurations to create the table</param>
-        public virtual void CreateTable(Dictionary<string, Dictionary<string, ConfigDbColumn>> configCols)
-        {
-            foreach (var item in configCols)
-            {
-                CreateTable(item.Key, item.Value);
-            }
-        }
-
-        /// <summary>
-        /// Create a new table in the database. If the table exists then throw error.
-        /// </summary>
-        /// <param name="tableName">The name of the table</param>
-        /// <param name="configCols">The table column configurations to create the table</param>
-        protected virtual void CreateTable(string tableName, 
-            Dictionary<string, ConfigDbColumn> configCols)
-        {
-            CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
+            Connection.Close();
         }
 
         /// <summary>
@@ -208,19 +132,58 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Create the database from the config file dynamically
+        /// </summary>
+        public virtual void CreateTable(
+            Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnConfigs)
+        {
+            // Create App specific tables
+            foreach (var kv in TableColumnConfigs)
+            {
+                CreateTable(kv.Key, kv.Value);
+            }
+        }
+
+        /// <summary>
+        /// Create a new table in the database. If the table exists then throw error.
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="configCols">The table column configurations to create the table</param>
+        public virtual void CreateTable(string tableName,
+            Dictionary<string, ConfigDbColumn> configCols)
+        {
+            CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
+        }
+
+        /// <summary>
+        /// Bulk add the table metadata information
+        /// </summary>
+        /// <param name="tableMetas"></param>
+        private void AddOrUpdateRows(Dictionary<string, ConfigDbTable> tableMetas)
+        {
+            Type tableMetaType = typeof(DbMetaTableModel);
+            DDTableAttribute tableAttr = tableMetaType.GetCustomAttribute<DDTableAttribute>();
+
+            if (tableAttr == null) throw new Exception("Table name attribute on DbMetaTableModel class not found");
+            if (!Tables.ContainsKey(tableAttr.Name)) LoadMetadata(tableAttr.Name);
+
+            Tables[tableAttr.Name].AddorUpdate(tableMetas);
+        }
+
+        /// <summary>
         /// A generic private method to create table
         /// </summary>
         /// <param name="name"></param>
         /// <param name="fnTableCreate"></param>
-        private void CreateTable(string name, Action<TDynTable> fnTableCreate)
+        protected void CreateTable(string name, Action<IDbTable> fnTableCreate)
         {
             // Check if the tables data set exists if not create new
-            if (Tables == null) Tables = new Dictionary<string, TDynTable>();
+            if (Tables == null) Tables = new Dictionary<string, IDbTable>();
 
             if (Tables.ContainsKey(name)) throw new Exception(string.Format("The table {0} already exists", name));
 
             // Create the new table
-            TDynTable dynTable = (TDynTable)Activator.CreateInstance(typeof(TDynTable), name);
+            IDbTable dynTable = DynamicDbFactory.Create<IDbTable>(name);
 
             // The action method to create table
             fnTableCreate(dynTable);
@@ -270,30 +233,15 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="name"></param>
         /// <param name="fnTableLoad"></param>
-        private void Load(string name, Action<TDynTable> fnTableLoad)
+        private void Load(string name, Action<IDbTable> fnTableLoad)
         {
-            if (Tables == null) Tables = new Dictionary<string, TDynTable>();
-            TDynTable dynTable = Tables.ContainsKey(name) ? Tables[name] :
-                (TDynTable)Activator.CreateInstance(typeof(TDynTable), name);
+            if (Tables == null) Tables = new Dictionary<string, IDbTable>();
+            IDbTable dynTable = Tables.ContainsKey(name) ? Tables[name] :
+                DynamicDbFactory.Create<IDbTable>(name);
 
             fnTableLoad(dynTable);
 
             if (!Tables.ContainsKey(name)) Tables.Add(name, dynTable);
-        }
-
-        /// <summary>
-        /// Bulk add the table metadata information
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        private void AddOrUpdateRows(Dictionary<string, ConfigDbTable> tableMetas)
-        {
-            Type tableMetaType = typeof(DbMetaTableModel);
-            DDTableAttribute tableAttr = tableMetaType.GetCustomAttribute<DDTableAttribute>();
-
-            if (tableAttr == null) throw new Exception("Table name attribute on DbMetaTableModel class not found");
-            if (!Tables.ContainsKey(tableAttr.Name)) LoadMetadata(tableAttr.Name);
-
-            Tables[tableAttr.Name].AddorUpdate(tableMetas);
         }
 
         /// <summary>
@@ -325,7 +273,7 @@ namespace DynamicDatabase
                     }
 
                     if (DbCommand != null) DbCommand.Dispose();
-                    if (ConnectionCtx != null) ConnectionCtx.Dispose();
+                    if (Connection != null) Connection.Dispose();
                 }
 
                 disposedValue = true;
