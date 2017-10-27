@@ -13,6 +13,11 @@ namespace DynamicDatabase.Interfaces
         IEnumerable<IColumnMetadata>
     {
         /// <summary>
+        /// Refers to the parent table
+        /// </summary>
+        IDbTable Table { get; }
+
+        /// <summary>
         /// The list of column headers by name
         /// </summary>
         Dictionary<string, IColumnMetadata> ByNames { get; }

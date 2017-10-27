@@ -48,6 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Csv\CSVReader.cs" />
     <Compile Include="Csv\Meta\SplitIndexAttribute.cs" />
+    <Compile Include="Xml\DXmlReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebCommon\WebCommon.csproj">

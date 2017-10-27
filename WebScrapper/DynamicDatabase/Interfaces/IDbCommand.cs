@@ -19,6 +19,13 @@ namespace DynamicDatabase.Interfaces
         IDynamicDbConnection Connection { get; }
 
         /// <summary>
+        /// Constructor with database conetxt object and connection object
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="connectionCtx"></param>
+        void Initialize(IDbContext dbContext, IDynamicDbConnection connectionCtx = null);
+
+        /// <summary>
         /// Create table command
         /// </summary>
         /// <param name="dynTable"></param>
@@ -49,6 +56,11 @@ namespace DynamicDatabase.Interfaces
         /// <returns></returns>
         DbDataReader ExecuteDML();
 
+        /// <summary>
+        /// Load metadata
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         DbDataReader LoadMetadata(string name);
     }
 }

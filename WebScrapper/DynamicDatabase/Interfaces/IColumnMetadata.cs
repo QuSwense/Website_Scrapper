@@ -15,6 +15,11 @@ namespace DynamicDatabase.Interfaces
     public interface IColumnMetadata : IDisposable
     {
         /// <summary>
+        /// Refers to the parent table
+        /// </summary>
+        IDbTable Table { get; }
+
+        /// <summary>
         /// The name
         /// </summary>
         string ColumnName { get; }

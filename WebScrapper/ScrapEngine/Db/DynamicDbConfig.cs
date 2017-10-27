@@ -15,6 +15,8 @@ namespace ScrapEngine.Db
     /// </summary>
     public class DynamicDbConfig : IDisposable
     {
+        public string AppTopic { get; set; }
+
         /// <summary>
         /// This data set stores the table-columns information and contains all data to create a new table
         /// </summary>
@@ -30,11 +32,44 @@ namespace ScrapEngine.Db
         /// </summary>
         public Dictionary<string, ConfigDbTable> TableMetadatas { get; set; }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
         public DynamicDbConfig() { }
 
+        public DynamicDbConfig(string appTopic)
+        {
+            AppTopic = appTopic;
+        }
+
+        public void Initialize()
+        {
+            TableColumnConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
+            EnumConfigs = new Dictionary<string, Dictionary<int, string>>();
+            TableMetadatas = new Dictionary<string, ConfigDbTable>();
+        }
+
+        public void Read()
+        {
+            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic),
+                    TableColumnConfigs))
+            {
+                reader.Read();
+            }
+
+            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableEnumConfigPath(AppTopic),
+                    EnumConfigs))
+            {
+                reader.Read();
+            }
+
+            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableMetadataConfigPath(AppTopic),
+                    TableMetadatas))
+            {
+                reader.Read();
+            }
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+        
         /// <summary>
         /// Read the table configurations of a database
         /// </summary>
@@ -75,7 +110,5 @@ namespace ScrapEngine.Db
             // GC.SuppressFinalize(this);
         }
         #endregion
-
-
     }
 }

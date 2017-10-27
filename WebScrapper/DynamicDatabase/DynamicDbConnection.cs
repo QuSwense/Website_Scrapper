@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,14 +11,17 @@ using System.Text;
 namespace DynamicDatabase
 {
     /// <summary>
-    /// Dynamic database connection class
+    /// Dynamic database connection class. It wraps the main <see cref="DbConnection"/>
+    /// class. The <see cref="DynamicDbFactory"/> is used to create the new connection object
+    /// using the needed class.
     /// </summary>
-    public class DynamicDbConnection : IDynamicDbConnection
+    public abstract class DynamicDbConnection : IDynamicDbConnection
     {
         /// <summary>
-        /// Connection object
+        /// The main db Connection object
+        /// Use <see cref="DynamicDbFactory"/> to create the main class
         /// </summary>
-        public DbConnection Connection { get; set; }
+        public DbConnection Connection { get; protected set; }
 
         /// <summary>
         /// The name of the database
@@ -27,7 +31,7 @@ namespace DynamicDatabase
         /// <summary>
         /// The full local path of the database file
         /// </summary>
-        public string FullPath { get; set; }
+        public string FullPath { get; protected set; }
 
         /// <summary>
         /// The extension of the database file
@@ -43,15 +47,61 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Gets a string that represents the version of the server to which the object is connected
+        /// </summary>
+        public virtual string ServerVersion
+        {
+            get { return Connection.ServerVersion; }
+        }
+
+        /// <summary>
+        /// Gets the name of the database server to which to connect.
+        /// </summary>
+        public virtual string DataSource
+        {
+            get { return Connection.DataSource; }
+        }
+
+        /// <summary>
+        /// Gets the name of the current database after a connection is opened, or the
+        /// database name specified in the connection string before the connection is opened.
+        /// </summary>
+        public virtual string Database
+        {
+            get { return Connection.Database; }
+        }
+
+        /// <summary>
+        /// Gets the time to wait while establishing a connection before terminating 
+        /// the attempt and generating an error.
+        /// </summary>
+        public virtual int ConnectionTimeout
+        {
+            get { return Connection.ConnectionTimeout; }
+        }
+
+        /// <summary>
+        /// Gets or sets the string used to open the connection.
+        /// </summary>
+        public virtual string ConnectionString
+        {
+            get { return Connection.ConnectionString; }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DynamicDbConnection() { }
+
+        /// <summary>
         /// Constructor with db database file and name
         /// </summary>
         /// <param name="dbfilepath"></param>
         /// <param name="name"></param>
-        public DynamicDbConnection(string dbfilepath, string name)
+        public virtual void Initialize(string dbfilepath, string name)
         {
             DbName = name;
             FullPath = dbfilepath;
-            Connection = DynamicDbFactory.Create<DbConnection>(dbfilepath, name);
         }
 
         /// <summary>
@@ -60,11 +110,10 @@ namespace DynamicDatabase
         /// <param name="dbfilepath"></param>
         /// <param name="name"></param>
         /// <param name="connectionString"></param>
-        public DynamicDbConnection(string dbfilepath, string name, string connectionString)
+        public virtual void Initialize(string dbfilepath, string name, string connectionString)
         {
             DbName = name;
             FullPath = dbfilepath;
-            Connection = DynamicDbFactory.Create<DbConnection>(dbfilepath, name, connectionString);
         }
 
         /// <summary>
@@ -72,9 +121,9 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="connectionCtx"></param>
-        public DynamicDbConnection(string connectionString)
+        public virtual void Initialize(string connectionString)
         {
-            Connection = DynamicDbFactory.Create<DbConnection>(connectionString);
+            
         }
 
         /// <summary>
@@ -99,12 +148,18 @@ namespace DynamicDatabase
         /// <summary>
         /// Open a connection
         /// </summary>
-        public virtual void Open() { }
+        public virtual void Open()
+        {
+            Connection.Open();
+        }
 
         /// <summary>
         /// Close a connection
         /// </summary>
-        public virtual void Close() { }
+        public virtual void Close()
+        {
+            Connection.Close();
+        }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

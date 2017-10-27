@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DynamicDatabase.Model
 {
-    [DDTable("mtblcol")]
+    [DDTable("mdtcol")]
     public class DbMetaTableColumnsModel
     {
         [DDPrimaryKey]

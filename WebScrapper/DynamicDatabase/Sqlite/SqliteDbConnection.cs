@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
@@ -23,18 +24,27 @@ namespace DynamicDatabase.Sqlite
         }
 
         /// <summary>
-        /// Constructor with the database name with the file path
+        /// Initialize
+        /// </summary>
+        /// <param name="connectionString"></param>
+        public override void Initialize(string connectionString)
+        {
+            Connection = new SQLiteConnection(connectionString);
+        }
+
+        /// <summary>
+        /// Initialize the database connection
         /// </summary>
         /// <param name="dbfilepath"></param>
         /// <param name="name"></param>
-        public SqliteDbConnection(string dbfilepath, string name) 
-            : base(dbfilepath, name)
+        public override void Initialize(string dbfilepath, string name)
         {
-            string connection = string.Format("Data Source={0}.{1}",
-                Path.Combine(FullPath, DbName), FileExtension);
-            Connection = new SQLiteConnection(connection);
-        }
+            base.Initialize(dbfilepath, name);
 
+            Connection = new SQLiteConnection(string.Format("Data Source={0}.{1}",
+                Path.Combine(FullPath, DbName), FileExtension));
+        }
+        
         /// <summary>
         /// Create the Sqlite database
         /// </summary>

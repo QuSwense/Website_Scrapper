@@ -11,7 +11,7 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Connection object
         /// </summary>
-        DbConnection Connection { get; set; }
+        DbConnection Connection { get; }
 
         /// <summary>
         /// The name of the database
@@ -21,7 +21,7 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// The full local path of the database file
         /// </summary>
-        string FullPath { get; set; }
+        string FullPath { get; }
 
         /// <summary>
         /// The extension of the database file
@@ -32,6 +32,28 @@ namespace DynamicDatabase.Interfaces
         /// Get the full path of the database file including the name
         /// </summary>
         string FullDbFileName { get; }
+
+        /// <summary>
+        /// Constructor with db database file and name
+        /// </summary>
+        /// <param name="dbfilepath"></param>
+        /// <param name="name"></param>
+        void Initialize(string dbfilepath, string name);
+
+        /// <summary>
+        /// Constructor with db file path and name and connection string
+        /// </summary>
+        /// <param name="dbfilepath"></param>
+        /// <param name="name"></param>
+        /// <param name="connectionString"></param>
+        void Initialize(string dbfilepath, string name, string connectionString);
+
+        /// <summary>
+        /// Construct the database context using the connection string
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="connectionCtx"></param>
+        void Initialize(string connectionString);
 
         /// <summary>
         /// Create the Sqlite database

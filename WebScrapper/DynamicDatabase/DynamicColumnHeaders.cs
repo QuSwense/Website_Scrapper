@@ -13,6 +13,11 @@ namespace DynamicDatabase
     public class DynamicColumnHeaders : IColumnHeaders
     {
         /// <summary>
+        /// Refers to the parent table
+        /// </summary>
+        public IDbTable Table { get; protected set; }
+
+        /// <summary>
         /// The list of column headers by name
         /// </summary>
         public Dictionary<string, IColumnMetadata> ByNames { get; protected set; }

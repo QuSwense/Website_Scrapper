@@ -1,5 +1,6 @@
 ﻿using DynamicDatabase.Config;
 using DynamicDatabase.Interfaces;
+using DynamicDatabase.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -17,6 +18,11 @@ namespace DynamicDatabase
     /// <typeparam name="TDynCol"></typeparam>
     public class DynamicTable : IDbTable
     {
+        /// <summary>
+        /// Reference to the parent database context
+        /// </summary>
+        public IDbContext DbContext { get; protected set; }
+
         /// <summary>
         /// The name of the table
         /// </summary>
@@ -41,8 +47,9 @@ namespace DynamicDatabase
         /// Constructor with table name
         /// </summary>
         /// <param name="tablename"></param>
-        public DynamicTable(string tablename)
+        public virtual void Initialize(IDbContext dbContext, string tablename)
         {
+            DbContext = dbContext;
             TableName = tablename;
         }
 
@@ -76,11 +83,46 @@ namespace DynamicDatabase
             foreach (var item in tableMetas)
             {
                 var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
-                if (row == null) row = DynamicDbFactory.Create<IDbRow>(this);
+                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
+                row.Initialize(this);
 
                 row.AddorUpdate(0, item.Key);
                 row.AddorUpdate(1, item.Value.Display);
                 row.AddorUpdate(2, item.Value.Reference);
+            }
+        }
+
+        /// <summary>
+        /// Add rows of data
+        /// </summary>
+        /// <param name="row"></param>
+        public void AddorUpdate(List<TableDataColumnModel> cols)
+        {
+            List<string> pkCols = new List<string>();
+            List<string> pkColsData = new List<string>();
+            string pkdata = "";
+
+            foreach (var col in cols)
+            {
+                if (col.IsPk)
+                {
+                    pkCols.Add(col.Name);
+                    pkColsData.Add(col.Value);
+                }
+            }
+
+            pkdata = string.Join(",", pkColsData);
+
+            var foundRows = Rows.Where(r => r.ToStringByPK(pkCols) == pkdata);
+
+            if(foundRows != null)
+            {
+                IDbRow row = foundRows.First();
+
+                foreach (var col in cols)
+                {
+                    row.Columns[col.Name] = col.Value;
+                }
             }
         }
 
@@ -118,7 +160,8 @@ namespace DynamicDatabase
 
             while (reader.Read())
             {
-                var row = DynamicDbFactory.Create<IDbRow>(this);
+                var row = DynamicDbFactory.Create<IDbRow>();
+                row.Initialize(this);
 
                 foreach(var item in Headers)
                 {

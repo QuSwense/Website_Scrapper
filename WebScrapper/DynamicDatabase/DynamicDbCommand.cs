@@ -45,7 +45,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="connectionCtx"></param>
-        public DynamicDbCommand(IDbContext dbContext, IDynamicDbConnection connectionCtx = null)
+        public void Initialize(IDbContext dbContext, IDynamicDbConnection connectionCtx = null)
         {
             this.dbContext = dbContext;
 
@@ -117,6 +117,11 @@ namespace DynamicDatabase
         /// <returns></returns>
         public virtual DbDataReader ExecuteDML() { return null; }
 
+        /// <summary>
+        /// Load metadata
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public virtual DbDataReader LoadMetadata(string name) { return null; }
 
         #region IDisposable Support

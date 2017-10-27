@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using DynamicDatabase.Model;
 
 namespace DynamicDatabase.Interfaces
 {
@@ -14,6 +15,11 @@ namespace DynamicDatabase.Interfaces
     /// </summary>
     public interface IDbTable : IDisposable
     {
+        /// <summary>
+        /// Reference to the parent database context
+        /// </summary>
+        IDbContext DbContext { get; }
+
         /// <summary>
         /// The name of the table
         /// </summary>
@@ -28,6 +34,12 @@ namespace DynamicDatabase.Interfaces
         /// The list of column headers
         /// </summary>
         IColumnHeaders Headers { get; }
+
+        /// <summary>
+        /// Constructor with table name
+        /// </summary>
+        /// <param name="tablename"></param>
+        void Initialize(IDbContext dbContext, string tablename);
 
         /// <summary>
         /// Get the index from the column name
@@ -71,5 +83,11 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="tableMetas"></param>
         void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas);
+
+        /// <summary>
+        /// Add rows of data
+        /// </summary>
+        /// <param name="row"></param>
+        void AddorUpdate(List<TableDataColumnModel> row);
     }
 }

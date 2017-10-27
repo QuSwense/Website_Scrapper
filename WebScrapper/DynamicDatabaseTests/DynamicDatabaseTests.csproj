@@ -52,6 +52,13 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sqlite\SqliteDbConnectionTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicDatabase\DynamicDatabase.csproj">
+      <Project>{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}</Project>
+      <Name>DynamicDatabase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

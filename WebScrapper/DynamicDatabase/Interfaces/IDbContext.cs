@@ -11,6 +11,8 @@ namespace DynamicDatabase.Interfaces
     /// </summary>
     public interface IDbContext
     {
+        IDataTypeContext DataType { get; }
+
         /// <summary>
         /// The connection object
         /// </summary>
@@ -27,6 +29,28 @@ namespace DynamicDatabase.Interfaces
         /// property
         /// </summary>
         IDbCommand DbCommand { get; }
+
+        /// <summary>
+        /// Constructor with db database file and name
+        /// </summary>
+        /// <param name="dbfilepath"></param>
+        /// <param name="name"></param>
+        void Initialize(string dbfilepath, string name);
+
+        /// <summary>
+        /// Constructor with db file path and name and connection string
+        /// </summary>
+        /// <param name="dbfilepath"></param>
+        /// <param name="name"></param>
+        /// <param name="connectionString"></param>
+        void Initialize(string dbfilepath, string name, string connectionString);
+
+        /// <summary>
+        /// Construct the database context using the connection string
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="connectionCtx"></param>
+        void Initialize(string connectionString);
 
         /// <summary>
         /// An empty virtual method whose purpose is to create database
@@ -59,7 +83,7 @@ namespace DynamicDatabase.Interfaces
         /// Database attributes
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        void CreateTable<T>();
+        void CreateTable<T>(string tableName);
 
         /// <summary>
         /// Create the database from the config file dynamically

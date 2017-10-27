@@ -9,13 +9,11 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 
-namespace WebScrapper.Db.Ctx
+namespace DynamicDatabase.Sqlite
 {
     public class SqliteDbCommand : DynamicDbCommand
     {
         public SqliteDbCommand() { }
-        public SqliteDbCommand(IDbContext dbContext) 
-            : base(dbContext) { }
 
         public override void ExecuteDDL()
         {

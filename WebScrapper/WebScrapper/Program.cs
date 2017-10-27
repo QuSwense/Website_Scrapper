@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrapEngine;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,20 +16,20 @@ namespace WebScrapper
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //if(args[0] == "*")
-            //{
-            //    // Get a list of all app folders
-            //    foreach(var folderPath in Directory.GetDirectories("App"))
-            //    {
-            //        AppEngine appEngine = new AppEngine(args[0]);
-            //        appEngine.Run();
-            //    }
-            //}
-            //else
-            //{
-            //    AppEngine appEngine = new AppEngine(args[0]);
-            //    appEngine.Run();
-            //}
+            if (args != null && args.Length > 0 && args[0] == "*")
+            {
+                // Get a list of all app folders
+                foreach (var folderPath in Directory.GetDirectories("App"))
+                {
+                    ScrapEngineContext appEngine = new ScrapEngineContext();
+                    appEngine.Initialize(folderPath, "sqlite");
+                }
+            }
+            else
+            {
+                ScrapEngineContext appEngine = new ScrapEngineContext();
+                appEngine.Initialize("country", "sqlite");
+            }
         }
     }
 }

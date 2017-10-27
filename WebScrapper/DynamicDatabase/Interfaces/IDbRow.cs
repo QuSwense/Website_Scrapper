@@ -26,6 +26,12 @@ namespace DynamicDatabase.Interfaces
         DynamicColumns Columns { get; }
 
         /// <summary>
+        /// Constructor with parent table
+        /// </summary>
+        /// <param name="table"></param>
+        void Initialize(IDbTable table);
+
+        /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="name"></param>
@@ -44,5 +50,11 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <returns></returns>
         string ToStringByPK();
+
+        /// <summary>
+        /// Get the unique key representation of PK
+        /// </summary> 
+        /// <returns></returns>
+        string ToStringByPK(List<string> pkCols);
     }
 }

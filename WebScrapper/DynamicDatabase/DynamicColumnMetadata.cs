@@ -18,6 +18,11 @@ namespace DynamicDatabase
     public class DynamicColumnMetadata : IDisposable, IColumnMetadata
     {
         /// <summary>
+        /// Refers to the parent table
+        /// </summary>
+        public IDbTable Table { get; protected set; }
+
+        /// <summary>
         /// The name
         /// </summary>
         public string ColumnName { get; protected set; }
@@ -65,7 +70,7 @@ namespace DynamicDatabase
         public virtual void Parse(DbDataReader reader)
         {
             ColumnName = reader.GetString(1);
-            DataType = ParseDataType(reader.GetString(2));
+            DataType = Table.DbContext.DataType.ParseDataType(reader.GetString(2));
             Constraint = ParseConstraint(reader);
         }
 
@@ -112,13 +117,6 @@ namespace DynamicDatabase
 
             return constraint;
         }
-
-        /// <summary>
-        /// Parse data type from the string typename
-        /// </summary>
-        /// <param name="typeName"></param>
-        /// <returns></returns>
-        protected virtual DbDataType ParseDataType(string typeName) { return null; }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

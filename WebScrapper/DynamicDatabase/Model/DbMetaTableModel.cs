@@ -3,15 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicDatabase.Model
 {
-    [DDTable("mtbl")]
+    [DDTable("mdt")]
     public class DbMetaTableModel
     {
         [DDPrimaryKey]
-        [DDColumn("tnm")]
+        [DDColumn("tbl")]
         public string TableName { get; set; }
 
         [DDColumn("desc")]
@@ -22,8 +21,5 @@ namespace DynamicDatabase.Model
 
         [DDColumn("xpath")]
         public string XPath { get; set; }
-
-        [DDColumn("typ")]
-        public string TypeOfDataExtract { get; set; }
     }
 }

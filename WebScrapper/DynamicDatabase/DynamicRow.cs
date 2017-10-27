@@ -35,7 +35,7 @@ namespace DynamicDatabase
         /// Constructor with parent table
         /// </summary>
         /// <param name="table"></param>
-        public DynamicRow(IDbTable table)
+        public void Initialize(IDbTable table)
         {
             Table = table;
         }
@@ -69,6 +69,15 @@ namespace DynamicDatabase
         public string ToStringByPK()
         {
             return string.Join(",", RowId, Columns.ToStringPK());
+        }
+
+        /// <summary>
+        /// Get the unique key representation of PK
+        /// </summary> 
+        /// <returns></returns>
+        public virtual string ToStringByPK(List<string> pkCols)
+        {
+            return Columns.ToStringPK(pkCols);
         }
 
         /// <summary>

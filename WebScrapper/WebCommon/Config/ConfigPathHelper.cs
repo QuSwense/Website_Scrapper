@@ -11,34 +11,34 @@ namespace WebCommon.Config
         public static readonly string ScrapperAppsFolder = "ScrapperApps";
         public static readonly string ScrapperAppsDbScriptsFolder = "dbscripts";
 
-        public static string GetAppConfigPath(string folderpath, string appTopic)
+        public static string GetAppConfigPath(string appTopic, string folderpath = "")
         {
-            return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, appTopic + "Config.xml");
+            return Path.Combine(folderpath, ScrapperAppsFolder, "AppConfig.xml");
         }
 
-        public static string GetDbTableEnumConfigPath(string folderpath, string appTopic)
+        public static string GetDbTableEnumConfigPath(string appTopic, string folderpath = "")
         {
             return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, ScrapperAppsDbScriptsFolder, "table_enum.csv");
         }
 
-        public static string GetDbTableMetadataConfigPath(string folderpath, string appTopic)
+        public static string GetDbTableMetadataConfigPath(string appTopic, string folderpath = "")
         {
             return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, ScrapperAppsDbScriptsFolder, "table_metadata.csv");
         }
 
-        public static string GetDbTableColumnsConfigPath(string folderpath, string appTopic)
+        public static string GetDbTableColumnsConfigPath(string appTopic, string folderpath = "")
         {
             return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, ScrapperAppsDbScriptsFolder, "table_columns.csv");
         }
 
-        public static string GetScrapConfigPath(string folderpath, string appTopic)
+        public static string GetScrapConfigPath(string appTopic, string folderpath = "")
         {
             return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, "Scrap", appTopic + "Scrap.xml");
         }
 
-        public static string GetDbConfigPath(string folderpath, string appTopic, string extension)
+        public static string GetDbFilePath(string appTopic, string folderpath = "")
         {
-            return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, appTopic + extension);
+            return Path.Combine(folderpath, ScrapperAppsFolder, appTopic);
         }
     }
 }

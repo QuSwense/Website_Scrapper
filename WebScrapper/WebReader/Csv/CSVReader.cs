@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using WebCommon.Extn;
 
 namespace WebReader.Csv
@@ -20,8 +21,16 @@ namespace WebReader.Csv
     /// </summary>
     public class CSVReader : DynamicReader
     {
+        /// <summary>
+        /// Constructor default
+        /// </summary>
         public CSVReader() { }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="fullfile"></param>
+        /// <param name="store"></param>
         public CSVReader(string fullfile, object store) : base(fullfile, store) { }
 
         /// <summary>
@@ -30,9 +39,15 @@ namespace WebReader.Csv
         protected override void ReadLineOverride(string line)
         {
             int keyIndx = 0;
-            string[] split = line.Split(new char[] { ',' });
+            List<string> splits = new List<string>();
 
-            SetValues(Store, split, keyIndx);
+            var regex = new Regex("(?<=^|,)(\"(?:[^\"]|\"\")*\"|[^,]*)");
+            foreach (Match m in regex.Matches(line))
+            {
+                splits.Add(m.Value);
+            }
+
+            SetValues(Store, splits, keyIndx);
         }
 
         /// <summary>
@@ -41,16 +56,16 @@ namespace WebReader.Csv
         /// <param name="objStore"></param>
         /// <param name="split"></param>
         /// <param name="keyIndx"></param>
-        private void SetValues(object store, string[] split, int keyIndx)
+        private void SetValues(object store, List<string> splits, int keyIndx)
         {
             // If the current object is Dictionary
             if (store is IDictionary)
             {
-                SetValueToDictionary(store as IDictionary, split, keyIndx);
+                SetValueToDictionary(store as IDictionary, splits, keyIndx);
             }
             else
             {
-                SetValueToClass(store, split, keyIndx);
+                SetValueToClass(store, splits, keyIndx);
             }
         }
 
@@ -60,7 +75,7 @@ namespace WebReader.Csv
         /// <param name="objStore"></param>
         /// <param name="split"></param>
         /// <param name="keyIndx"></param>
-        private void SetValueToClass(object objStore, string[] split, int keyIndx)
+        private void SetValueToClass(object objStore, List<string> splits, int keyIndx)
         {
             PropertyInfo[] props = objStore.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo propOfObjValue in props)
@@ -68,12 +83,12 @@ namespace WebReader.Csv
                 SplitIndexAttribute splitIndex = propOfObjValue.GetCustomAttribute<SplitIndexAttribute>();
                 if (propOfObjValue.PropertyType == typeof(IDictionary))
                 {
-                    SetValues(propOfObjValue.PropertyType, split, splitIndex.Index);
+                    SetValues(propOfObjValue.PropertyType, splits, splitIndex.Index);
                 }
                 else
                 {
                     propOfObjValue.SetValue(objStore,
-                        ChangeType(split[splitIndex.Index], propOfObjValue.PropertyType));
+                        propOfObjValue.PropertyType.ChangeType(splits[splitIndex.Index]));
                 }
             }
         }
@@ -84,7 +99,7 @@ namespace WebReader.Csv
         /// <param name="store"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        private void SetValueToDictionary(IDictionary dictObjStore, string[] split, int keyIndx)
+        private void SetValueToDictionary(IDictionary dictObjStore, List<string> splits, int keyIndx)
         {
             // The type of dictionary object
             Type dictObjStoreType = dictObjStore.GetType();
@@ -96,23 +111,22 @@ namespace WebReader.Csv
             object objValueStore = null;
 
             // Get the existing dictionary object
-            if (dictObjStore.Contains(split[keyIndx])) objValueStore = dictObjStore[split[keyIndx]];
+            if (dictObjStore.Contains(splits[keyIndx])) objValueStore = dictObjStore[splits[keyIndx]];
             else if (genericArguments[1] is IDictionary || (!genericArguments[1].IsValueType &&
                 genericArguments[1] != typeof(string)))
             {
                 // If the value type is a class type which is not a dictionary or known value type
                 // then create a value type using Activator
                 objValueStore = Activator.CreateInstance(genericArguments[1]);
-                dictObjStore.Add(split[keyIndx], objValueStore);
+                dictObjStore.Add(splits[keyIndx], objValueStore);
             }
             else
             {
                 // For a value type (a terminal node in this recusrsive call)
-                if (split.Length >= keyIndx + 1)
-                    objValueStore = ChangeType(split[keyIndx + 1], genericArguments[1]);
-                dictObjStore.Add(
-                    ChangeType(split[keyIndx], genericArguments[0]),
-                    objValueStore);
+                if (splits.Count >= keyIndx + 1)
+                    dictObjStore.Add(
+                        genericArguments[0].ChangeType(splits[keyIndx]),
+                        genericArguments[1].ChangeType(splits[keyIndx + 1]));
             }
 
             if (objValueStore != null)
@@ -120,66 +134,8 @@ namespace WebReader.Csv
                 SplitIndexAttribute splitIndex = dictObjStoreType.GetCustomAttribute<SplitIndexAttribute>();
                 int childkeyIndx = (splitIndex != null) ? splitIndex.Index : keyIndx + 1;
 
-                SetValues(objValueStore, split, childkeyIndx);
+                SetValues(objValueStore, splits, childkeyIndx);
             }
-        }
-
-        public static object ChangeType(string value, Type type)
-        {
-            object result = null;
-            if (type == typeof(bool))
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    result = false;
-                }
-                else
-                {
-                    double d;
-                    string s = value.ToString().Trim();
-                    // t/f
-                    // true/false
-                    // y/n
-                    // yes/no
-                    // <>0/0
-                    if (string.Compare("False", s, true) == 0 || string.Compare("No", s, true) == 0)
-                    {
-                        result = false;
-                    }
-                    else if (double.TryParse(s, out d) && d == 0) // numeric zero
-                    {
-                        result = false;
-                    }
-                    else if (string.Compare("True", s, true) == 0 || string.Compare("Yes", s, true) == 0)
-                    {
-                        result = true;
-                    }
-                    else
-                    {
-                        result = true;
-                    }
-                }
-            }
-            else if (type.IsEnum)
-            {
-                result = Enum.Parse(type, value.ToString(), true);
-            }
-            else if(type == typeof(int))
-            {
-                if (string.IsNullOrEmpty(value.ToString())) result = 0;
-                else result = Convert.ChangeType(value, type);
-            }
-            else if (type == typeof(double))
-            {
-                if (string.IsNullOrEmpty(value.ToString())) result = 0.0;
-                else result = Convert.ChangeType(value, type);
-            }
-            else
-            {
-                result = Convert.ChangeType(value, type);
-            }
-
-            return result;
         }
     }
 }

@@ -137,6 +137,17 @@ namespace DynamicDatabase
             return string.Join(",", ByIndices.Select(p => p.Value.ToString()).ToList());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pkCols"></param>
+        /// <returns></returns>
+        internal string ToStringPK(List<string> pkCols)
+        {
+            return string.Join(",",ByNames.Where(c => pkCols.Contains(c.Key))
+                .Select(p => p.Value.Value).ToList());
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
