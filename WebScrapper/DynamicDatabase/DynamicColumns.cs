@@ -21,7 +21,7 @@ namespace DynamicDatabase
         public Dictionary<string, DbDataType> ByNames { get; protected set; }
 
         /// <summary>
-        /// The data set which dcontains column data by index
+        /// The data set which contains column data by index
         /// </summary>
         public List<DbDataType> ByIndices { get; protected set; }
 

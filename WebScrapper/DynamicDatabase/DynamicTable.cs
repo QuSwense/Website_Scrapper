@@ -75,6 +75,13 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="args"></param>
+        public virtual void LoadData(DbDataReader reader, params string[] args) { }
+
+        /// <summary>
         /// Add rows of metadata table
         /// </summary>
         /// <param name="tableMetas"></param>
@@ -89,6 +96,23 @@ namespace DynamicDatabase
                 row.AddorUpdate(0, item.Key);
                 row.AddorUpdate(1, item.Value.Display);
                 row.AddorUpdate(2, item.Value.Reference);
+            }
+        }
+
+        /// <summary>
+        /// Add rows of metadata table
+        /// </summary>
+        /// <param name="tableMetas"></param>
+        public void AddorUpdate(Dictionary<string, ConfigDbColumn> tableColMetas)
+        {
+            foreach (var item in tableColMetas)
+            {
+                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
+                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
+                row.Initialize(this);
+
+                row.AddorUpdate(0, item.Key);
+                row.AddorUpdate(1, item.Value.Display);
             }
         }
 
@@ -127,6 +151,12 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Add row of data
+        /// </summary>
+        /// <param name="row"></param>
+        public virtual void AddorUpdate(List<string> pks, List<string> dataList) { }
+
+        /// <summary>
         /// Create table from property type (soft create in memory)
         /// </summary>
         /// <param name="classProperties"></param>
@@ -152,7 +182,7 @@ namespace DynamicDatabase
         /// Load data in memory by Rowid
         /// </summary>
         /// <param name="reader"></param>
-        public void LoadData(DbDataReader reader)
+        public virtual void LoadData(DbDataReader reader)
         {
             if (Headers == null) throw new Exception("Table metadata must be loaded before data");
 
@@ -169,6 +199,24 @@ namespace DynamicDatabase
                 }
                 Rows.Add(row);
             }
+        }
+
+        /// <summary>
+        /// Load data in memory by Rowid
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="args"></param>
+        public virtual void LoadData(DbDataReader reader, params string[] args)
+        {
+
+        }
+
+        /// <summary>
+        /// Clear all table data
+        /// </summary>
+        public void Clear()
+        {
+
         }
 
         /// <summary>

@@ -63,6 +63,18 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Add data by indexed list
+        /// </summary>
+        /// <param name="dataList"></param>
+        public void AddorUpdate(List<string> dataList)
+        {
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                Columns[i] = dataList[i];
+            }
+        }
+
+        /// <summary>
         /// Get the unique key representation of PK
         /// </summary>
         /// <returns></returns>

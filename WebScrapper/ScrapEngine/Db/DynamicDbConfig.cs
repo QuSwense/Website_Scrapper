@@ -15,6 +15,9 @@ namespace ScrapEngine.Db
     /// </summary>
     public class DynamicDbConfig : IDisposable
     {
+        /// <summary>
+        /// The application topic name
+        /// </summary>
         public string AppTopic { get; set; }
 
         /// <summary>
@@ -32,13 +35,23 @@ namespace ScrapEngine.Db
         /// </summary>
         public Dictionary<string, ConfigDbTable> TableMetadatas { get; set; }
 
+        /// <summary>
+        /// Constructor default
+        /// </summary>
         public DynamicDbConfig() { }
 
+        /// <summary>
+        /// Constructor parameterized
+        /// </summary>
+        /// <param name="appTopic"></param>
         public DynamicDbConfig(string appTopic)
         {
             AppTopic = appTopic;
         }
 
+        /// <summary>
+        /// Initialize
+        /// </summary>
         public void Initialize()
         {
             TableColumnConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
@@ -46,6 +59,9 @@ namespace ScrapEngine.Db
             TableMetadatas = new Dictionary<string, ConfigDbTable>();
         }
 
+        /// <summary>
+        /// Read the web config files
+        /// </summary>
         public void Read()
         {
             using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic),

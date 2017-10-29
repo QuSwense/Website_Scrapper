@@ -14,6 +14,10 @@ namespace DynamicDatabase.Model
         [DDColumn("col")]
         public string ColumnName { get; set; }
 
+        [DDPrimaryKey]
+        [DDColumn("dspl")]
+        public string Display { get; set; }
+
         [DDColumn("desc")]
         public string Description { get; set; }
 

@@ -69,7 +69,7 @@ namespace DynamicDatabase
                 IColumnMetadata header = item.Value;
 
                 colDefList.Add(header.ColumnName + " " +
-                    dbContext.GetDataType(header.DataType.GetType()) +
+                    dbContext.DataType.GetDataType(header.DataType.GetType()) +
                     (((header.Constraint & EColumnConstraint.NOTNULL) == EColumnConstraint.NOTNULL) ? " NOT NULL" : "") +
                     (((header.Constraint & EColumnConstraint.UNQIUE) == EColumnConstraint.UNQIUE) ? " UNIQUE" : ""));
 

@@ -1,5 +1,8 @@
 ﻿using DynamicDatabase.Config;
+using DynamicDatabase.Model;
+using DynamicDatabase.Types;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,10 +14,16 @@ namespace DynamicDatabase.Interfaces
     /// </summary>
     public interface IDbContext
     {
+        #region Properties
+
+        /// <summary>
+        /// A database data type helper context class. Every database has its own data type.
+        /// Use <see cref="DynamicDbFactory"/> to register the Data type class for the database.
+        /// </summary>
         IDataTypeContext DataType { get; }
 
         /// <summary>
-        /// The connection object
+        /// The connection object used to help in connecting to the database
         /// </summary>
         IDynamicDbConnection Connection { get; }
 
@@ -30,27 +39,20 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         IDbCommand DbCommand { get; }
 
+        #endregion Properties
+
+        #region Initialize
+
         /// <summary>
         /// Constructor with db database file and name
         /// </summary>
         /// <param name="dbfilepath"></param>
         /// <param name="name"></param>
-        void Initialize(string dbfilepath, string name);
+        void Initialize(ArgsContextInitialize arg);
 
-        /// <summary>
-        /// Constructor with db file path and name and connection string
-        /// </summary>
-        /// <param name="dbfilepath"></param>
-        /// <param name="name"></param>
-        /// <param name="connectionString"></param>
-        void Initialize(string dbfilepath, string name, string connectionString);
+        #endregion Initialize
 
-        /// <summary>
-        /// Construct the database context using the connection string
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="connectionCtx"></param>
-        void Initialize(string connectionString);
+        #region Database
 
         /// <summary>
         /// An empty virtual method whose purpose is to create database
@@ -68,6 +70,10 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         void DeleteDatabase();
 
+        #endregion Database
+
+        #region Connection
+
         /// <summary>
         /// Use this method to open connection to the database
         /// </summary>
@@ -78,6 +84,10 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         void Close();
 
+        #endregion Connection
+
+        #region Create
+
         /// <summary>
         /// Create a new table in the database using a class type. That class should be decorated with 
         /// Database attributes
@@ -86,18 +96,27 @@ namespace DynamicDatabase.Interfaces
         void CreateTable<T>(string tableName);
 
         /// <summary>
-        /// Create the database from the config file dynamically
+        /// Create table(s) using the collection value
         /// </summary>
-        void CreateTable(
-            Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnConfigs);
+        /// <param name="colData">The value with column data</param>
+        void CreateTable(ICollection colData);
 
         /// <summary>
-        /// Create a new table in the database. If the table exists then throw error.
+        /// Create table(s) using the collection value
         /// </summary>
-        /// <param name="tableName">The name of the table</param>
-        /// <param name="configCols">The table column configurations to create the table</param>
-        void CreateTable(string tableName,
-            Dictionary<string, ConfigDbColumn> configCols);
+        /// <param name="name">The table name</param>
+        /// <param name="colData">The value with column data</param>
+        void CreateTable(string name, ICollection colData);
+
+        /// <summary>
+        /// Delete a table
+        /// </summary>
+        /// <param name="name">The name of the table</param>
+        void DeleteTable(string name);
+
+        #endregion Create
+
+        #region Load
 
         /// <summary>
         /// Use this method to load data
@@ -107,10 +126,55 @@ namespace DynamicDatabase.Interfaces
         void Load(string name);
 
         /// <summary>
+        /// Load the data type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        void Load<T>(string name);
+
+        /// <summary>
         /// Load the metadata of the table.
         /// </summary>
         /// <param name="name">The name of the table</param>
         void LoadMetadata(string name);
+
+        /// <summary>
+        /// Clear the table data that is loaded in memory
+        /// </summary>
+        /// <param name="name"></param>
+        void Clear(string name);
+
+        #endregion Load
+
+        #region Insert
+        
+        /// <summary>
+        /// Add or update a row using the unique keys.
+        /// For this method to work it is mandatory that the tbale class is registered before with 
+        /// <see cref="DynamicSortTable"/>
+        /// </summary>
+        /// <param name="tablename"></param>
+        /// <param name="ukeys"></param>
+        /// <param name="row"></param>
+        void AddOrUpdate(string tablename, IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row);
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="tablename"></param>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by zero.</param>
+        void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row);
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="tablename"></param>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by column name.</param>
+        void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
+
+        #endregion Insert
 
         /// <summary>
         /// This is a virtual method which needs to be overriden in the derived class.
@@ -118,6 +182,6 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="propertyType"></param>
         /// <returns></returns>
-        string GetDataType(Type propertyType);
+        //string GetDataType(Type propertyType);
     }
 }

@@ -44,7 +44,7 @@ namespace DynamicDatabase
             container.RegisterType<IDbRow, DynamicRow>();
             container.RegisterType<IColumnHeaders, DynamicColumnHeaders>();
             container.RegisterType<IDbCommand, DynamicDbCommand>();
-            container.RegisterType<IDbTable, DynamicTable>();
+            container.RegisterType<IDbTable, DynamicSortTable>();
             container.RegisterType<IDataTypeContext, DataTypeContext>();
         }
 

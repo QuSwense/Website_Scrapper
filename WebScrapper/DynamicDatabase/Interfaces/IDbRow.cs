@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -56,5 +57,11 @@ namespace DynamicDatabase.Interfaces
         /// </summary> 
         /// <returns></returns>
         string ToStringByPK(List<string> pkCols);
+
+        /// <summary>
+        /// Add data by indexed list
+        /// </summary>
+        /// <param name="dataList"></param>
+        void AddorUpdate(List<string> dataList);
     }
 }

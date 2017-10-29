@@ -15,6 +15,8 @@ namespace DynamicDatabase.Interfaces
     /// </summary>
     public interface IDbTable : IDisposable
     {
+        #region Properties
+
         /// <summary>
         /// Reference to the parent database context
         /// </summary>
@@ -35,11 +37,17 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         IColumnHeaders Headers { get; }
 
+        #endregion Properties
+
+        #region Initialize
+
         /// <summary>
         /// Constructor with table name
         /// </summary>
         /// <param name="tablename"></param>
         void Initialize(IDbContext dbContext, string tablename);
+
+        #endregion Initialize
 
         /// <summary>
         /// Get the index from the column name
@@ -48,11 +56,23 @@ namespace DynamicDatabase.Interfaces
         /// <returns></returns>
         int GetColumnIndex(string name);
 
+        #region Create
+
         /// <summary>
         /// Create table from property type (soft create in memory)
         /// </summary>
         /// <param name="classProperties"></param>
         void CreateTable(PropertyInfo[] classProperties);
+
+        /// <summary>
+        /// Loop through the column configuration and create a new table
+        /// </summary>
+        /// <param name="configCols"></param>
+        void CreateTable(Dictionary<string, ConfigDbColumn> configCols);
+
+        #endregion Create
+
+        #region Load
 
         /// <summary>
         /// Load table metadata. This is the metadata query result
@@ -67,17 +87,27 @@ namespace DynamicDatabase.Interfaces
         void LoadData(DbDataReader reader);
 
         /// <summary>
+        /// Use this method to load data
+        /// Load the table data and metdata from the database
+        /// </summary>
+        /// <param name="name"></param>
+        void LoadData(DbDataReader reader, params string[] args);
+
+        /// <summary>
+        /// Clear all table data
+        /// </summary>
+        void Clear();
+
+        #endregion Load
+
+        /// <summary>
         /// Get the list of Primary keys by name
         /// </summary>
         /// <returns></returns>
         List<string> GetPKNames();
 
-        /// <summary>
-        /// Loop through the column configuration and create a new table
-        /// </summary>
-        /// <param name="configCols"></param>
-        void CreateTable(Dictionary<string, ConfigDbColumn> configCols);
-
+        #region Insert
+        
         /// <summary>
         /// Add rows of metadata table
         /// </summary>
@@ -89,5 +119,13 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="row"></param>
         void AddorUpdate(List<TableDataColumnModel> row);
+
+        /// <summary>
+        /// Add row of data
+        /// </summary>
+        /// <param name="row"></param>
+        void AddorUpdate(List<string> pks, List<string> dataList);
+
+        #endregion Insert
     }
 }

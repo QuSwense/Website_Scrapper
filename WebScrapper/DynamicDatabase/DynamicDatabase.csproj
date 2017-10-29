@@ -93,6 +93,7 @@
     <Compile Include="DynamicDbContext.cs" />
     <Compile Include="DynamicDbFactory.cs" />
     <Compile Include="DynamicRow.cs" />
+    <Compile Include="DynamicSortTable.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EColumnConstraint.cs" />
     <Compile Include="Interfaces\IColumnHeaders.cs" />
