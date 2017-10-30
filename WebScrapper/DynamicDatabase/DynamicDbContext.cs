@@ -330,7 +330,7 @@ namespace DynamicDatabase
         {
             IDbTable table = GetTable(tablename);
 
-            if (!(table is DynamicSortTable)) table.AddorUpdate(ukeys, row);
+            table.AddorUpdate(ukeys, row);
         }
 
         /// <summary>
@@ -342,7 +342,10 @@ namespace DynamicDatabase
         /// <param name="row">The row data to insert into table indexed by zero.</param>
         public virtual void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys,
             IEnumerable<DbDataType> row)
-        { }
+        {
+            IDbTable table = GetTable(tablename);
+            table.AddorUpdate(ukeys, row);
+        }
 
         /// <summary>
         /// Add or update a row using the the unique keys with column names.

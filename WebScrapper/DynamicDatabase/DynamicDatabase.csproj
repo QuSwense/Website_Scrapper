@@ -92,6 +92,7 @@
     <Compile Include="DynamicDbConnection.cs" />
     <Compile Include="DynamicDbContext.cs" />
     <Compile Include="DynamicDbFactory.cs" />
+    <Compile Include="DynamicDbHelper.cs" />
     <Compile Include="DynamicRow.cs" />
     <Compile Include="DynamicSortTable.cs" />
     <Compile Include="DynamicTable.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Meta\DTIntegerAttribute.cs" />
     <Compile Include="Meta\DTNumericAttribute.cs" />
     <Compile Include="Meta\DTVarcharAttribute.cs" />
+    <Compile Include="Model\ArgsContextInitialize.cs" />
     <Compile Include="Model\DbMetaTableColumnsModel.cs" />
     <Compile Include="Model\DbMetaTableModel.cs" />
     <Compile Include="Model\DbMetaTableRowModel.cs" />

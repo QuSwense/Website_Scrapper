@@ -1,6 +1,7 @@
 ﻿using DynamicDatabase.Config;
 using DynamicDatabase.Interfaces;
 using DynamicDatabase.Model;
+using DynamicDatabase.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -18,6 +19,8 @@ namespace DynamicDatabase
     /// <typeparam name="TDynCol"></typeparam>
     public class DynamicTable : IDbTable
     {
+        #region Properties
+
         /// <summary>
         /// Reference to the parent database context
         /// </summary>
@@ -38,6 +41,10 @@ namespace DynamicDatabase
         /// </summary>
         public IColumnHeaders Headers { get; protected set; }
 
+        #endregion Properties
+
+        #region Initialize
+
         /// <summary>
         /// Constructor default
         /// </summary>
@@ -53,6 +60,8 @@ namespace DynamicDatabase
             TableName = tablename;
         }
 
+        #endregion Initialize
+
         /// <summary>
         /// Get the index from the column name
         /// </summary>
@@ -62,6 +71,8 @@ namespace DynamicDatabase
         {
             return Headers.GetColumnIndex(name);
         }
+
+        #region Create
 
         /// <summary>
         /// Loop through the column configuration and create a new table
@@ -73,6 +84,41 @@ namespace DynamicDatabase
             Headers = DynamicDbFactory.Create<IColumnHeaders>();
             Headers.Initialize(configCols);
         }
+
+        #endregion Create
+
+        #region Insert
+
+        /// <summary>
+        /// Add or update a row using the unique keys.
+        /// For this method to work it is mandatory that the table class is registered before with 
+        /// <see cref="DynamicSortTable"/>
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="ukeys"></param>
+        /// <param name="row"></param>
+        public virtual void AddOrUpdate(IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by zero.</param>
+        public virtual void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row)
+        {
+            string ukeydata = string.Join(",", ukeys.Values);
+            List<string> colNames = ukeys.Keys.ToList();
+        }
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by column name.</param>
+        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
 
         /// <summary>
         /// 
@@ -155,6 +201,8 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="row"></param>
         public virtual void AddorUpdate(List<string> pks, List<string> dataList) { }
+
+        #endregion Insert
 
         /// <summary>
         /// Create table from property type (soft create in memory)

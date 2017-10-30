@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using DynamicDatabase.Model;
+using DynamicDatabase.Types;
 
 namespace DynamicDatabase.Interfaces
 {
@@ -107,7 +108,30 @@ namespace DynamicDatabase.Interfaces
         List<string> GetPKNames();
 
         #region Insert
-        
+
+        /// <summary>
+        /// Add or update a row using the unique keys.
+        /// For this method to work it is mandatory that the tbale class is registered before with 
+        /// <see cref="DynamicSortTable"/>
+        /// </summary>
+        /// <param name="ukeys"></param>
+        /// <param name="row"></param>
+        void AddOrUpdate(IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row);
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by zero.</param>
+        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row);
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by column name.</param>
+        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
+
         /// <summary>
         /// Add rows of metadata table
         /// </summary>
