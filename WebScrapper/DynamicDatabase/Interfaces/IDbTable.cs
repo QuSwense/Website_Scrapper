@@ -29,9 +29,9 @@ namespace DynamicDatabase.Interfaces
         string TableName { get; }
 
         /// <summary>
-        /// The rows in the table. The data key is RowId.
+        /// The rows of the table
         /// </summary>
-        List<IDbRow> Rows { get; }
+        DynamicRows Rows { get; }
 
         /// <summary>
         /// The list of column headers
@@ -50,12 +50,16 @@ namespace DynamicDatabase.Interfaces
 
         #endregion Initialize
 
+        #region Helper
+
         /// <summary>
         /// Get the index from the column name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         int GetColumnIndex(string name);
+
+        #endregion Helper
 
         #region Create
 
@@ -70,6 +74,11 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="configCols"></param>
         void CreateTable(Dictionary<string, ConfigDbColumn> configCols);
+
+        /// <summary>
+        /// Cleanup and soft delete the current table
+        /// </summary>
+        void Delete();
 
         #endregion Create
 
@@ -88,6 +97,12 @@ namespace DynamicDatabase.Interfaces
         void LoadData(DbDataReader reader);
 
         /// <summary>
+        /// Load data in memory by Rowid
+        /// </summary>
+        /// <param name="reader"></param>
+        void LoadData<T>(DbDataReader reader);
+
+        /// <summary>
         /// Use this method to load data
         /// Load the table data and metdata from the database
         /// </summary>
@@ -100,12 +115,6 @@ namespace DynamicDatabase.Interfaces
         void Clear();
 
         #endregion Load
-
-        /// <summary>
-        /// Get the list of Primary keys by name
-        /// </summary>
-        /// <returns></returns>
-        List<string> GetPKNames();
 
         #region Insert
 
@@ -139,17 +148,21 @@ namespace DynamicDatabase.Interfaces
         void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas);
 
         /// <summary>
-        /// Add rows of data
-        /// </summary>
-        /// <param name="row"></param>
-        void AddorUpdate(List<TableDataColumnModel> row);
-
-        /// <summary>
         /// Add row of data
         /// </summary>
         /// <param name="row"></param>
-        void AddorUpdate(List<string> pks, List<string> dataList);
+        void AddorUpdate(IEnumerable<string> pks, IEnumerable<string> dataList);
 
         #endregion Insert
+
+        #region Helper
+
+        /// <summary>
+        /// Get the list of Primary keys by name
+        /// </summary>
+        /// <returns></returns>
+        List<string> GetPKNames();
+
+        #endregion Helper
     }
 }

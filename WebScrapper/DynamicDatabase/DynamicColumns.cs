@@ -30,7 +30,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public object this[int index]
+        public DbDataType this[int index]
         {
             get
             {
@@ -40,7 +40,7 @@ namespace DynamicDatabase
             set
             {
                 if (ByIndices == null || ByIndices.Count <= index) throw new IndexOutOfRangeException("Column Index out of range");
-                ByIndices[index].Value = value;
+                ByIndices[index] = value;
             }
         }
 
@@ -49,7 +49,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public object this[string name]
+        public DbDataType this[string name]
         {
             get
             {
@@ -59,7 +59,7 @@ namespace DynamicDatabase
             set
             {
                 if (ByNames == null || !ByNames.ContainsKey(name)) throw new IndexOutOfRangeException("Column name do not exists");
-                ByNames[name].Value = value;
+                ByNames[name] = value;
             }
         }
 

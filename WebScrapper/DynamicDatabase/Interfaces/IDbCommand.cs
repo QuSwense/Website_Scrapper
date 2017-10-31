@@ -32,6 +32,18 @@ namespace DynamicDatabase.Interfaces
         void CreateTable(IDbTable dynTable);
 
         /// <summary>
+        /// Execute delete table command
+        /// </summary>
+        /// <param name="dynTable"></param>
+        void RemoveTable(IDbTable dynTable);
+
+        /// <summary>
+        /// Execute delete table command from the table name
+        /// </summary>
+        /// <param name="tablename"></param>
+        void RemoveTable(string tablename);
+
+        /// <summary>
         /// Select all data of the table
         /// </summary>
         /// <param name="name"></param>

@@ -28,5 +28,11 @@ namespace DynamicDatabase.Types
         {
             this.Count = count;
         }
+
+        /// <summary>
+        /// Parameterized data types
+        /// </summary>
+        /// <param name="value"></param>
+        public DbIntDataType(object value) : base(value) { }
     }
 }

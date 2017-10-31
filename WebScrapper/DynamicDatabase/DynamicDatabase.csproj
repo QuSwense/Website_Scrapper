@@ -94,6 +94,7 @@
     <Compile Include="DynamicDbFactory.cs" />
     <Compile Include="DynamicDbHelper.cs" />
     <Compile Include="DynamicRow.cs" />
+    <Compile Include="DynamicRows.cs" />
     <Compile Include="DynamicSortTable.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EColumnConstraint.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Interfaces\IColumnMetadata.cs" />
     <Compile Include="Interfaces\IDataTypeContext.cs" />
     <Compile Include="Interfaces\IDbCommand.cs" />
+    <Compile Include="Interfaces\IDbFactory.cs" />
     <Compile Include="Interfaces\IDynamicDbConnection.cs" />
     <Compile Include="Interfaces\IDbContext.cs" />
     <Compile Include="Interfaces\IDbRow.cs" />
@@ -148,7 +150,9 @@
       <Name>WebReader</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="README.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net40\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

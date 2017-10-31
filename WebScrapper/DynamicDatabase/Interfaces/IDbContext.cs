@@ -17,6 +17,11 @@ namespace DynamicDatabase.Interfaces
         #region Properties
 
         /// <summary>
+        /// A Database factory instance which is used to create all database objects
+        /// </summary>
+        IDbFactory DbFactory { get; }
+
+        /// <summary>
         /// A database data type helper context class. Every database has its own data type.
         /// Use <see cref="DynamicDbFactory"/> to register the Data type class for the database.
         /// </summary>
@@ -93,7 +98,19 @@ namespace DynamicDatabase.Interfaces
         /// Database attributes
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        void CreateTable<T>(string tableName);
+        void CreateTable<T>();
+
+        /// <summary>
+        /// Create multiple tables from the dynamic config data
+        /// </summary>
+        void CreateTable(Dictionary<string, Dictionary<string, ConfigDbColumn>> tableColumnConfigs);
+
+        /// <summary>
+        /// Create a new table in the database from column config. If the table exists then throw error.
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="configCols">The table column configurations to create the table</param>
+        void CreateTable(string tableName, Dictionary<string, ConfigDbColumn> configCols);
 
         /// <summary>
         /// Create table(s) using the collection value
@@ -129,8 +146,16 @@ namespace DynamicDatabase.Interfaces
         /// Load the data type
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        void Load<T>();
+
+        /// <summary>
+        /// Use this method to load data
+        /// Load the table data and metdata from the database and sort by the unique keys column names
+        /// This method is useful for inserting or updating rows by these unique columns
+        /// </summary>
         /// <param name="name"></param>
-        void Load<T>(string name);
+        /// <param name="cols">The list of unique keys columns</param>
+        void Load(string name, params string[] cols);
 
         /// <summary>
         /// Load the metadata of the table.
@@ -174,14 +199,12 @@ namespace DynamicDatabase.Interfaces
         /// <param name="row">The row data to insert into table indexed by column name.</param>
         void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
 
-        #endregion Insert
-
         /// <summary>
-        /// This is a virtual method which needs to be overriden in the derived class.
-        /// Different Databse will have different data types
+        /// Bulk add the table metadata information
         /// </summary>
-        /// <param name="propertyType"></param>
-        /// <returns></returns>
-        //string GetDataType(Type propertyType);
+        /// <param name="tableMetas"></param>
+        void AddOrUpdate(Dictionary<string, ConfigDbTable> tableMetas);
+
+        #endregion Insert
     }
 }

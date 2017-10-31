@@ -32,14 +32,14 @@ namespace DynamicDatabase
         public string TableName { get; protected set; }
 
         /// <summary>
-        /// The rows in the table. The data key is RowId.
-        /// </summary>
-        public List<IDbRow> Rows { get; protected set; }
-
-        /// <summary>
         /// The list of column headers
         /// </summary>
         public IColumnHeaders Headers { get; protected set; }
+
+        /// <summary>
+        /// The rows of the table
+        /// </summary>
+        public DynamicRows Rows { get; protected set; }
 
         #endregion Properties
 
@@ -62,15 +62,16 @@ namespace DynamicDatabase
 
         #endregion Initialize
 
+        #region Helper
+
         /// <summary>
         /// Get the index from the column name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public int GetColumnIndex(string name)
-        {
-            return Headers.GetColumnIndex(name);
-        }
+        public int GetColumnIndex(string name) => Headers.GetColumnIndex(name);
+
+        #endregion Helper
 
         #region Create
 
@@ -81,128 +82,9 @@ namespace DynamicDatabase
         public void CreateTable(Dictionary<string, ConfigDbColumn> configCols)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = DynamicDbFactory.Create<IColumnHeaders>();
+            Headers = DbContext.DbFactory.Create<IColumnHeaders>();
             Headers.Initialize(configCols);
         }
-
-        #endregion Create
-
-        #region Insert
-
-        /// <summary>
-        /// Add or update a row using the unique keys.
-        /// For this method to work it is mandatory that the table class is registered before with 
-        /// <see cref="DynamicSortTable"/>
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        /// <param name="ukeys"></param>
-        /// <param name="row"></param>
-        public virtual void AddOrUpdate(IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Add or update a row using the the unique keys with column names.
-        /// </summary>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by zero.</param>
-        public virtual void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row)
-        {
-            string ukeydata = string.Join(",", ukeys.Values);
-            List<string> colNames = ukeys.Keys.ToList();
-        }
-
-        /// <summary>
-        /// Add or update a row using the the unique keys with column names.
-        /// </summary>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by column name.</param>
-        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="args"></param>
-        public virtual void LoadData(DbDataReader reader, params string[] args) { }
-
-        /// <summary>
-        /// Add rows of metadata table
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        public void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas)
-        {
-            foreach (var item in tableMetas)
-            {
-                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
-                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
-                row.Initialize(this);
-
-                row.AddorUpdate(0, item.Key);
-                row.AddorUpdate(1, item.Value.Display);
-                row.AddorUpdate(2, item.Value.Reference);
-            }
-        }
-
-        /// <summary>
-        /// Add rows of metadata table
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        public void AddorUpdate(Dictionary<string, ConfigDbColumn> tableColMetas)
-        {
-            foreach (var item in tableColMetas)
-            {
-                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
-                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
-                row.Initialize(this);
-
-                row.AddorUpdate(0, item.Key);
-                row.AddorUpdate(1, item.Value.Display);
-            }
-        }
-
-        /// <summary>
-        /// Add rows of data
-        /// </summary>
-        /// <param name="row"></param>
-        public void AddorUpdate(List<TableDataColumnModel> cols)
-        {
-            List<string> pkCols = new List<string>();
-            List<string> pkColsData = new List<string>();
-            string pkdata = "";
-
-            foreach (var col in cols)
-            {
-                if (col.IsPk)
-                {
-                    pkCols.Add(col.Name);
-                    pkColsData.Add(col.Value);
-                }
-            }
-
-            pkdata = string.Join(",", pkColsData);
-
-            var foundRows = Rows.Where(r => r.ToStringByPK(pkCols) == pkdata);
-
-            if(foundRows != null)
-            {
-                IDbRow row = foundRows.First();
-
-                foreach (var col in cols)
-                {
-                    row.Columns[col.Name] = col.Value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add row of data
-        /// </summary>
-        /// <param name="row"></param>
-        public virtual void AddorUpdate(List<string> pks, List<string> dataList) { }
-
-        #endregion Insert
 
         /// <summary>
         /// Create table from property type (soft create in memory)
@@ -211,8 +93,28 @@ namespace DynamicDatabase
         public void CreateTable(PropertyInfo[] classProperties)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = DynamicDbFactory.Create<IColumnHeaders>();
+            Headers = DbContext.DbFactory.Create<IColumnHeaders>();
             Headers.Initialize(classProperties);
+        }
+
+        #endregion Create
+
+        #region Load
+
+        /// <summary>
+        /// Load the data from the table into memory and also initialize the data set for
+        /// unique key navigation
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="cols"></param>
+        public virtual void LoadData(DbDataReader reader, params string[] cols)
+        {
+            if (Rows == null) Rows = new DynamicRows(this);
+
+            while(reader.Read())
+            {
+                Rows.Load(reader, cols);
+            }
         }
 
         /// <summary>
@@ -222,7 +124,7 @@ namespace DynamicDatabase
         public void LoadTableMetadata(DbDataReader reader)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = DynamicDbFactory.Create<IColumnHeaders>();
+            Headers = DbContext.DbFactory.Create<IColumnHeaders>();
             Headers.Initialize(reader);
         }
 
@@ -238,10 +140,10 @@ namespace DynamicDatabase
 
             while (reader.Read())
             {
-                var row = DynamicDbFactory.Create<IDbRow>();
+                var row = DbContext.DbFactory.Create<IDbRow>();
                 row.Initialize(this);
 
-                foreach(var item in Headers)
+                foreach (var item in Headers)
                 {
                     row.AddorUpdate(item.ColumnName, reader.GetValue(item.Index));
                 }
@@ -266,6 +168,64 @@ namespace DynamicDatabase
         {
 
         }
+
+        #endregion Load
+
+        #region Insert
+
+        /// <summary>
+        /// Add or update a row using the unique key columns.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="ukeys"></param>
+        /// <param name="row"></param>
+        public virtual void AddOrUpdate(IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row)
+        {
+            if (Rows == null) Rows = new DynamicRows(this);
+
+            // Get the unique key columns
+            string ukeyString = DynamicDbHelper.GetPrimaryKeyString(ukeys);
+        }
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by zero.</param>
+        public virtual void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row)
+        {
+            string ukeydata = string.Join(",", ukeys.Values);
+            List<string> colNames = ukeys.Keys.ToList();
+        }
+
+        /// <summary>
+        /// Add or update a row using the the unique keys with column names.
+        /// </summary>
+        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
+        /// <param name="row">The row data to insert into table indexed by column name.</param>
+        public virtual void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row)
+        {
+
+        }
+
+        /// <summary>
+        /// Add rows of metadata table
+        /// </summary>
+        /// <param name="tableMetas"></param>
+        public void AddorUpdate(Dictionary<string, ConfigDbColumn> tableColMetas)
+        {
+            foreach (var item in tableColMetas)
+            {
+                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
+                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
+                row.Initialize(this);
+
+                row.AddorUpdate(0, item.Key);
+                row.AddorUpdate(1, item.Value.Display);
+            }
+        }
+
+        #endregion Insert
 
         /// <summary>
         /// Get the list of Primary keys by name

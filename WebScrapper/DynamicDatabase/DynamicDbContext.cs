@@ -12,6 +12,7 @@ using System.IO;
 using DynamicDatabase.Model;
 using System.Collections;
 using DynamicDatabase.Types;
+using log4net;
 
 namespace DynamicDatabase
 {
@@ -24,7 +25,21 @@ namespace DynamicDatabase
     /// </summary>
     public class DynamicDbContext : IDbContext
     {
+        #region Log
+
+        /// <summary>
+        /// The logger to log events
+        /// </summary>
+        public static ILog logger = LogManager.GetLogger(typeof(DynamicDbContext));
+
+        #endregion Log
+
         #region Properties
+
+        /// <summary>
+        /// A Database factory instance which is used to create all database objects
+        /// </summary>
+        public IDbFactory DbFactory { get; protected set; }
 
         /// <summary>
         /// The Database data type context
@@ -55,10 +70,18 @@ namespace DynamicDatabase
         /// <summary>
         /// Default constructor
         /// </summary>
-        public DynamicDbContext()
+        public DynamicDbContext() : this(new DynamicDbFactory()) { }
+
+        /// <summary>
+        /// Constructor which provides its own factory class
+        /// </summary>
+        public DynamicDbContext(IDbFactory dbfactory)
         {
-            Connection = DynamicDbFactory.Create<IDynamicDbConnection>();
-            DbCommand = DynamicDbFactory.Create<IDbCommand>();
+            DbFactory = dbfactory;
+            Connection = DbFactory.Create<IDynamicDbConnection>();
+            DbCommand = DbFactory.Create<IDbCommand>();
+
+            logger.Debug("New instance created");
         }
 
         /// <summary>
@@ -70,6 +93,8 @@ namespace DynamicDatabase
             if (arg == null) throw new Exception("The context initialize argument is null");
             Connection.Initialize(arg.DbFilePath, arg.Name, arg.ConnectionString);
             DbCommand.Initialize(this, Connection);
+
+            logger.Debug("The Db connection object and the Db command object is initialized");
         }
 
         #endregion Initialize
@@ -82,6 +107,8 @@ namespace DynamicDatabase
         public virtual void CreateDatabase()
         {
             Connection.CreateDatabase();
+
+            logger.Debug("A new database is created");
         }
         
         /// <summary>
@@ -99,6 +126,8 @@ namespace DynamicDatabase
         public virtual void DeleteDatabase()
         {
             Connection.DeleteDatabase();
+
+            logger.DebugFormat("{0} Database is deleted", Connection.DbName);
         }
 
         #endregion Database
@@ -111,6 +140,8 @@ namespace DynamicDatabase
         public virtual void Open()
         {
             Connection.Open();
+
+            logger.DebugFormat("{0} Database connectivity is opened", Connection.DbName);
         }
 
         /// <summary>
@@ -119,6 +150,8 @@ namespace DynamicDatabase
         public virtual void Close()
         {
             Connection.Close();
+
+            logger.DebugFormat("{0} Database connectivity is closed", Connection.DbName);
         }
 
         #endregion Connection
@@ -131,15 +164,15 @@ namespace DynamicDatabase
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tableName">The name of the table. Use this to overwrite the table attribute</param>
-        public virtual void CreateTable<T>(string tableName = null)
+        public virtual void CreateTable<T>()
         {
             Type tableType = typeof(T);
             DDTableAttribute tableattr = tableType.GetCustomAttribute<DDTableAttribute>();
 
-            if (string.IsNullOrEmpty(tableName))
-            {
-                tableName = (tableattr != null) ? tableattr.Name : tableType.Name;
-            }
+            if (tableattr == null) throw new Exception("The class type provided to create table does not define DDTableAttribute");
+            logger.DebugFormat("Create a table from class {0} which has DDTableAttribute {0} defined", tableType.Name, (tableattr != null)? "" : "not");
+
+            string tableName = (tableattr != null) ? tableattr.Name : tableType.Name;
 
             CreateTable(tableName,
                 (dynTable) => dynTable.CreateTable(
@@ -147,16 +180,17 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Create the database from the config data dynamically
+        /// Create multiple tables from the dynamic config data
         /// </summary>
         public virtual void CreateTable(
             Dictionary<string, Dictionary<string, ConfigDbColumn>> tableColumnConfigs)
         {
+            if (tableColumnConfigs == null) return;
+            logger.DebugFormat("Create {0} tables from ConfigDbColumn", tableColumnConfigs.Count);
+
             // Create App specific tables
             foreach (var kv in tableColumnConfigs)
-            {
                 CreateTable(kv.Key, kv.Value);
-            }
         }
 
         /// <summary>
@@ -164,20 +198,19 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="tableName">The name of the table</param>
         /// <param name="configCols">The table column configurations to create the table</param>
-        public virtual void CreateTable(string tableName,
-            Dictionary<string, ConfigDbColumn> configCols)
-        {
-            CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
-        }
+        public virtual void CreateTable(string tableName, Dictionary<string, ConfigDbColumn> configCols)
+            => CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
 
         /// <summary>
         /// Create table(s) using the collection value
+        /// Override in derived class and implement your own collection
         /// </summary>
         /// <param name="value">The value with column data</param>
         public virtual void CreateTable(ICollection colData) { }
 
         /// <summary>
         /// Create table(s) using the collection value with the table name
+        /// Override in derived class and implement your own collection
         /// </summary>
         /// <param name="name">The table name</param>
         /// <param name="colData">The value with column data</param>
@@ -189,9 +222,17 @@ namespace DynamicDatabase
         /// <param name="tablename">The name of the table</param>
         public virtual void DeleteTable(string tablename)
         {
-            IDbTable table = GetTable(tablename);
-            table.Delete();
-            Tables.Remove(tablename);
+            if (string.IsNullOrEmpty(tablename)) throw new Exception("No table name provided to delete");
+            if (Tables != null && Tables.Count > 0 && Tables.ContainsKey(tablename))
+            {
+                logger.DebugFormat("Table {0} is loaded in memory. Clearing memory data ...", tablename);
+                IDbTable table = GetTable(tablename);
+                table.Delete();
+                Tables.Remove(tablename);
+            }
+            
+            // Finally delete from the database
+            DbCommand.RemoveTable(tablename);
         }
 
         /// <summary>
@@ -207,7 +248,7 @@ namespace DynamicDatabase
             if (Tables.ContainsKey(name)) throw new Exception(string.Format("The table {0} already exists", name));
 
             // Create the new table
-            IDbTable dynTable = DynamicDbFactory.Create<IDbTable>();
+            IDbTable dynTable = DbFactory.Create<IDbTable>();
             dynTable.Initialize(this, name);
 
             // The action method to create table
@@ -235,31 +276,34 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Load the data type
+        /// Load the data using the classtype
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
-        public virtual void Load<T>(string name)
+        public virtual void Load<T>()
         {
             Type tableType = typeof(T);
             DDTableAttribute tableattr = tableType.GetCustomAttribute<DDTableAttribute>();
 
-            if (string.IsNullOrEmpty(name))
-                name = (tableattr != null) ? tableattr.Name : tableType.Name;
+            if (tableattr == null) throw new Exception("The class type provided to load table does not define DDTableAttribute");
+
+            string name = (!string.IsNullOrEmpty(tableattr.Name)) ? tableattr.Name : tableType.Name;
+
             LoadMetadata(name);
-            LoadData(name);
+            LoadData<T>(name);
         }
 
         /// <summary>
         /// Use this method to load data
-        /// Load the table data and metdata from the database
+        /// Load the table data and metdata from the database and sort by the unique keys column names
+        /// This method is useful for inserting or updating rows by these unique columns
         /// </summary>
         /// <param name="name"></param>
-        public void Load(string name, params string[] args)
+        /// <param name="cols">The list of unique keys columns</param>
+        public virtual void Load(string name, params string[] cols)
         {
             LoadMetadata(name);
             Load(name, (dynTable) => {
-                dynTable.LoadData(DbCommand.LoadData(name), args);
+                dynTable.LoadData(DbCommand.LoadData(name), cols);
             });
         }
 
@@ -267,13 +311,10 @@ namespace DynamicDatabase
         /// Load the metadata of the table.
         /// </summary>
         /// <param name="name">The name of the table</param>
-        public void LoadMetadata(string tablename)
-        {
-            IDbTable table = GetTable(tablename);
-            Load(tablename, (dynTable) => {
+        public virtual void LoadMetadata(string tablename)
+            => Load(tablename, (dynTable) => {
                 dynTable.LoadTableMetadata(DbCommand.LoadTableMetadata(tablename));
             });
-        }
 
         /// <summary>
         /// Load the table data. This method is not public. We should always use <see cref="Load(string)"/>
@@ -281,12 +322,19 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="name"></param>
         protected void LoadData(string tablename)
-        {
-            IDbTable table = GetTable(tablename);
-            Load(tablename, (dynTable) => {
+            => Load(tablename, (dynTable) => {
                 dynTable.LoadData(DbCommand.LoadData(tablename));
             });
-        }
+
+        /// <summary>
+        /// Load the table data. This method is not public. We should always use <see cref="Load(string)"/>
+        /// to load data into a table as Loading of metdata alongwith data is important
+        /// </summary>
+        /// <param name="name"></param>
+        protected void LoadData<T>(string tablename)
+            => Load(tablename, (dynTable) => {
+                dynTable.LoadData<T>(DbCommand.LoadData(tablename));
+            });
 
         /// <summary>
         /// Load data / metadata from the database and store in memory
@@ -306,58 +354,24 @@ namespace DynamicDatabase
         /// Clear the table data that is loaded in memory
         /// </summary>
         /// <param name="name"></param>
-        public void Clear(string tablename)
-        {
-            IDbTable table = GetTable(tablename);
-            if (table != null) table.Clear();
-        }
+        public void Clear(string tablename) => GetTable(tablename).Clear();
 
         #endregion Load
 
         #region Insert
 
         /// <summary>
-        /// Add or update a row using the unique keys.
-        /// For this method to work it is mandatory that the tbale class is registered before with 
-        /// <see cref="DynamicSortTable"/>
+        /// Add or update a table row by the given table name.
+        /// Find the row using the unique keys column names provided.
+        /// The 
         /// </summary>
-        /// <exception cref="Exception">If the table do not exists</exception>
         /// <param name="tablename"></param>
-        /// <param name="ukeys"></param>
+        /// <param name="ukeycolNames"></param>
         /// <param name="row"></param>
-        public virtual void AddOrUpdate(string tablename, IEnumerable<DbDataType> ukeys,
-            IEnumerable<DbDataType> row)
-        {
-            IDbTable table = GetTable(tablename);
-
-            table.AddorUpdate(ukeys, row);
-        }
-
-        /// <summary>
-        /// Add or update a row using the the unique keys with column names.
-        /// </summary>
-        /// <exception cref="Exception">If the table do not exists</exception>
-        /// <param name="tablename"></param>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by zero.</param>
-        public virtual void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys,
-            IEnumerable<DbDataType> row)
-        {
-            IDbTable table = GetTable(tablename);
-            table.AddorUpdate(ukeys, row);
-        }
-
-        /// <summary>
-        /// Add or update a row using the the unique keys with column names.
-        /// </summary>
-        /// <exception cref="Exception">If the table do not exists</exception>
-        /// <param name="tablename"></param>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by column name.</param>
-        public virtual void AddOrUpdate(string tablename, IDictionary<string, DbDataType> ukeys,
+        public virtual void AddOrUpdate(string tablename, IEnumerable<string> ukeycolNames,
             IDictionary<string, DbDataType> row)
-        { }
-
+            => AddOrUpdate(tablename, (table) => table.AddorUpdate(ukeys, row));
+        
         /// <summary>
         /// Bulk add the table metadata information
         /// </summary>
@@ -374,31 +388,12 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Add or update
+        /// A common helper method to execute common set of Add or update methods
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="row"></param>
-        public virtual void AddOrUpdate(string name, List<TableDataColumnModel> row)
-        {
-            if (!Tables.ContainsKey(name)) LoadMetadata(name);
-
-            Tables[name].AddorUpdate(row);
-        }
-
-        /// <summary>
-        /// Add or update
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="row"></param>
-        public virtual void AddOrUpdate<T>(string name, List<TableDataColumnModel> row)
-        {
-            Type tableMetaType = typeof(DbMetaTableModel);
-            DDTableAttribute tableAttr = tableMetaType.GetCustomAttribute<DDTableAttribute>();
-
-            name = (tableAttr == null) ? name : tableAttr.Name;
-
-            AddOrUpdate(name, row);
-        }
+        /// <param name="tablename"></param>
+        /// <param name="fnAddorUpdate"></param>
+        protected void AddOrUpdate(string tablename, Action<IDbTable> fnAddorUpdate)
+            => fnAddorUpdate(GetTable(tablename));
 
         #endregion Insert
 
@@ -413,23 +408,13 @@ namespace DynamicDatabase
         protected IDbTable GetTable(string tablename)
         {
             if (string.IsNullOrEmpty(tablename)) throw new Exception("The name of the table is delete");
+            if (Tables == null || Tables.Count <= 0) throw new Exception("No table is loaded yet into memory");
             if (!Tables.ContainsKey(tablename)) throw new Exception(tablename + ": No such table found");
             return Tables[tablename];
         }
 
         #endregion Helper
-
-        ///// <summary>
-        ///// This is a virtual method which needs to be overriden in the derived class.
-        ///// Different Databse will have different data types
-        ///// </summary>
-        ///// <param name="propertyType"></param>
-        ///// <returns></returns>
-        //public virtual string GetDataType(Type propertyType)
-        //{
-        //    return "TEXT";
-        //}
-
+        
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -439,16 +424,11 @@ namespace DynamicDatabase
             {
                 if (disposing)
                 {
-                    if(Tables != null)
-                    {
-                        foreach(var item in Tables)
-                        {
-                            item.Value.Dispose();
-                        }
-                    }
+                    if(Tables != null) foreach (var item in Tables) item.Value.Dispose();
 
                     if (DbCommand != null) DbCommand.Dispose();
                     if (Connection != null) Connection.Dispose();
+                    if (DbFactory != null) DbFactory = null;
                 }
 
                 disposedValue = true;

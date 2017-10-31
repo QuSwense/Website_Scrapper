@@ -18,17 +18,17 @@ namespace DynamicDatabase
     /// The Factory class used to initialize the Database classes
     /// Manipulate this class to create different database context structure
     /// </summary>
-    public static class DynamicDbFactory
+    public class DynamicDbFactory : IDbFactory
     {
         /// <summary>
         /// Unity container
         /// </summary>
-        private static readonly IUnityContainer container;
+        private readonly IUnityContainer container;
 
         /// <summary>
         /// Static constructor
         /// </summary>
-        static DynamicDbFactory()
+        public DynamicDbFactory()
         {
             container = new UnityContainer();
 
@@ -38,7 +38,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Register defaults
         /// </summary>
-        private static void RegisterDefaults()
+        private void RegisterDefaults()
         {
             container.RegisterType<IColumnMetadata, DynamicColumnMetadata>();
             container.RegisterType<IDbRow, DynamicRow>();
@@ -51,7 +51,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Register types for sqlite
         /// </summary>
-        public static void RegisterSqlite()
+        public void RegisterSqlite()
         {
             container.RegisterType<DbConnection, SQLiteConnection>();
             container.RegisterType<IDataTypeContext, SqliteDataTypeContext>();
@@ -64,7 +64,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <typeparam name="TContract"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
-        public static void Register<TContract, TImplementation>()
+        public void Register<TContract, TImplementation>()
             where TImplementation : TContract
         {
             container.RegisterType<TContract, TImplementation>();
@@ -75,7 +75,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Create<T>()
+        public T Create<T>()
         {
             return container.Resolve<T>();
         }

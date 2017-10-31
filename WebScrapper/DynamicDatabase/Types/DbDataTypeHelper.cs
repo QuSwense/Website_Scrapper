@@ -51,5 +51,19 @@ namespace DynamicDatabase.Types
                     return new DbCharDataType(colConfig.Size > 0 ? colConfig.Size : 200);
             }
         }
+
+        /// <summary>
+        /// Clone a Database data type
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
+        public static DbDataType Clone(DbDataType dataType)
+        {
+            if (dataType is DbCharDataType) return new DbCharDataType();
+            else if (dataType is DbDateTimeDataType) return new DbDateTimeDataType();
+            else if (dataType is DbDoubleDataType) return new DbDoubleDataType();
+            else if (dataType is DbIntDataType) return new DbIntDataType();
+            else throw new Exception("Unknwon database dta type");
+        }
     }
 }

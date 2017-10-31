@@ -35,6 +35,12 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Add a column value
         /// </summary>
+        /// <param name="reader"></param>
+        void AddorUpdate(DbDataReader reader);
+
+        /// <summary>
+        /// Add a column value
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="data"></param>
         void AddorUpdate(string name, object data);

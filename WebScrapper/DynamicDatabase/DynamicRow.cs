@@ -1,6 +1,8 @@
 ﻿using DynamicDatabase.Interfaces;
+using DynamicDatabase.Types;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -70,7 +72,23 @@ namespace DynamicDatabase
         {
             for (int i = 0; i < dataList.Count; i++)
             {
-                Columns[i] = dataList[i];
+                Columns[i] = DbDataTypeHelper.Clone(Table.Headers[i].DataType);
+                Columns[i].Value = dataList[i];
+            }
+        }
+
+        /// <summary>
+        /// Add a column value
+        /// </summary>
+        /// <param name="reader"></param>
+        public void AddorUpdate(DbDataReader reader)
+        {
+            if (Columns == null) Columns = new DynamicColumns();
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                Columns[i] = DbDataTypeHelper.ParseDataType(reader.GetFieldType(i));
+                Columns[i].Value = reader.GetValue(i);
             }
         }
 

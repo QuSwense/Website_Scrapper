@@ -15,5 +15,19 @@ namespace DynamicDatabase.Types
         /// The actual data for the data type
         /// </summary>
         public object Value { get; set; }
+
+        /// <summary>
+        /// Default
+        /// </summary>
+        public DbDataType() { }
+
+        /// <summary>
+        /// Parameterized data types
+        /// </summary>
+        /// <param name="value"></param>
+        public DbDataType(object value)
+        {
+            Value = value;
+        }
     }
 }
