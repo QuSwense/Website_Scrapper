@@ -11,7 +11,32 @@ namespace WebCommon.Config
         public static readonly string ScrapperAppsFolder = "ScrapperApps";
         public static readonly string ScrapperAppsDbScriptsFolder = "dbscripts";
 
+        public static string GetGenericDbScriptsTableMdtCsv(string folderpath = "")
+        {
+            return Path.Combine(folderpath, ScrapperAppsFolder, "DbScripts", "table_metadata.csv");
+        }
+
+        public static string GetGenericDbScriptsTableColMdtCsv(string folderpath = "")
+        {
+            return Path.Combine(folderpath, ScrapperAppsFolder, "DbScripts", "table_column_mdt.csv");
+        }
+
+        public static string GetGenericDbScriptsTableColRowMdtCsv(string folderpath = "")
+        {
+            return Path.Combine(folderpath, ScrapperAppsFolder, "DbScripts", "table_column_rows_mdt.csv");
+        }
+
+        public static string GetScrapperAppFolderPath(string folderpath = "")
+        {
+            return Path.Combine(folderpath, ScrapperAppsFolder);
+        }
+
         public static string GetAppConfigPath(string appTopic, string folderpath = "")
+        {
+            return Path.Combine(folderpath, ScrapperAppsFolder, appTopic, "AppConfig.xml");
+        }
+
+        public static string GetAppGenericConfigPath(string folderpath = "")
         {
             return Path.Combine(folderpath, ScrapperAppsFolder, "AppConfig.xml");
         }

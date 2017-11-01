@@ -1,4 +1,6 @@
 ﻿using DynamicDatabase;
+using DynamicDatabase.Interfaces;
+using DynamicDatabase.Model;
 using DynamicDatabase.Scrap;
 using ScrapEngine.Bl;
 using ScrapEngine.Db;
@@ -6,6 +8,7 @@ using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using WebCommon.Config;
@@ -22,6 +25,11 @@ namespace ScrapEngine
     public class ScrapEngineContext : IScrapEngineContext
     {
         /// <summary>
+        /// The folder path for ScrapperApps. If empty assume current
+        /// </summary>
+        public string ScrapperFolderPath { get; protected set; }
+
+        /// <summary>
         /// The application name topic for which the web scrapper Database is to be generated
         /// </summary>
         public string AppTopic { get; protected set; }
@@ -32,14 +40,14 @@ namespace ScrapEngine
         public ApplicationConfig AppConfig { get; protected set; }
 
         /// <summary>
-        /// Read the Database configuration
+        /// A generic database config
         /// </summary>
-        public DynamicDbConfig MetaDbConfig { get; protected set; }
+        public DynamicDbConfig GenericDbConfig { get; protected set; }
 
         /// <summary>
-        /// The configuration for web scrapping
+        /// The Database class layer
         /// </summary>
-        public WebScrapDbContext WebScrapDb { get; protected set; }
+        public ScrapDbContext WebDbContext { get; protected set; }
 
         /// <summary>
         /// Web scrapper html context
@@ -56,38 +64,51 @@ namespace ScrapEngine
         /// </summary>
         /// <param name="appTopic"></param>
         /// <param name="sqldb"></param>
-        public void Initialize(string appTopic, string sqldb)
+        public void Initialize(string folderPath, string appTopic, ApplicationConfig appGenericConfig, DynamicDbConfig genericDbConfig)
         {
+            ScrapperFolderPath = folderPath;
             AppTopic = appTopic;
+            
+            // Read the application config and set the values by overwriting with the app topic specific config
+            ReadApplicationConfig(appGenericConfig);
 
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetAppConfigPath(AppTopic),
-                    AppConfig))
-            {
-                reader.Read();
-            }
+            WebDbContext = new ScrapDbContext(this);
+            WebDbContext.Initialize();
 
-            MetaDbConfig = new DynamicDbConfig(AppTopic);
-            MetaDbConfig.Initialize();
-            MetaDbConfig.Read();
+            
+            
+            //WebScrapDb.Open();
 
-            if (string.Compare(AppConfig.Db(), "sqlite", true) == 0)
-                DynamicDbFactory.RegisterSqlite();
+            //if(AppConfig.DoCreateDb())
+            //    WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
+
+            //WebScrapHtml = new WebScrapHtmlContext();
+            //WebScrapHtml.Initialize();
+            //WebScrapHtml.Run();
+            //WebScrapDb.Close();
+        }
+
+        /// <summary>
+        /// It merges the application generic config to the application topic specific config
+        /// </summary>
+        /// <param name="appGenericConfig"></param>
+        private void ReadApplicationConfig(ApplicationConfig appGenericConfig)
+        {
+            // Find Application Topic specific config
+            ApplicationConfig appSpecificConfig = null;
+            var appSpecificConfigFile = ConfigPathHelper.GetAppConfigPath(ScrapperFolderPath, AppTopic);
+
+            if(File.Exists(appSpecificConfigFile))
+                using (CSVReader reader = new CSVReader(appSpecificConfigFile, appSpecificConfig)) reader.Read();
+
+            if (appGenericConfig == null)
+                AppConfig = appSpecificConfig;
+            else if (appSpecificConfig == null)
+                AppConfig = appGenericConfig.Clone();
             else
-                throw new Exception("Unknwon database. Not Supported.");
-
-            WebScrapDb = new WebScrapDbContext();
-            WebScrapDb.Initialize(ConfigPathHelper.GetDbFilePath(AppTopic), AppTopic);
-            if (AppConfig.DoCreateDb())
-                WebScrapDb.CreateDatabase();
-            WebScrapDb.Open();
-
-            if(AppConfig.DoCreateDb())
-                WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
-
-            WebScrapHtml = new WebScrapHtmlContext();
-            WebScrapHtml.Initialize();
-            WebScrapHtml.Run();
-            WebScrapDb.Close();
+            {
+                AppConfig = appGenericConfig.Union(appSpecificConfig);
+            }
         }
 
         /// <summary>

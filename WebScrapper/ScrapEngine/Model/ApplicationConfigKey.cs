@@ -15,5 +15,18 @@ namespace ScrapEngine.Model
 
         [XmlAttribute("value")]
         public string Value { get; set; }
+
+        public ApplicationConfigKey() { }
+
+        public ApplicationConfigKey(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        public ApplicationConfigKey Clone()
+        {
+            return new ApplicationConfigKey(Name, Value);
+        }
     }
 }

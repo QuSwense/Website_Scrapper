@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
+using DynamicDatabase.Types;
 
 namespace DynamicDatabase
 {
@@ -87,6 +88,48 @@ namespace DynamicDatabase
         {
             IDbRow row = Table.DbContext.DbFactory.Create<IDbRow>();
             row.AddorUpdate(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fnCriteria"></param>
+        /// <returns></returns>
+        public IDbRow FindByPK(string uniqueKeyString)
+        {
+            IDbRow result = null;
+            ByNames.TryGetValue(uniqueKeyString, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Load data in memory by Rowid
+        /// </summary>
+        /// <param name="reader"></param>
+        public virtual void AddOrUpdate(DbDataReader reader)
+        {
+            var row = Table.DbContext.DbFactory.Create<IDbRow>();
+            row.Initialize(Table);
+
+            List<DbDataType> pks = new List<DbDataType>();
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                row.Columns[i] = DbDataTypeHelper.ParseDataType(reader.GetFieldType(i));
+                row.Columns[i].Value = reader.GetValue(i);
+
+                if ((Table.Headers[i].Constraint & EColumnConstraint.PRIMARYKEY) > 0)
+                    pks.Add(row.Columns[i]);
+            }
+
+            if (ByIndices == null) ByIndices = new List<IDbRow>();
+            ByIndices.Add(row);
+
+            if (ByNames == null) ByNames = new Dictionary<string, IDbRow>();
+            string pkString = DynamicDbHelper.GetPrimaryKeyString(pks);
+
+            if (ByNames.ContainsKey(pkString)) throw new Exception("Duplicate data insertion not allowed by Primary key string : " + pkString);
+            ByNames.Add(pkString, row);
         }
 
         #region IDisposable Support

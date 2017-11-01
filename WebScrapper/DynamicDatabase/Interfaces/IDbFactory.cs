@@ -25,5 +25,11 @@ namespace DynamicDatabase.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         T Create<T>();
+
+        /// <summary>
+        /// Initialize using the database name type
+        /// </summary>
+        /// <param name="dbType"></param>
+        void Initialize(string dbType);
     }
 }

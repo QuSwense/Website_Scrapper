@@ -118,7 +118,7 @@ namespace DynamicDatabase
             int index = 0;
             while (reader.Read())
             {
-                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
+                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(reader);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;

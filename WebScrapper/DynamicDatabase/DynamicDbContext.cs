@@ -395,6 +395,19 @@ namespace DynamicDatabase
         protected void AddOrUpdate(string tablename, Action<IDbTable> fnAddorUpdate)
             => fnAddorUpdate(GetTable(tablename));
 
+        /// <summary>
+        /// Bulk add the table metadata information
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tableMetas"></param>
+        public virtual void AddOrUpdate(string name, Dictionary<string, ConfigDbTable> tableMetas)
+        {
+            if (!Tables.ContainsKey(name)) Load(name);
+            if (!Tables.ContainsKey(name)) throw new Exception(name + " table not created or not found");
+
+            Tables[name].AddorUpdate(tableMetas);
+        }
+
         #endregion Insert
 
         #region Helper

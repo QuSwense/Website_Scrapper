@@ -1,6 +1,7 @@
 ﻿using DynamicDatabase.Config;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using WebCommon.Config;
@@ -8,123 +9,52 @@ using WebReader.Csv;
 
 namespace ScrapEngine.Db
 {
-    /// <summary>
-    /// This class is used to read configuration files which contains metdaat information
-    /// to create a database.
-    /// It reads the files and extracts Database information, Tables, Columsn of each tables
-    /// </summary>
-    public class DynamicDbConfig : IDisposable
+    public class DynamicDbConfig
     {
-        /// <summary>
-        /// The application topic name
-        /// </summary>
-        public string AppTopic { get; set; }
+        public string FolderPath { get; protected set; }
 
         /// <summary>
-        /// This data set stores the table-columns information and contains all data to create a new table
+        /// This data set stores the table informations
         /// </summary>
-        public Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnConfigs { get; set; }
+        public Dictionary<string, Dictionary<string, ConfigDbColumn>> TableMetadataConfigs { get; set; }
 
         /// <summary>
-        /// This defines a table of contants used in the database
+        /// This data set stores the table column informations
         /// </summary>
-        public Dictionary<string, Dictionary<int, string>> EnumConfigs { get; set; }
+        public Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnMetadataConfigs { get; set; }
 
         /// <summary>
-        /// this data set contians information / descriptions about the tables
+        /// This data set stores the table column rows informations
         /// </summary>
-        public Dictionary<string, ConfigDbTable> TableMetadatas { get; set; }
+        public Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnRowMetadataConfigs { get; set; }
 
         /// <summary>
-        /// Constructor default
+        /// Constructor
         /// </summary>
-        public DynamicDbConfig() { }
-
-        /// <summary>
-        /// Constructor parameterized
-        /// </summary>
-        /// <param name="appTopic"></param>
-        public DynamicDbConfig(string appTopic)
+        public DynamicDbConfig(string folderPath)
         {
-            AppTopic = appTopic;
+            FolderPath = folderPath;
+            TableMetadataConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
+            TableColumnMetadataConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
+            TableColumnRowMetadataConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
         }
 
         /// <summary>
-        /// Initialize
-        /// </summary>
-        public void Initialize()
-        {
-            TableColumnConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
-            EnumConfigs = new Dictionary<string, Dictionary<int, string>>();
-            TableMetadatas = new Dictionary<string, ConfigDbTable>();
-        }
-
-        /// <summary>
-        /// Read the web config files
+        /// Read the config files
         /// </summary>
         public void Read()
         {
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic),
-                    TableColumnConfigs))
-            {
-                reader.Read();
-            }
+            string tableMetadataFile = ConfigPathHelper.GetGenericDbScriptsTableMdtCsv(FolderPath);
+            string tableColMetadataFile = ConfigPathHelper.GetGenericDbScriptsTableColMdtCsv(FolderPath);
+            string tableColRowMetadataFile = ConfigPathHelper.GetGenericDbScriptsTableColRowMdtCsv(FolderPath);
 
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableEnumConfigPath(AppTopic),
-                    EnumConfigs))
-            {
-                reader.Read();
-            }
+            if (!File.Exists(tableMetadataFile)) throw new Exception("Unable to find Table metdata creation information file " + tableMetadataFile);
+            if (!File.Exists(tableColMetadataFile)) throw new Exception("Unable to find Table column metdata creation information file " + tableColMetadataFile);
+            if (!File.Exists(tableColRowMetadataFile)) throw new Exception("Unable to find Table column rows metdata creation information file " + tableColRowMetadataFile);
 
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableMetadataConfigPath(AppTopic),
-                    TableMetadatas))
-            {
-                reader.Read();
-            }
+            using (CSVReader reader = new CSVReader(tableMetadataFile, TableMetadataConfigs)) reader.Read();
+            using (CSVReader reader = new CSVReader(tableColMetadataFile, TableColumnMetadataConfigs)) reader.Read();
+            using (CSVReader reader = new CSVReader(tableColRowMetadataFile, TableColumnRowMetadataConfigs)) reader.Read();
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-        
-        /// <summary>
-        /// Read the table configurations of a database
-        /// </summary>
-        /// <param name="folderpath"></param>
-        public void Read(string folderpath, string appTopic)
-        {
-            if (string.IsNullOrEmpty(folderpath)) folderpath = ".";
-
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableEnumConfigPath(folderpath, appTopic), EnumConfigs))
-                csvReader.Read();
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableMetadataConfigPath(folderpath, appTopic), TableMetadatas))
-                csvReader.Read();
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(folderpath, appTopic), TableColumnConfigs))
-                csvReader.Read();
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    if (TableColumnConfigs != null) TableColumnConfigs.Clear();
-                    if (EnumConfigs != null) EnumConfigs.Clear();
-                    if (TableMetadatas != null) TableMetadatas.Clear();
-                }
-
-                disposedValue = true;
-            }
-        }
-        
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

@@ -136,29 +136,10 @@ namespace DynamicDatabase
         {
             if (Headers == null) throw new Exception("Table metadata must be loaded before data");
 
-            Rows = new List<IDbRow>();
+            // Destroys previous data if exists
+            Rows = new DynamicRows(this);
 
-            while (reader.Read())
-            {
-                var row = DbContext.DbFactory.Create<IDbRow>();
-                row.Initialize(this);
-
-                foreach (var item in Headers)
-                {
-                    row.AddorUpdate(item.ColumnName, reader.GetValue(item.Index));
-                }
-                Rows.Add(row);
-            }
-        }
-
-        /// <summary>
-        /// Load data in memory by Rowid
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="args"></param>
-        public virtual void LoadData(DbDataReader reader, params string[] args)
-        {
-
+            while (reader.Read()) Rows.AddOrUpdate(reader);
         }
 
         /// <summary>
@@ -216,12 +197,15 @@ namespace DynamicDatabase
         {
             foreach (var item in tableColMetas)
             {
-                var row = Rows.Where(r => r.ToStringByPK() == item.Key).First();
-                if (row == null) row = DynamicDbFactory.Create<IDbRow>();
-                row.Initialize(this);
+                var row = Rows.FindByPK(item.Key);
+                if (row == null)
+                {
+                    row = DbContext.DbFactory.Create<IDbRow>();
+                    row.Initialize(this);
+                    row.Columns[0].Value = item.Key;
+                }
 
-                row.AddorUpdate(0, item.Key);
-                row.AddorUpdate(1, item.Value.Display);
+                row.Columns[1].Value = item.Value.Display;
             }
         }
 

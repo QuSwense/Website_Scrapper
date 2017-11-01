@@ -79,5 +79,17 @@ namespace DynamicDatabase
         {
             return container.Resolve<T>();
         }
+
+        /// <summary>
+        /// Initialize using the database name type
+        /// </summary>
+        /// <param name="dbType"></param>
+        public void Initialize(string dbType)
+        {
+            if (string.Compare(dbType, "sqlite", true) == 0)
+                RegisterSqlite();
+            else
+                RegisterSqlite();
+        }
     }
 }

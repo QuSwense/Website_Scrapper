@@ -64,7 +64,9 @@
   <ItemGroup>
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />
+    <Compile Include="Db\DynamicAppDbConfig.cs" />
     <Compile Include="Db\DynamicDbConfig.cs" />
+    <Compile Include="Db\ScrapDbContext.cs" />
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
     <Compile Include="Model\ApplicationConfig.cs" />
     <Compile Include="Model\ApplicationConfigKey.cs" />

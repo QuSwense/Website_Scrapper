@@ -205,6 +205,13 @@ namespace DynamicDatabase.Interfaces
         /// <param name="tableMetas"></param>
         void AddOrUpdate(Dictionary<string, ConfigDbTable> tableMetas);
 
+        /// <summary>
+        /// Bulk add the table metadata information
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tableMetas"></param>
+        void AddOrUpdate(string name, Dictionary<string, ConfigDbTable> tableMetas);
+
         #endregion Insert
     }
 }

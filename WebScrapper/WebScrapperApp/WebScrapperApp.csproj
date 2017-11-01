@@ -51,24 +51,27 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ScrapperApps\AppConfig.xml" />
-    <Content Include="ScrapperApps\Country\Scrap\CountryScrap.xml">
+    <Content Include="ScrapperApps\AppCountry\Scrap\CountryScrap.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ScrapperApps\Country\DbScripts\table_columns.csv">
+    <None Include="ScrapperApps\AppCountry\DbScripts\table_columns.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ScrapperApps\Country\DbScripts\table_enum.csv">
+    <None Include="ScrapperApps\AppCountry\DbScripts\table_enum.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ScrapperApps\Country\DbScripts\table_metadata.csv">
+    <None Include="ScrapperApps\AppCountry\DbScripts\table_metadata.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="ScrapperApps\Config\DbScipts\table_column_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScipts\table_column_rows_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScipts\table_metadata.csv" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ScrapperApps\Country\Static\" />
+    <Folder Include="ScrapperApps\AppCountry\Static\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
