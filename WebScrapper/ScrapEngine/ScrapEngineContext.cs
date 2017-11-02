@@ -75,17 +75,9 @@ namespace ScrapEngine
             WebDbContext = new ScrapDbContext(this);
             WebDbContext.Initialize();
 
-            
-            
-            //WebScrapDb.Open();
-
-            //if(AppConfig.DoCreateDb())
-            //    WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
-
-            //WebScrapHtml = new WebScrapHtmlContext();
-            //WebScrapHtml.Initialize();
-            //WebScrapHtml.Run();
-            //WebScrapDb.Close();
+            WebScrapHtml = new WebScrapHtmlContext();
+            WebScrapHtml.Initialize();
+            WebScrapHtml.Run();
         }
 
         /// <summary>

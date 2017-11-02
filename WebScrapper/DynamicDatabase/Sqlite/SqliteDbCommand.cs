@@ -19,7 +19,7 @@ namespace DynamicDatabase.Sqlite
         {
             if (!string.IsNullOrEmpty(SQL))
             {
-                SQLiteCommand command = new SQLiteCommand(SQL, (SQLiteConnection)(Connection.Connection));
+                SQLiteCommand command = new SQLiteCommand(SQL, (SQLiteConnection)(dbContext.DbConnection.Connection));
                 command.ExecuteNonQuery();
             }
         }
@@ -28,7 +28,7 @@ namespace DynamicDatabase.Sqlite
         {
             if (!string.IsNullOrEmpty(SQL))
             {
-                using (SQLiteCommand fmd = ((SQLiteCommand)Connection.Connection.CreateCommand()))
+                using (SQLiteCommand fmd = ((SQLiteCommand)dbContext.DbConnection.Connection.CreateCommand()))
                 {
                     fmd.CommandText = SQL;
                     fmd.CommandType = CommandType.Text;

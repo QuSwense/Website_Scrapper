@@ -28,12 +28,12 @@ namespace DynamicDatabase.Types
             return new DbCharDataType();
         }
 
-        public static DbDataType Deduce(object value, Type type)
-        {
-            DbDataType dt = null;
+        //public static DbDataType Deduce(object value, Type type)
+        //{
+        //    DbDataType dt = null;
 
-            if(type is byte)
-                dt = new DbIntDataType()
-        }
+        //    if(type is byte)
+        //        dt = new DbIntDataType()
+        //}
     }
 }

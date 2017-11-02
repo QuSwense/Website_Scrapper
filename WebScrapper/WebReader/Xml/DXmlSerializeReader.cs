@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,22 @@ using System.Xml.Serialization;
 
 namespace WebReader.Xml
 {
-    public class DXmlReader : IDisposable
+    /// <summary>
+    /// A Xml file serialization reader
+    /// </summary>
+    public class DXmlSerializeReader : IDisposable
     {
+        /// <summary>
+        /// The private logger
+        /// </summary>
+        private ILog logger = LogManager.GetLogger(typeof(DXmlSerializeReader));
+
+        /// <summary>
+        /// Read a file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public T Read<T>(string fileName)
         {
             XmlSerializer configXmlSerializer = new XmlSerializer(typeof(T));
@@ -24,24 +39,48 @@ namespace WebReader.Xml
             }
         }
 
+        /// <summary>
+        /// Exception on unreferenced object
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnUnreferencedObject(object sender, UnreferencedObjectEventArgs e)
         {
-
+            logger.ErrorFormat("An unreferenced object {0} for {1} while xml serialization",
+                e.UnreferencedId, e.UnreferencedObject);
         }
 
+        /// <summary>
+        /// Exception on unknown node
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnUnknownNode(object sender, XmlNodeEventArgs e)
         {
-
+            logger.ErrorFormat("An unknown node {0} of type {3} found at Line {1}:{2} while xml serialization. Node Text: {4}",
+                e.Name, e.LineNumber, e.LinePosition, e.NodeType, e.Text);
         }
 
+        /// <summary>
+        /// Exception on unknown element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnUnknownElement(object sender, XmlElementEventArgs e)
         {
-
+            logger.ErrorFormat("An unknown element {0} found at Line {1}:{2} while xml serialization. Expected elements: {3}",
+                e.Element.Name, e.LineNumber, e.LinePosition, e.ExpectedElements);
         }
 
+        /// <summary>
+        /// Exception on unknown attributes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void OnUnknownAttribute(object sender, XmlAttributeEventArgs e)
         {
-
+            logger.ErrorFormat("An unknown attribute {0} found at Line {1}:{2} while xml serialization. Expected attributes: {3}",
+                e.Attr.Name, e.LineNumber, e.LinePosition, e.ExpectedAttributes);
         }
 
         #region IDisposable Support

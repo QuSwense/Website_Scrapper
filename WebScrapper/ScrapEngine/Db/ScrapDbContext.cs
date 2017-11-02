@@ -39,6 +39,9 @@ namespace ScrapEngine.Db
             ParentEngine = parent;
         }
 
+        /// <summary>
+        /// Initialize
+        /// </summary>
         public void Initialize()
         {
             // Read aplication specific database config
@@ -66,7 +69,7 @@ namespace ScrapEngine.Db
             if (ParentEngine.AppConfig.DoCreateDb())
                 WebScrapDb.CreateDatabase();
 
-            // Open connection to the database
+            // Create database
             CreateDbContextTables();
         }
 
@@ -82,10 +85,8 @@ namespace ScrapEngine.Db
                 // Global Table metadata should contain only one type of table which is the main metdata table
                 if (ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.Count > 1)
                     throw new Exception("Multiple Table metadata tables are not supported.");
-                WebScrapDb.CreateTable(ParentEngine.GenericDbConfig.TableMetadataConfigs);
-                // Add table metadata data
-                WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.First(),
-                    MetaDbConfig.TableMetadatas);
+
+                CreateTableMetadata();
 
                 // Create all the data specific tables
                 WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
@@ -108,6 +109,38 @@ namespace ScrapEngine.Db
             }
         }
 
+        private void CreateTableMetadata()
+        {
+            WebScrapDb.CreateTable(ParentEngine.GenericDbConfig.TableMetadataConfigs);
+            // Add table metadata data
+            WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.First(),
+                MetaDbConfig.TableMetadatas);
+        }
+
+        private void CreateTableColumnMetadata()
+        {
+            // Create tables
+            foreach (var item in MetaDbConfig.TableColumnConfigs)
+            {
+                string tableName = string.Format(
+                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
+
+                WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values);
+            }
+
+            // Add column data that is available
+            foreach (var item in MetaDbConfig.TableColumnConfigs)
+            {
+                string tableName = string.Format(
+                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
+
+                foreach (var coldata in item.Value)
+                {
+                    WebScrapDb.AddOrUpdate(tableName, new string[] { coldata.Key, coldata.Value.Display });
+                }
+            }
+        }
+
         private void CreateTableColumnRowsMetadata()
         {
             foreach (var tableconfig in MetaDbConfig.TableColumnConfigs)
@@ -120,18 +153,6 @@ namespace ScrapEngine.Db
 
                     WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Values);
                 }
-            }
-        }
-
-        private void CreateTableColumnMetadata()
-        {
-            foreach (var item in MetaDbConfig.TableColumnConfigs)
-            {
-                var metaTableConfig = new Dictionary<string, ConfigDbColumn>();
-                string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
-
-                WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values);
             }
         }
     }

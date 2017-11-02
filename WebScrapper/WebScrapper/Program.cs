@@ -35,12 +35,15 @@ namespace WebScrapper
             ApplicationConfig AppConfig = null;
             string appGenericConfigPath = ConfigPathHelper.GetAppGenericConfigPath(options.ScrapperFolderPath);
 
-            DynamicDbConfig GenericDbConfig = new DynamicDbConfig(options.ScrapperFolderPath);
-            GenericDbConfig.Read();
-
             if (File.Exists(appGenericConfigPath))
                 using (CSVReader reader = new CSVReader(appGenericConfigPath, AppConfig)) reader.Read();
 
+            // Read database generic config
+            DynamicDbConfig GenericDbConfig = new DynamicDbConfig(options.ScrapperFolderPath);
+            GenericDbConfig.Read();
+
+            // If application topic value is "*" run scrapper for all
+            // available application folders
             if (string.Compare(options.AppTopic, "*", true) == 0)
             {
                 var scrapperAppFolder = ConfigPathHelper.GetScrapperAppFolderPath(options.ScrapperFolderPath);
@@ -51,7 +54,7 @@ namespace WebScrapper
                     return;
                 }
 
-                // Get a list of all app folders and generate application scrapper databases for all
+                // Get a list of all application scrap folders and generate application scrapper context
                 foreach (var folderPath in Directory.GetDirectories(scrapperAppFolder, "App*"))
                 {
                     DirectoryInfo dinfo = new DirectoryInfo(folderPath);
@@ -61,6 +64,7 @@ namespace WebScrapper
             }
             else
             {
+                // For specific application topic value
                 ScrapEngineContext appEngine = new ScrapEngineContext();
                 appEngine.Initialize(options.ScrapperFolderPath, options.AppTopic, AppConfig, GenericDbConfig);
             }

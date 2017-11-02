@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<WebData name="country">
-  <Scrap name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
+<WebData>
+  <Scrap name="unsd_m49" dbtbl="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
     <Column name="m49" xpath="./@data-tt-id" ispk="1"></Column>
     <Column name="nm" xpath="td[1]"></Column>
     <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
@@ -52,7 +52,7 @@
     <Column name="nm" xpath="td[2]"></Column>
   </Scrap>
   <Scrap name="cntrylang" url="http://www.geonames.org/countries/" type="table" xpath="//table[@id='countries']//tr[position()>1]/td[5]/@href">
-    <Scrap xpath="//body/div[2]/table[1]" type="table">
+    <Scrap xpath="//body/div[2]/table[1]" type="table" url="@{parentValue}">
       <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
         <Manipulate>
           <Split data="," index="2"></Split>

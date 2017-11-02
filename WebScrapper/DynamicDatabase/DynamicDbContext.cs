@@ -30,7 +30,7 @@ namespace DynamicDatabase
         /// <summary>
         /// The logger to log events
         /// </summary>
-        public static ILog logger = LogManager.GetLogger(typeof(DynamicDbContext));
+        private static ILog logger = LogManager.GetLogger(typeof(DynamicDbContext));
 
         #endregion Log
 
@@ -44,12 +44,12 @@ namespace DynamicDatabase
         /// <summary>
         /// The Database data type context
         /// </summary>
-        public IDataTypeContext DataType { get; protected set; }
+        public IDataTypeContext DbDataType { get; protected set; }
 
         /// <summary>
         /// The connection object
         /// </summary>
-        public IDynamicDbConnection Connection { get; protected set; }
+        public IDynamicDbConnection DbConnection { get; protected set; }
 
         /// <summary>
         /// The list of all tables in the database
@@ -78,7 +78,7 @@ namespace DynamicDatabase
         public DynamicDbContext(IDbFactory dbfactory)
         {
             DbFactory = dbfactory;
-            Connection = DbFactory.Create<IDynamicDbConnection>();
+            DbConnection = DbFactory.Create<IDynamicDbConnection>();
             DbCommand = DbFactory.Create<IDbCommand>();
 
             logger.Debug("New instance created");
@@ -91,8 +91,8 @@ namespace DynamicDatabase
         public virtual void Initialize(ArgsContextInitialize arg)
         {
             if (arg == null) throw new Exception("The context initialize argument is null");
-            Connection.Initialize(arg.DbFilePath, arg.Name, arg.ConnectionString);
-            DbCommand.Initialize(this, Connection);
+            DbConnection.Initialize(arg.DbFilePath, arg.Name, arg.ConnectionString);
+            DbCommand.Initialize(this, DbConnection);
 
             logger.Debug("The Db connection object and the Db command object is initialized");
         }
@@ -106,7 +106,7 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void CreateDatabase()
         {
-            Connection.CreateDatabase();
+            DbConnection.CreateDatabase();
 
             logger.Debug("A new database is created");
         }
@@ -117,7 +117,7 @@ namespace DynamicDatabase
         /// <returns></returns>
         public virtual bool DatabaseExists()
         {
-            return Connection.DatabaseExists();
+            return DbConnection.DatabaseExists();
         }
 
         /// <summary>
@@ -125,9 +125,9 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void DeleteDatabase()
         {
-            Connection.DeleteDatabase();
+            DbConnection.DeleteDatabase();
 
-            logger.DebugFormat("{0} Database is deleted", Connection.DbName);
+            logger.DebugFormat("{0} Database is deleted", DbConnection.DbName);
         }
 
         #endregion Database
@@ -139,9 +139,9 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void Open()
         {
-            Connection.Open();
+            DbConnection.Open();
 
-            logger.DebugFormat("{0} Database connectivity is opened", Connection.DbName);
+            logger.DebugFormat("{0} Database connectivity is opened", DbConnection.DbName);
         }
 
         /// <summary>
@@ -149,35 +149,14 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void Close()
         {
-            Connection.Close();
+            DbConnection.Close();
 
-            logger.DebugFormat("{0} Database connectivity is closed", Connection.DbName);
+            logger.DebugFormat("{0} Database connectivity is closed", DbConnection.DbName);
         }
 
         #endregion Connection
 
         #region Create
-
-        /// <summary>
-        /// Create a new table in the database using a class type. That class should be decorated with 
-        /// Database attribute <see cref="DDTableAttribute"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName">The name of the table. Use this to overwrite the table attribute</param>
-        public virtual void CreateTable<T>()
-        {
-            Type tableType = typeof(T);
-            DDTableAttribute tableattr = tableType.GetCustomAttribute<DDTableAttribute>();
-
-            if (tableattr == null) throw new Exception("The class type provided to create table does not define DDTableAttribute");
-            logger.DebugFormat("Create a table from class {0} which has DDTableAttribute {0} defined", tableType.Name, (tableattr != null)? "" : "not");
-
-            string tableName = (tableattr != null) ? tableattr.Name : tableType.Name;
-
-            CreateTable(tableName,
-                (dynTable) => dynTable.CreateTable(
-                    tableType.GetProperties(BindingFlags.Public | BindingFlags.Instance)));
-        }
 
         /// <summary>
         /// Create multiple tables from the dynamic config data
@@ -200,21 +179,6 @@ namespace DynamicDatabase
         /// <param name="configCols">The table column configurations to create the table</param>
         public virtual void CreateTable(string tableName, Dictionary<string, ConfigDbColumn> configCols)
             => CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
-
-        /// <summary>
-        /// Create table(s) using the collection value
-        /// Override in derived class and implement your own collection
-        /// </summary>
-        /// <param name="value">The value with column data</param>
-        public virtual void CreateTable(ICollection colData) { }
-
-        /// <summary>
-        /// Create table(s) using the collection value with the table name
-        /// Override in derived class and implement your own collection
-        /// </summary>
-        /// <param name="name">The table name</param>
-        /// <param name="colData">The value with column data</param>
-        public virtual void CreateTable(string name, ICollection colData) { }
 
         /// <summary>
         /// Delete a table
@@ -273,24 +237,7 @@ namespace DynamicDatabase
         {
             LoadMetadata(name);
             LoadData(name);
-        }
-
-        /// <summary>
-        /// Load the data using the classtype
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public virtual void Load<T>()
-        {
-            Type tableType = typeof(T);
-            DDTableAttribute tableattr = tableType.GetCustomAttribute<DDTableAttribute>();
-
-            if (tableattr == null) throw new Exception("The class type provided to load table does not define DDTableAttribute");
-
-            string name = (!string.IsNullOrEmpty(tableattr.Name)) ? tableattr.Name : tableType.Name;
-
-            LoadMetadata(name);
-            LoadData<T>(name);
-        }
+        }        
 
         /// <summary>
         /// Use this method to load data
@@ -325,17 +272,7 @@ namespace DynamicDatabase
             => Load(tablename, (dynTable) => {
                 dynTable.LoadData(DbCommand.LoadData(tablename));
             });
-
-        /// <summary>
-        /// Load the table data. This method is not public. We should always use <see cref="Load(string)"/>
-        /// to load data into a table as Loading of metdata alongwith data is important
-        /// </summary>
-        /// <param name="name"></param>
-        protected void LoadData<T>(string tablename)
-            => Load(tablename, (dynTable) => {
-                dynTable.LoadData<T>(DbCommand.LoadData(tablename));
-            });
-
+        
         /// <summary>
         /// Load data / metadata from the database and store in memory
         /// </summary>
@@ -355,10 +292,33 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="name"></param>
         public void Clear(string tablename) => GetTable(tablename).Clear();
-
+        
         #endregion Load
 
         #region Insert
+
+        /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
+        public void Commit(string tableName)
+        {
+            if (!Tables.ContainsKey(tableName)) throw new Exception(tableName + " table not created or not found");
+            DbCommand.InsertOrReplace(Tables[tableName]);
+        }
+
+        /// <summary>
+        /// Insert into the table. Data is indexed by column
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        void AddOrUpdate(string tableName, string[] colIndexData)
+        {
+            if (!Tables.ContainsKey(tableName)) Load(tableName);
+            if (!Tables.ContainsKey(tableName)) throw new Exception(tableName + " table not created or not found");
+
+            Tables[tableName].AddorUpdate(colIndexData);
+            DbCommand.Insert(Tables[tableName], colIndexData);
+        }
 
         /// <summary>
         /// Add or update a table row by the given table name.
@@ -440,7 +400,7 @@ namespace DynamicDatabase
                     if(Tables != null) foreach (var item in Tables) item.Value.Dispose();
 
                     if (DbCommand != null) DbCommand.Dispose();
-                    if (Connection != null) Connection.Dispose();
+                    if (DbConnection != null) DbConnection.Dispose();
                     if (DbFactory != null) DbFactory = null;
                 }
 

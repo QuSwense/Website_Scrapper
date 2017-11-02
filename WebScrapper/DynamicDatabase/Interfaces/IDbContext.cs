@@ -25,12 +25,12 @@ namespace DynamicDatabase.Interfaces
         /// A database data type helper context class. Every database has its own data type.
         /// Use <see cref="DynamicDbFactory"/> to register the Data type class for the database.
         /// </summary>
-        IDataTypeContext DataType { get; }
+        IDataTypeContext DbDataType { get; }
 
         /// <summary>
         /// The connection object used to help in connecting to the database
         /// </summary>
-        IDynamicDbConnection Connection { get; }
+        IDynamicDbConnection DbConnection { get; }
 
         /// <summary>
         /// The list of all tables in the database
@@ -172,7 +172,14 @@ namespace DynamicDatabase.Interfaces
         #endregion Load
 
         #region Insert
-        
+
+        /// <summary>
+        /// Insert into the table. Data is indexed by column
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        void AddOrUpdate(string tableName, string[] colIndexData);
+
         /// <summary>
         /// Add or update a row using the unique keys.
         /// For this method to work it is mandatory that the tbale class is registered before with 

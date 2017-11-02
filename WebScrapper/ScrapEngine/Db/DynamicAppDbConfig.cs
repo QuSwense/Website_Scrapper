@@ -1,6 +1,7 @@
 ﻿using DynamicDatabase.Config;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using WebCommon.Config;
@@ -55,35 +56,24 @@ namespace ScrapEngine.Db
         }
 
         /// <summary>
-        /// Initialize
-        /// </summary>
-        public void Initialize()
-        {
-            
-        }
-
-        /// <summary>
         /// Read the web config files
         /// </summary>
         public void Read()
         {
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic),
-                    TableColumnConfigs))
-            {
-                reader.Read();
-            }
+            string tableColConfigFile = ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic);
+            string enumConfigFile = ConfigPathHelper.GetDbTableEnumConfigPath(AppTopic);
+            string tableConfigFile = ConfigPathHelper.GetDbTableMetadataConfigPath(AppTopic);
 
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableEnumConfigPath(AppTopic),
-                    EnumConfigs))
-            {
-                reader.Read();
-            }
+            if (!File.Exists(tableColConfigFile)) throw new Exception("Table column configuration file not found");
+            if (!File.Exists(enumConfigFile)) throw new Exception("Table Enum configuration file not found");
+            if (!File.Exists(tableConfigFile)) throw new Exception("Table configuration file not found");
 
-            using (CSVReader reader = new CSVReader(ConfigPathHelper.GetDbTableMetadataConfigPath(AppTopic),
-                    TableMetadatas))
-            {
+            using (CSVReader reader = new CSVReader(tableColConfigFile, TableColumnConfigs))
                 reader.Read();
-            }
+
+            using (CSVReader reader = new CSVReader(enumConfigFile, EnumConfigs)) reader.Read();
+
+            using (CSVReader reader = new CSVReader(tableConfigFile, TableMetadatas)) reader.Read();
         }
 
         #region IDisposable Support

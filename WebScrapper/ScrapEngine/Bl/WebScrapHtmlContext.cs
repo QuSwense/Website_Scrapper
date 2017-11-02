@@ -52,7 +52,7 @@ namespace ScrapEngine.Bl
         /// </summary>
         public void Initialize()
         {
-            using (DXmlReader reader = new DXmlReader())
+            using (DXmlSerializeReader reader = new DXmlSerializeReader())
                 ScrapperRulesConfig = reader.Read<WebDataConfig>(ConfigPathHelper.GetScrapConfigPath(EngineContext.AppTopic));
 
             ScrapperCommand = new HtmlScrapperCommand();
@@ -63,12 +63,12 @@ namespace ScrapEngine.Bl
         /// </summary>
         public void Run()
         {
-            EngineContext.WebScrapDb.Open();
+            EngineContext.WebDbContext.WebScrapDb.Open();
 
             // Loop through the instances of table to be modified
             RunMainScrap(ScrapperRulesConfig.Scraps);
 
-            EngineContext.WebScrapDb.Close();
+            EngineContext.WebDbContext.WebScrapDb.Close();
         }
 
         /// <summary>

@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
+    <Compile Include="Bl\WebScrapConfigParser.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />
     <Compile Include="Db\DynamicAppDbConfig.cs" />
     <Compile Include="Db\DynamicDbConfig.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Model\WebDataConfigManipulate.cs" />
     <Compile Include="Model\WebDataConfigMetadata.cs" />
     <Compile Include="Model\WebDataConfigScrap.cs" />
+    <Compile Include="Model\WebDataConfigScrapState.cs" />
     <Compile Include="Model\WebDataConfigSplit.cs" />
     <Compile Include="Model\WebDataConfigTrim.cs" />
     <Compile Include="ScrapEngineContext.cs" />

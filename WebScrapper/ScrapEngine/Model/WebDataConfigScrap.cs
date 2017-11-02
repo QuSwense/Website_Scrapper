@@ -11,7 +11,7 @@ namespace ScrapEngine.Model
     public class WebDataConfigScrap
     {
         [XmlElement("Scrap")]
-        public WebDataConfigScrap[] Scraps { get; set; }
+        public List<WebDataConfigScrap> Scraps { get; set; }
 
         [XmlAttribute("name")]
         public string Name { get; set; }
@@ -19,26 +19,20 @@ namespace ScrapEngine.Model
         [XmlAttribute("url")]
         public string Url { get; set; }
 
+        [XmlAttribute("dbtbl")]
+        public string DbTable { get; set; }
+
         [XmlAttribute("xpath")]
         public string XPath { get; set; }
-
-        [XmlAttribute("type")]
-        public string TypeString
-        {
-            get
-            {
-                return Type.ToString();
-            }
-            set
-            {
-                Type = (EWebDataConfigType)Enum.Parse(typeof(EWebDataConfigType), value.ToUpper());
-            }
-        }
 
         [XmlIgnore]
         public EWebDataConfigType Type { get; set; }
 
         [XmlElement("Column")]
         public WebDataConfigColumn[] Columns { get; set; }
+
+        public WebDataConfigScrapState State { get; set; }
+
+        public WebDataConfigScrap Parent { get; set; }
     }
 }

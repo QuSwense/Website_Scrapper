@@ -74,5 +74,18 @@ namespace DynamicDatabase.Interfaces
         /// <param name="name"></param>
         /// <returns></returns>
         DbDataReader LoadMetadata(string name);
+
+        /// <summary>
+        /// Insert a row in a table
+        /// </summary>
+        /// <param name="dbTable"></param>
+        /// <param name="colIndexData"></param>
+        void Insert(IDbTable dbTable, string[] colIndexData);
+
+        /// <summary>
+        /// Insert or replace all the table data in the Database
+        /// </summary>
+        /// <param name="dbTable"></param>
+        void InsertOrReplace(IDbTable dbTable);
     }
 }

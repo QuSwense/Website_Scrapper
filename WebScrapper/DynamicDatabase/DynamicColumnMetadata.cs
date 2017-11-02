@@ -70,7 +70,7 @@ namespace DynamicDatabase
         public virtual void Parse(DbDataReader reader)
         {
             ColumnName = reader.GetString(1);
-            DataType = Table.DbContext.DataType.ParseDataType(reader.GetString(2));
+            DataType = Table.DbContext.DbDataType.ParseDataType(reader.GetString(2));
             Constraint = ParseConstraint(reader);
         }
 
