@@ -59,20 +59,18 @@
     <None Include="ScrapperApps\AppCountry\DbScripts\table_columns.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ScrapperApps\AppCountry\DbScripts\table_enum.csv">
+    <None Include="ScrapperApps\AppCountry\DbScripts\table_enums.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ScrapperApps\AppCountry\DbScripts\table_metadata.csv">
+    <None Include="ScrapperApps\AppCountry\DbScripts\table_mdt.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="ScrapperApps\Config\DbScipts\table_column_mdt.csv" />
     <None Include="ScrapperApps\Config\DbScipts\table_column_rows_mdt.csv" />
-    <None Include="ScrapperApps\Config\DbScipts\table_metadata.csv" />
+    <None Include="ScrapperApps\Config\DbScipts\table_mdt.csv" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ScrapperApps\AppCountry\Static\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

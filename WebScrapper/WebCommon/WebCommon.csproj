@@ -43,9 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\ConfigHelper.cs" />
-    <Compile Include="Config\ConfigPathHelper.cs" />
+    <Compile Include="Error\PathException.cs" />
+    <Compile Include="PathHelp\AppTopicConfigPathHelper.cs" />
+    <Compile Include="PathHelp\ConfigHelper.cs" />
+    <Compile Include="PathHelp\AppGenericConfigPathHelper.cs" />
     <Compile Include="Extn\TypeExtensionMethods.cs" />
+    <Compile Include="PathHelp\PathGeneric.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

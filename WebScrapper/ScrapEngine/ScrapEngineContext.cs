@@ -21,6 +21,7 @@ namespace ScrapEngine
     /// The main controller class which controls the web scrapping of web page data from
     /// the websites and stores in the database. The Scrapping rule configuration is in
     /// the config xml file.
+    /// This context class is to be used per Application Topic
     /// </summary>
     public class ScrapEngineContext : IScrapEngineContext
     {
@@ -64,10 +65,10 @@ namespace ScrapEngine
         /// </summary>
         /// <param name="appTopic"></param>
         /// <param name="sqldb"></param>
-        public void Initialize(string folderPath, string appTopic, ApplicationConfig appGenericConfig, DynamicDbConfig genericDbConfig)
+        public void Initialize(string folderPath, string appTopicFolder, ApplicationConfig appGenericConfig, DynamicDbConfig genericDbConfig)
         {
             ScrapperFolderPath = folderPath;
-            AppTopic = appTopic;
+            AppTopic = GetApplicationName(appTopic;
             
             // Read the application config and set the values by overwriting with the app topic specific config
             ReadApplicationConfig(appGenericConfig);

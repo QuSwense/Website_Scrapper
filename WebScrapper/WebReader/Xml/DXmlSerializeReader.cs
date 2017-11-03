@@ -83,6 +83,18 @@ namespace WebReader.Xml
                 e.Attr.Name, e.LineNumber, e.LinePosition, e.ExpectedAttributes);
         }
 
+        /// <summary>
+        /// A static method to load the xml file into the class type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fullFilePath"></param>
+        /// <returns></returns>
+        public static T Load<T>(string fullFilePath)
+        {
+            using (DXmlSerializeReader dXmlSerializeReader = new DXmlSerializeReader())
+                return dXmlSerializeReader.Read<T>(fullFilePath);
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

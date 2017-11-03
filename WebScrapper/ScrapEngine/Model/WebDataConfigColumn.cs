@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace ScrapEngine.Model
@@ -10,6 +11,7 @@ namespace ScrapEngine.Model
     [Serializable]
     public class WebDataConfigColumn
     {
+        public WebDataConfigScrap Parent { get; set; }
         [XmlAttribute("name")]
         public string Name { get; set; }
         
@@ -24,5 +26,7 @@ namespace ScrapEngine.Model
 
         [XmlElement("Manipulate")]
         public WebDataConfigManipulate[] Manipulations { get; set; }
+
+        public XmlNode State { get; set; }
     }
 }

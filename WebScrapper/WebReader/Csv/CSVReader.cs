@@ -137,5 +137,16 @@ namespace WebReader.Csv
                 SetValues(objValueStore, splits, childkeyIndx);
             }
         }
+
+        /// <summary>
+        /// A static helper functio nto read a file and save it to data structure
+        /// </summary>
+        /// <param name="path"></param>
+        public static T Read<T>(string path)
+        {
+            T fileObj = default(T);
+            using (CSVReader reader = new CSVReader(path, fileObj)) reader.Read();
+            return fileObj;
+        }
     }
 }

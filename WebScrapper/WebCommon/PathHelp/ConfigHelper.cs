@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace WebCommon.Config
+namespace WebCommon.PathHelp
 {
     public class ConfigHelper
     {

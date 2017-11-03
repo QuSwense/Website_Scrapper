@@ -29,7 +29,7 @@ namespace ScrapEngine.Model
         public EWebDataConfigType Type { get; set; }
 
         [XmlElement("Column")]
-        public WebDataConfigColumn[] Columns { get; set; }
+        public List<WebDataConfigColumn> Columns { get; set; }
 
         public WebDataConfigScrapState State { get; set; }
 
