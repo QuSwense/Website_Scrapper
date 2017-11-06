@@ -6,10 +6,14 @@ using System.Xml.Serialization;
 
 namespace ScrapEngine.Model
 {
-    [Serializable]
+    /// <summary>
+    /// Manipulate node data
+    /// </summary>
     public class WebDataConfigTrim
     {
-        [XmlAttribute("data")]
+        /// <summary>
+        /// The data
+        /// </summary>
         public string Data { get; set; }
     }
 }

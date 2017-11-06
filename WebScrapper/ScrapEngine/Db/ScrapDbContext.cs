@@ -7,15 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WebCommon.Config;
 
 namespace ScrapEngine.Db
 {
     /// <summary>
     /// A class used to help in forming a wrapper between the actual Database activity and the 
     /// </summary>
-    public class ScrapDbContext
+    public class ScrapDbContext : IScrapDbContext
     {
+        #region Properties
+
         /// <summary>
         /// The application name topic for which the web scrapper Database is to be generated
         /// </summary>
@@ -31,21 +32,25 @@ namespace ScrapEngine.Db
         /// </summary>
         public IDbContext WebScrapDb { get; protected set; }
 
+        #endregion Properties
+
+        #region Constructor
+
         /// <summary>
         /// Constructor
         /// </summary>
-        public ScrapDbContext(IScrapEngineContext parent)
-        {
-            ParentEngine = parent;
-        }
+        public ScrapDbContext() { }
 
         /// <summary>
         /// Initialize
         /// </summary>
-        public void Initialize()
+        public void Initialize(IScrapEngineContext parent)
         {
+            ParentEngine = parent;
+
             // Read aplication specific database config
-            MetaDbConfig = new DynamicAppDbConfig(ParentEngine.AppTopic);
+            MetaDbConfig = new DynamicAppDbConfig();
+            MetaDbConfig.Initialize(this);
             MetaDbConfig.Read();
 
             // Create database context
@@ -61,8 +66,8 @@ namespace ScrapEngine.Db
             WebScrapDb.DbFactory.Initialize(ParentEngine.AppConfig.Db());
 
             ArgsContextInitialize dbContextArgs = new ArgsContextInitialize();
-            dbContextArgs.DbFilePath = ConfigPathHelper.GetDbFilePath(ParentEngine.AppTopic, ParentEngine.ScrapperFolderPath);
-            dbContextArgs.Name = ParentEngine.AppTopic;
+            dbContextArgs.DbFilePath = ParentEngine.AppTopicPath.AppTopicMain.FullPath;
+            dbContextArgs.Name = ParentEngine.AppTopicPath.AppTopic;
 
             WebScrapDb.Initialize(dbContextArgs);
 
@@ -73,6 +78,10 @@ namespace ScrapEngine.Db
             CreateDbContextTables();
         }
 
+        #endregion Constructor
+
+        #region Create
+
         /// <summary>
         /// Create all the application specific tables
         /// </summary>
@@ -82,24 +91,11 @@ namespace ScrapEngine.Db
 
             try
             {
-                // Global Table metadata should contain only one type of table which is the main metdata table
-                if (ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.Count > 1)
-                    throw new Exception("Multiple Table metadata tables are not supported.");
-
                 CreateTableMetadata();
-
-                // Create all the data specific tables
-                WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
-
-                if (ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.Count > 1)
-                    throw new Exception("Multiple Table column metadata are not supported.");
-
+                
                 // Create each table column metadata
                 CreateTableColumnMetadata();
-
-                if (ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Keys.Count > 1)
-                    throw new Exception("Multiple Table column rows metadata are not supported.");
-
+                
                 // Create each table column rows metadata
                 CreateTableColumnRowsMetadata();
             }
@@ -115,6 +111,9 @@ namespace ScrapEngine.Db
             // Add table metadata data
             WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.First(),
                 MetaDbConfig.TableMetadatas);
+
+            // Create all the data specific tables
+            WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
         }
 
         private void CreateTableColumnMetadata()
@@ -155,5 +154,7 @@ namespace ScrapEngine.Db
                 }
             }
         }
+
+        #endregion Create
     }
 }

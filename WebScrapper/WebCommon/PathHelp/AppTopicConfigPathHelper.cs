@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WebCommon.Error;
 
 namespace WebCommon.PathHelp
 {
@@ -35,15 +36,9 @@ namespace WebCommon.PathHelp
         public AppTopicConfigPathHelper(string appTopic)
         {
             AppTopic = appTopic;
-        }
 
-        /// <summary>
-        /// Initialize the application topic data
-        /// </summary>
-        /// <param name="appTopic"></param>
-        public void Initialize(string appTopic)
-        {
             AppTopicMain = new PathGeneric("App" + AppTopic, AppGenericConfigPathHelper.I.ScrapperApps);
+            AppConfig = new PathGeneric(AppTopic + "Config.xml", AppTopicMain, true);
             ScrapConfig = new PathGeneric("Scrap", AppTopicMain);
             AppTopicScrap = new PathGeneric(AppTopic + "Scrap.xml", ScrapConfig, true);
             DbScripts = new PathGeneric("DbScripts", AppTopicMain);
@@ -60,6 +55,11 @@ namespace WebCommon.PathHelp
         /// The application topic main folder path
         /// </summary>
         public PathGeneric AppTopicMain { get; protected set; }
+
+        /// <summary>
+        /// The application topic scrap folder
+        /// </summary>
+        public PathGeneric AppConfig { get; protected set; }
 
         /// <summary>
         /// The application topic scrap folder
@@ -92,5 +92,38 @@ namespace WebCommon.PathHelp
         public PathGeneric DbScriptsTableMdt { get; protected set; }
 
         #endregion Accessor
+
+        #region Static
+
+        /// <summary>
+        /// A static initializer of app topic specific folders / files path
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<AppTopicConfigPathHelper> GetAppTopics()
+        {
+            foreach (var folderAppTopic in 
+                Directory.GetDirectories(AppGenericConfigPathHelper.I.ScrapperApps.FullPath, "App*"))
+            {
+                // Remove "App" from the folder name
+                string appTopic = folderAppTopic.Remove(0, 3);
+                AppTopicConfigPathHelper appTopicConfigPath = new AppTopicConfigPathHelper(appTopic);
+
+                yield return appTopicConfigPath;
+            }
+        }
+
+        /// <summary>
+        /// A static initializer of app topic specific folders / files path
+        /// </summary>
+        /// <returns></returns>
+        public static AppTopicConfigPathHelper GetAppTopics(string appTopic)
+        {
+            // Remove "App" from the folder name
+            return new AppTopicConfigPathHelper(appTopic);
+
+            return appTopicConfigPath;
+        }
+
+        #endregion Static
     }
 }

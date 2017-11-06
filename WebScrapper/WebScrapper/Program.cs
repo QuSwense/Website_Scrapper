@@ -25,57 +25,43 @@ namespace WebScrapper
         {
             // Parse arguments
             CommandOptions options = new CommandOptions();
-            var result = Parser.Default.ParseArguments(args, options);
-
-            if(result == false)
-            {
-                Console.WriteLine("Command line arguments error");
-                return;
-            }
+            
+            if (!Parser.Default.ParseArguments(args, options))
+                throw new CommandLineException(args, CommandLineException.EErrorType.PARSE_ERROR);
 
             // Initialize the root config path (Always)
             AppGenericConfigPathHelper.I.Initialize(options.ScrapperFolderPath);
-
+            
             // Check path
-            if (!AppGenericConfigPathHelper.I.GlobalConfig.Exists)
-                throw new PathException(AppGenericConfigPathHelper.I.GlobalConfig.FullPath,
-                    PathException.EErrorType.NOT_EXISTS);
+            AppGenericConfigPathHelper.I.ScrapperApps.AssertExists();
+            AppGenericConfigPathHelper.I.GlobalAppConfig.AssertExists();
 
             // Read the generic application configuration file independent of any application topic
-            ApplicationConfig AppConfig = DXmlSerializeReader.Load<ApplicationConfig>(
-                AppGenericConfigPathHelper.I.GlobalConfig.FullPath);
-
-            using (CSVReader reader = new CSVReader(AppGenericConfigPathHelper.I.GlobalConfig.FullPath, AppConfig)) reader.Read();
+            ApplicationConfig appGenericConfig = DXmlSerializeReader.Load<ApplicationConfig>(
+                AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
 
             // Read database generic config
-            DynamicDbConfig GenericDbConfig = new DynamicDbConfig(options.ScrapperFolderPath);
-            GenericDbConfig.Read();
+            DynamicGenericDbConfig genericDbConfig = new DynamicGenericDbConfig();
+            genericDbConfig.Read();
 
             // If application topic value is "*" run scrapper for all
             // available application folders
             if (string.Compare(options.AppTopic, "*", true) == 0)
             {
-                var scrapperAppFolder = ConfigPathHelper.GetScrapperAppFolderPath(options.ScrapperFolderPath);
-
-                if(!Directory.Exists(scrapperAppFolder))
-                {
-                    Console.WriteLine("No folder for Scrapper Apps found : " + scrapperAppFolder);
-                    return;
-                }
-
                 // Get a list of all application scrap folders and generate application scrapper context
-                foreach (var folderPath in Directory.GetDirectories(scrapperAppFolder, "App*"))
+                foreach (var appTopicPath in AppTopicConfigPathHelper.GetAppTopics())
                 {
-                    DirectoryInfo dinfo = new DirectoryInfo(folderPath);
-                    ScrapEngineContext appEngine = new ScrapEngineContext();
-                    appEngine.Initialize(options.ScrapperFolderPath, dinfo.Name, AppConfig, GenericDbConfig);
+                    ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(appTopicPath, 
+                        appGenericConfig, genericDbConfig);
+                    engineContext.Run();
                 }
             }
             else
             {
                 // For specific application topic value
-                ScrapEngineContext appEngine = new ScrapEngineContext();
-                appEngine.Initialize(options.ScrapperFolderPath, options.AppTopic, AppConfig, GenericDbConfig);
+                ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(new AppTopicConfigPathHelper(options.AppTopic), 
+                    appGenericConfig, genericDbConfig);
+                engineContext.Run();
             }
         }
     }

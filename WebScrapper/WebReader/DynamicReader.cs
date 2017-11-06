@@ -56,16 +56,7 @@ namespace WebReader
             FileName = fi.Name;
             Store = store;
         }
-
-        /// <summary>
-        /// Set the store type
-        /// </summary>
-        /// <param name="storeType"></param>
-        public void SetStore(Type storeType)
-        {
-            Store = Activator.CreateInstance(storeType);
-        }
-
+        
         /// <summary>
         /// The main virtual read function
         /// </summary>

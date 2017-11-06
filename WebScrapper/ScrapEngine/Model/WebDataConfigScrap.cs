@@ -4,35 +4,73 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
-    [Serializable]
+    /// <summary>
+    /// The root element of the scrap xml config
+    /// </summary>
     public class WebDataConfigScrap
     {
-        [XmlElement("Scrap")]
+        /// <summary>
+        /// The list of child Scrap element
+        /// </summary>
         public List<WebDataConfigScrap> Scraps { get; set; }
 
-        [XmlAttribute("name")]
+        /// <summary>
+        /// The name of the node
+        /// </summary>
+        [DXmlAttribute("name")]
         public string Name { get; set; }
 
-        [XmlAttribute("url")]
+        /// <summary>
+        /// The url
+        /// </summary>
+        [DXmlAttribute("xpath")]
         public string Url { get; set; }
 
-        [XmlAttribute("dbtbl")]
+        /// <summary>
+        /// The database table name where the web scrapped data is inserted / stored
+        /// </summary>
+        [DXmlAttribute("dbtbl")]
         public string DbTable { get; set; }
 
-        [XmlAttribute("xpath")]
+        /// <summary>
+        /// The Xpath
+        /// </summary>
+        [DXmlAttribute("url")]
         public string XPath { get; set; }
 
-        [XmlIgnore]
+        /// <summary>
+        /// The type of the scrap node
+        /// </summary>
+        [DXmlAttribute("type")]
         public EWebDataConfigType Type { get; set; }
 
-        [XmlElement("Column")]
+        /// <summary>
+        /// The list of column nodes
+        /// </summary>
         public List<WebDataConfigColumn> Columns { get; set; }
 
-        public WebDataConfigScrapState State { get; set; }
+        /// <summary>
+        /// The state of the node
+        /// </summary>
+        public WebPageHtmlState State { get; set; }
 
+        /// <summary>
+        /// The parent node
+        /// </summary>
         public WebDataConfigScrap Parent { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public WebDataConfigScrap()
+        {
+            State = new WebPageHtmlState();
+            Scraps = new List<WebDataConfigScrap>();
+            Columns = new List<WebDataConfigColumn>();
+        }
     }
 }

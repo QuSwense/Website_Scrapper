@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WebCommon.Error;
 
 namespace WebCommon.PathHelp
 {
@@ -11,6 +12,8 @@ namespace WebCommon.PathHelp
     /// </summary>
     public class PathGeneric
     {
+        #region Properties
+
         /// <summary>
         /// Get the parent path of this sub path
         /// </summary>
@@ -60,6 +63,10 @@ namespace WebCommon.PathHelp
             }
         }
 
+        #endregion Properties
+
+        #region Constructor
+
         /// <summary>
         /// A parameterized constructor
         /// </summary>
@@ -71,5 +78,20 @@ namespace WebCommon.PathHelp
             Parent = parent;
             IsFile = isFile;
         }
+
+        #endregion Constructor
+
+        #region Asserts
+
+        /// <summary>
+        /// This method checks if the path exists or not.
+        /// If it does not exists then throws exception
+        /// </summary>
+        public void AssertExists()
+        {
+            if (!Exists) throw new PathException(FullPath, PathException.EErrorType.NOT_EXISTS);
+        }
+
+        #endregion Static
     }
 }

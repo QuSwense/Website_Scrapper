@@ -7,13 +7,20 @@ using System.Xml.Serialization;
 
 namespace ScrapEngine.Model
 {
-    [Serializable]
+    /// <summary>
+    /// The class for parsing an reading a line of csv file.
+    /// The element is used to manipulate the data
+    /// </summary>
     public class WebDataConfigSplit
     {
-        [XmlAttribute("data")]
+        /// <summary>
+        /// The data node
+        /// </summary>
         public string Data { get; set; }
 
-        [XmlAttribute("index")]
+        /// <summary>
+        /// The index of the split array
+        /// </summary>
         public int Index { get; set; }
     }
 }

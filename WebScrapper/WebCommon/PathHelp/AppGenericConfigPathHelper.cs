@@ -47,6 +47,7 @@ namespace WebCommon.PathHelp
         protected AppGenericConfigPathHelper()
         {
             ScrapperApps = new PathGeneric("ScrapperApps");
+            GlobalAppConfig = new PathGeneric("AppConfig.xml", ScrapperApps, true);
             GlobalConfig = new PathGeneric("Config", ScrapperApps);
             GlobalDbScripts = new PathGeneric("DbScripts", GlobalConfig);
             DbScriptsTableColumnMdt = new PathGeneric("table_column_mdt.csv", GlobalDbScripts, true);
@@ -71,6 +72,11 @@ namespace WebCommon.PathHelp
         /// The root scrapper apps folder name
         /// </summary>
         public PathGeneric ScrapperApps { get; protected set; }
+
+        /// <summary>
+        /// The global config file
+        /// </summary>
+        public PathGeneric GlobalAppConfig { get; protected set; }
 
         /// <summary>
         /// The global config folder name

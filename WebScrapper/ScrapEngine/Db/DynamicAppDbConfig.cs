@@ -1,10 +1,11 @@
 ﻿using DynamicDatabase.Config;
+using ScrapEngine.Interfaces;
+using ScrapEngine.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebCommon.Config;
 using WebReader.Csv;
 
 namespace ScrapEngine.Db
@@ -16,64 +17,68 @@ namespace ScrapEngine.Db
     /// </summary>
     public class DynamicAppDbConfig : IDisposable
     {
+        #region Properties
+
         /// <summary>
-        /// The application topic name
+        /// A reference to the parent database context
         /// </summary>
-        public string AppTopic { get; set; }
+        public IScrapDbContext ParentDbContext { get; protected set; }
 
         /// <summary>
         /// This data set stores the table-columns information and contains all data to create a new table
         /// </summary>
-        public Dictionary<string, Dictionary<string, ConfigDbColumn>> TableColumnConfigs { get; set; }
+        public DbTablesDefinitionModel TableColumnConfigs { get; set; }
 
         /// <summary>
         /// This defines a table of constants used in the database
         /// </summary>
-        public Dictionary<string, Dictionary<int, string>> EnumConfigs { get; set; }
+        public DbAppTopicConstantsDefinitionModel EnumConfigs { get; set; }
 
         /// <summary>
         /// this data set contians information / descriptions about the tables
         /// </summary>
-        public Dictionary<string, ConfigDbTable> TableMetadatas { get; set; }
+        public DbTablesMetdataDefinitionModel TableMetadatas { get; set; }
+
+        #endregion Properties
+
+        #region Constructor
 
         /// <summary>
         /// Constructor default
         /// </summary>
         public DynamicAppDbConfig()
         {
-            TableColumnConfigs = new Dictionary<string, Dictionary<string, ConfigDbColumn>>();
-            EnumConfigs = new Dictionary<string, Dictionary<int, string>>();
-            TableMetadatas = new Dictionary<string, ConfigDbTable>();
+            TableColumnConfigs = new DbTablesDefinitionModel();
+            EnumConfigs = new DbAppTopicConstantsDefinitionModel();
+            TableMetadatas = new DbTablesMetdataDefinitionModel();
         }
 
         /// <summary>
-        /// Constructor parameterized
+        /// Do the initialization
         /// </summary>
-        /// <param name="appTopic"></param>
-        public DynamicAppDbConfig(string appTopic) : base()
+        /// <param name="pDbContext"></param>
+        public void Initialize(IScrapDbContext pDbContext)
         {
-            AppTopic = appTopic;
+            ParentDbContext = pDbContext;
         }
+
+        #endregion Constructor
 
         /// <summary>
         /// Read the web config files
         /// </summary>
         public void Read()
         {
-            string tableColConfigFile = ConfigPathHelper.GetDbTableColumnsConfigPath(AppTopic);
-            string enumConfigFile = ConfigPathHelper.GetDbTableEnumConfigPath(AppTopic);
-            string tableConfigFile = ConfigPathHelper.GetDbTableMetadataConfigPath(AppTopic);
+            ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableMdt.AssertExists();
+            ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableColumn.AssertExists();
+            ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableEnum.AssertExists();
 
-            if (!File.Exists(tableColConfigFile)) throw new Exception("Table column configuration file not found");
-            if (!File.Exists(enumConfigFile)) throw new Exception("Table Enum configuration file not found");
-            if (!File.Exists(tableConfigFile)) throw new Exception("Table configuration file not found");
-
-            using (CSVReader reader = new CSVReader(tableColConfigFile, TableColumnConfigs))
-                reader.Read();
-
-            using (CSVReader reader = new CSVReader(enumConfigFile, EnumConfigs)) reader.Read();
-
-            using (CSVReader reader = new CSVReader(tableConfigFile, TableMetadatas)) reader.Read();
+            TableColumnConfigs = CSVReader.Read<DbTablesDefinitionModel>(
+                ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableColumn.FullPath);
+            EnumConfigs = CSVReader.Read<DbAppTopicConstantsDefinitionModel>(
+                ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableEnum.FullPath);
+            TableMetadatas = CSVReader.Read<DbTablesMetdataDefinitionModel>(
+                ParentDbContext.ParentEngine.AppTopicPath.DbScriptsTableMdt.FullPath);
         }
 
         #region IDisposable Support

@@ -8,23 +8,39 @@ using System.Xml.Serialization;
 
 namespace ScrapEngine.Model
 {
-    [Serializable]
+    /// <summary>
+    /// REafs to a column of the table to store the data scrapped
+    /// </summary>
     public class WebDataConfigColumn
     {
+        /// <summary>
+        /// Points to the parent scrap node
+        /// </summary>
         public WebDataConfigScrap Parent { get; set; }
-        [XmlAttribute("name")]
+        
+        /// <summary>
+        /// The name of the column
+        /// </summary>
         public string Name { get; set; }
         
-        [XmlAttribute("ispk")]
+        /// <summary>
+        /// Whether this column is the unique key for insertion or updation
+        /// </summary>
         public bool IsPk { get; set; }
 
-        [XmlAttribute("index")]
+        /// <summary>
+        /// The index element in case of csv
+        /// </summary>
         public int Index { get; set; }
 
-        [XmlAttribute("xpath")]
+        /// <summary>
+        /// The xpath
+        /// </summary>
         public string XPath { get; set; }
 
-        [XmlElement("Manipulate")]
+        /// <summary>
+        /// The manipulate tag
+        /// </summary>
         public WebDataConfigManipulate[] Manipulations { get; set; }
 
         public XmlNode State { get; set; }

@@ -7,13 +7,19 @@ using System.Xml.Serialization;
 
 namespace ScrapEngine.Model
 {
-    [Serializable]
+    /// <summary>
+    /// The manipulate tags
+    /// </summary>
     public class WebDataConfigManipulate
     {
-        [XmlElement("Split")]
+        /// <summary>
+        /// The tags which is used to split the data
+        /// </summary>
         public WebDataConfigSplit[] Splits { get; set; }
 
-        [XmlElement("Trim")]
+        /// <summary>
+        /// The tag is used to trim the data
+        /// </summary>
         public WebDataConfigTrim Trim { get; set; }
     }
 }

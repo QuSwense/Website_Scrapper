@@ -7,7 +7,7 @@ using System.Xml.XPath;
 
 namespace ScrapEngine.Model
 {
-    public class WebDataConfigScrapState
+    public class WebPageHtmlState
     {
         public List<HtmlNodeNavigator> Nodes { get; set; }
     }

@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using WebCommon.Config;
+using WebReader.Xml;
 
 namespace ScrapEngine.Bl
 {
@@ -29,9 +30,14 @@ namespace ScrapEngine.Bl
         public Dictionary<string, WebDataConfigScrap> WebScrapsConfig { get; set; }
 
         /// <summary>
-        /// The xml document is loaded and stored in memory
+        /// The html page is loaded as xml document and stored in memory
         /// </summary>
         private XmlDocument xmlDocument;
+
+        /// <summary>
+        /// A xml configuration reader
+        /// </summary>
+        private DXmlDocReader xmlConfigReader;
 
         /// <summary>
         /// The Html helper command class
@@ -47,9 +53,12 @@ namespace ScrapEngine.Bl
         /// Constructor parameterized
         /// </summary>
         /// <param name="context"></param>
-        public WebScrapConfigParser(WebScrapHtmlContext context)
+        public void Initialize(WebScrapHtmlContext context)
         {
             WebContext = context;
+
+            // Initialize the data store
+            WebScrapsConfig = new Dictionary<string, WebDataConfigScrap>();
         }
 
         /// <summary>
@@ -58,74 +67,129 @@ namespace ScrapEngine.Bl
         /// </summary>
         public void Run()
         {
-            // Initialize the data store
-            WebScrapsConfig = new Dictionary<string, WebDataConfigScrap>();
-
             // Load the scrap xml config
-            string scrapXmlConfigFile = ConfigPathHelper.GetScrapConfigPath(WebContext.EngineContext.AppTopic);
-            if (string.IsNullOrEmpty(scrapXmlConfigFile)) throw new Exception("The scrap xml config file is not found");
-            xmlDocument = new XmlDocument();
-            xmlDocument.Load(scrapXmlConfigFile);
+            WebContext.EngineContext.AppTopicPath.AppTopicScrap.AssertExists();
+            xmlConfigReader = DXmlDocReader.Create(WebContext.EngineContext.AppTopicPath.AppTopicScrap.FullPath);
 
             // Read the Scraps nodes which are the individual reader config nodes
-            XmlNodeList rootScrapNodeList = xmlDocument.DocumentElement.SelectNodes("/WebData/Scrap");
-
-            foreach (XmlNode rootScrapNode in rootScrapNodeList)
-            {
+            foreach (XmlNode rootScrapNode in xmlConfigReader.ReadNodes("/WebData/Scrap"))
                 ParseScrapElement(rootScrapNode);
-            }
         }
 
         /// <summary>
         /// Parse Root Scrap Element
         /// </summary>
         /// <param name="reader"></param>
-        private void ParseScrapElement(XmlNode scrapNode, WebDataConfigScrap parentScrapNode = null, HtmlNodeNavigator webnode = null)
+        private void ParseScrapElement(XmlNode scrapNode, WebDataConfigScrap parentScrapNode = null,
+            HtmlNodeNavigator webNodeNavigator = null)
         {
             // Construct the scrap element state
-            WebDataConfigScrap webScrapConfigObj = ParseScrapElementAttributes(scrapNode, parentScrapNode, webnode);
+            WebDataConfigScrap webScrapConfigObj = ParseScrapElementAttributes(scrapNode, parentScrapNode, webNodeNavigator);
             WebScrapsConfig.Add(webScrapConfigObj.Name, webScrapConfigObj);
 
-            ProcessScrapElement(webScrapConfigObj);
+            // This finally scraps the html webpage data
+            List<HtmlNodeNavigator> webChildNodeNavigator = ProcessScrapElement(webScrapConfigObj);
 
-            // if the scrap element type is TABLE type that means
+            // If the scrap element type is TABLE type that means
             // The child data needs to be processed in a loop
             if (webScrapConfigObj.Type == EWebDataConfigType.TABLE)
             {
-                int nodeIndex = 0;
-                foreach (var item in webScrapConfigObj.State.Nodes)
-                {
-                    // Read the Scraps nodes which are the individual reader config nodes
-                    XmlNodeList childScrapNodeList = scrapNode.SelectNodes("Scrap");
-
-                    if (childScrapNodeList != null && childScrapNodeList.Count > 0)
-                    {
-                        foreach (XmlNode childScrapNode in childScrapNodeList)
-                        {
-                            ParseScrapElement(childScrapNode, webScrapConfigObj, item);
-                        }
-                    }
-
-                    // Read the Scraps nodes which are the individual reader config nodes
-                    XmlNodeList columnNodeList = scrapNode.SelectNodes("Column");
-
-                    if(columnNodeList != null && columnNodeList.Count > 0)
-                    {
-                        webScrapConfigObj.Columns = new List<WebDataConfigColumn>();
-                        foreach (XmlNode columnNode in columnNodeList)
-                        {
-                            webScrapConfigObj.Columns.Add(
-                                ParseColumnElement(nodeIndex, columnNode, webScrapConfigObj, item));
-                        }
-
-                        ColumnScrapIterator(nodeIndex, webScrapConfigObj, item);
-                    }
-
-                    nodeIndex++;
-                }
+                ProcessAsHtmlTableType(webScrapConfigObj, scrapNode, webChildNodeNavigator);
             }
 
             ParseHtmlTableFromWeb(webScrapConfigObj);
+        }
+
+        /// <summary>
+        /// Parse scrap element attributes
+        /// </summary>
+        /// <param name="scrapNode"></param>
+        /// <param name="parentScrapNode"></param>
+        /// <returns></returns>
+        private WebDataConfigScrap ParseScrapElementAttributes(XmlNode scrapNode,
+            WebDataConfigScrap parentScrapNode, HtmlNodeNavigator webNodeNavigator = null)
+        {
+            WebDataConfigScrap webScrapConfigObj = xmlConfigReader.ReadElement<WebDataConfigScrap>(scrapNode);
+            webScrapConfigObj.Parent = parentScrapNode;
+            webScrapConfigObj.Name = ParseName(webScrapConfigObj.Name);
+            webScrapConfigObj.Url = ParseUrlValue(webScrapConfigObj.Url, webNodeNavigator);
+            return webScrapConfigObj;
+        }
+
+        /// <summary>
+        /// Process the parsed Scrap element tag
+        /// This method uses the xml config Scrap information to get to the Html webpage path
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        private List<HtmlNodeNavigator> ProcessScrapElement(WebDataConfigScrap webScrapConfigObj)
+        {
+            HtmlNode htmlDoc = ScrapperCommand.LoadOnline(webScrapConfigObj.Url);
+            return ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
+        }
+
+        /// <summary>
+        /// Process the Scrap element data as HTML Table type
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        /// <param name="scrapNode"></param>
+        private void ProcessAsHtmlTableType(WebDataConfigScrap webScrapConfigObj, XmlNode scrapNode,
+            List<HtmlNodeNavigator> webNodeNavigatorList)
+        {
+            int nodeIndex = 0;
+            foreach (var webNodeNavigator in webNodeNavigatorList)
+            {
+                // Read the child Scraps nodes which are the individual reader config nodes
+                ProcessChildScrapNodes(webScrapConfigObj, scrapNode, webNodeNavigator);
+
+                // Read the Column nodes which are the individual reader config nodes
+                ProcessColumnNodes(nodeIndex, webScrapConfigObj, scrapNode, webNodeNavigator);
+
+                nodeIndex++;
+            }
+        }
+
+        /// <summary>
+        /// Parse and Process any Child Scrap Nodes (recursively)
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        /// <param name="scrapNode"></param>
+        /// <param name="webNodeNavigator"></param>
+        private void ProcessChildScrapNodes(WebDataConfigScrap webScrapConfigObj, XmlNode scrapNode,
+            HtmlNodeNavigator webNodeNavigator)
+        {
+            XmlNodeList childScrapNodeList = scrapNode.SelectNodes("Scrap");
+
+            if (childScrapNodeList != null && childScrapNodeList.Count > 0)
+            {
+                foreach (XmlNode childScrapNode in childScrapNodeList)
+                {
+                    ParseScrapElement(childScrapNode, webScrapConfigObj, webNodeNavigator);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parse and process column nodes
+        /// </summary>
+        /// <param name="nodeIndex"></param>
+        /// <param name="webScrapConfigObj"></param>
+        /// <param name="scrapNode"></param>
+        /// <param name="webNodeNavigator"></param>
+        private void ProcessColumnNodes(int nodeIndex, WebDataConfigScrap webScrapConfigObj, XmlNode scrapNode,
+            HtmlNodeNavigator webNodeNavigator)
+        {
+            XmlNodeList columnNodeList = scrapNode.SelectNodes("Column");
+
+            if (columnNodeList != null && columnNodeList.Count > 0)
+            {
+                foreach (XmlNode columnNode in columnNodeList)
+                {
+                    webScrapConfigObj.Columns.Add(
+                        ParseColumnElement(nodeIndex, columnNode, webScrapConfigObj, webNodeNavigator));
+                }
+
+                ColumnScrapIterator(nodeIndex, webScrapConfigObj, webNodeNavigator);
+            }
         }
 
         private void ColumnScrapIterator(int count, WebDataConfigScrap scrapConfig, 
@@ -245,26 +309,6 @@ namespace ScrapEngine.Bl
         }
 
         /// <summary>
-        /// Parse scrap element attributes
-        /// </summary>
-        /// <param name="scrapNode"></param>
-        /// <param name="parentScrapNode"></param>
-        /// <returns></returns>
-        private WebDataConfigScrap ParseScrapElementAttributes(XmlNode scrapNode, WebDataConfigScrap parentScrapNode, HtmlNodeNavigator item = null)
-        {
-            WebDataConfigScrap webScrapConfigObj = new WebDataConfigScrap();
-            webScrapConfigObj.Parent = parentScrapNode;
-
-            webScrapConfigObj.Name = ParseName(scrapNode.Attributes["name"].Value);
-            webScrapConfigObj.DbTable = scrapNode.Attributes["dbtbl"].Value;
-            webScrapConfigObj.Url = ParseUrlValue(scrapNode.Attributes["url"].Value, item);
-            webScrapConfigObj.XPath = scrapNode.Attributes["xpath"].Value;
-            webScrapConfigObj.Type =
-                (EWebDataConfigType)Enum.Parse(typeof(EWebDataConfigType), scrapNode.Attributes["type"].Value);
-            return webScrapConfigObj;
-        }
-
-        /// <summary>
         /// Parse html table from web
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
@@ -318,19 +362,6 @@ namespace ScrapEngine.Bl
             }
 
             return urlValue;
-        }
-
-        /// <summary>
-        /// Process the parsed Scrap element tag
-        /// </summary>
-        /// <param name="webScrapConfigObj"></param>
-        private void ProcessScrapElement(WebDataConfigScrap webScrapConfigObj)
-        {
-            webScrapConfigObj.State = new WebDataConfigScrapState();
-
-            HtmlNode htmlDoc = ScrapperCommand.LoadOnline(webScrapConfigObj.Url);
-            var navigator = (HtmlNodeNavigator)htmlDoc.CreateNavigator();
-            webScrapConfigObj.State.Nodes = navigator.Select(webScrapConfigObj.XPath).Cast<HtmlNodeNavigator>().ToList();
         }
     }
 }

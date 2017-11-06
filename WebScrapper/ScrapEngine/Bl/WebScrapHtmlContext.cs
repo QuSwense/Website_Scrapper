@@ -31,7 +31,12 @@ namespace ScrapEngine.Bl
         /// <summary>
         /// The Html helper command class
         /// </summary>
-        public HtmlScrapperCommand ScrapperCommand { get; protected set; }
+        private HtmlScrapperCommand ScrapperCommand;
+
+        /// <summary>
+        /// The main parser
+        /// </summary>
+        private WebScrapConfigParser WebScrapParser;
 
         /// <summary>
         /// Constructor
@@ -42,22 +47,16 @@ namespace ScrapEngine.Bl
         /// Constructor initializes with parent engine
         /// </summary>
         /// <param name="engineContext"></param>
-        public WebScrapHtmlContext(IScrapEngineContext engineContext)
+        public void Initialize(IScrapEngineContext engineContext)
         {
             EngineContext = engineContext;
-        }
-
-        /// <summary>
-        /// Initialize the web scrapper html data
-        /// </summary>
-        public void Initialize()
-        {
-            using (DXmlSerializeReader reader = new DXmlSerializeReader())
-                ScrapperRulesConfig = reader.Read<WebDataConfig>(ConfigPathHelper.GetScrapConfigPath(EngineContext.AppTopic));
 
             ScrapperCommand = new HtmlScrapperCommand();
-        }
 
+            WebScrapParser = new WebScrapConfigParser();
+            WebScrapParser.Initialize(this);
+        }
+        
         /// <summary>
         /// Execute
         /// </summary>
@@ -65,10 +64,15 @@ namespace ScrapEngine.Bl
         {
             EngineContext.WebDbContext.WebScrapDb.Open();
 
-            // Loop through the instances of table to be modified
-            RunMainScrap(ScrapperRulesConfig.Scraps);
-
-            EngineContext.WebDbContext.WebScrapDb.Close();
+            try
+            {
+                // Loop through the instances of table to be modified
+                WebScrapParser.Run();
+            }
+            finally
+            {
+                EngineContext.WebDbContext.WebScrapDb.Close();
+            }
         }
 
         /// <summary>
