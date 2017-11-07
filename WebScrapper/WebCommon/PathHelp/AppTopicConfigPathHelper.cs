@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using WebCommon.Error;
 
 namespace WebCommon.PathHelp
 {
@@ -110,18 +106,6 @@ namespace WebCommon.PathHelp
 
                 yield return appTopicConfigPath;
             }
-        }
-
-        /// <summary>
-        /// A static initializer of app topic specific folders / files path
-        /// </summary>
-        /// <returns></returns>
-        public static AppTopicConfigPathHelper GetAppTopics(string appTopic)
-        {
-            // Remove "App" from the folder name
-            return new AppTopicConfigPathHelper(appTopic);
-
-            return appTopicConfigPath;
         }
 
         #endregion Static

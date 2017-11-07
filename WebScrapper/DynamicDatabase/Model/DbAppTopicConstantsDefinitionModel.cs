@@ -1,7 +1,6 @@
-﻿using ScrapEngine.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace ScrapEngine.Model
+namespace DynamicDatabase.Model
 {
     /// <summary>
     /// An application topic can use several constants within itself.

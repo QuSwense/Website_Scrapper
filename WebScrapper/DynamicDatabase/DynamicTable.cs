@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace DynamicDatabase
 {
@@ -153,6 +152,16 @@ namespace DynamicDatabase
         #endregion Load
 
         #region Insert
+
+        /// <summary>
+        /// Insert into the table. Data is indexed by column
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        public void AddOrUpdate(List<TableDataColumnModel> row)
+        {
+            
+        }
 
         /// <summary>
         /// Add or update a row using the unique key columns.

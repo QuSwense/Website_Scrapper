@@ -1,8 +1,8 @@
 ﻿using DynamicDatabase.Config;
-using ScrapEngine.Interfaces;
+using DynamicDatabase.Interfaces;
 using System.Collections.Generic;
 
-namespace ScrapEngine.Model
+namespace DynamicDatabase.Model
 {
     /// <summary>
     /// This model resembles the structure of the csv file which contains the table definitions model

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DynamicDatabase.Model
+﻿namespace DynamicDatabase.Model
 {
     /// <summary>
     /// The class which contains the arguments for initializing a database context

@@ -1,11 +1,5 @@
 ﻿using DynamicDatabase;
-using DynamicDatabase.Types;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace WebScrapper.Db.Ctx.sqlite
 {

@@ -1,19 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace WebCommon.Error
 {
-    /// <summary>
-    /// Handles any error in the path.
-    /// IT handles a file, folder types
-    /// </summary>
-    public class PathException : Exception
+    public class DynamicDbException : Exception
     {
         /// <summary>
         /// The type of path error
         /// </summary>
         public enum EErrorType
         {
-            NOT_EXISTS
+            TABLE_NOT_FOUND
         }
 
         /// <summary>
@@ -24,35 +23,35 @@ namespace WebCommon.Error
         /// <summary>
         /// The path that has error
         /// </summary>
-        public string Path { get; protected set; }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Default
         /// </summary>
-        public PathException() : base() { }
+        public DynamicDbException() : base() { }
 
         /// <summary>
         /// Constructor with path value
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public PathException(string path, EErrorType type) : base(Initialize(path, type))
+        public DynamicDbException(string name, EErrorType type) : base(Initialize(name, type))
         {
-            Path = path;
+            Name = name;
             ErrorType = type;
         }
 
         /// <summary>
         /// Initialize message
         /// </summary>
-        private static string Initialize(string path, EErrorType type)
+        private static string Initialize(string name, EErrorType type)
         {
             switch (type)
             {
-                case EErrorType.NOT_EXISTS:
-                    return string.Format("The path {0} do not exists", path);
+                case EErrorType.TABLE_NOT_FOUND:
+                    return string.Format("The table is not created or loaded", name);
                 default:
-                    return "Unknwon path error";
+                    return "Unknwon Command line error";
             }
         }
     }

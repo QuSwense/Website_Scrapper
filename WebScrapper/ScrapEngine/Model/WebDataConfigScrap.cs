@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
@@ -21,13 +16,13 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The name of the node
         /// </summary>
-        [DXmlAttribute("name")]
+        [DXmlAttribute("name", IsMandatory =true)]
         public string Name { get; set; }
 
         /// <summary>
         /// The url
         /// </summary>
-        [DXmlAttribute("xpath")]
+        [DXmlAttribute("url", IsMandatory = true)]
         public string Url { get; set; }
 
         /// <summary>
@@ -39,13 +34,13 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The Xpath
         /// </summary>
-        [DXmlAttribute("url")]
+        [DXmlAttribute("xpath", IsMandatory =true)]
         public string XPath { get; set; }
 
         /// <summary>
         /// The type of the scrap node
         /// </summary>
-        [DXmlAttribute("type")]
+        [DXmlAttribute("type", IsMandatory =true)]
         public EWebDataConfigType Type { get; set; }
 
         /// <summary>

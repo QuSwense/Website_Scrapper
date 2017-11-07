@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DynamicDatabase.Types
+﻿namespace DynamicDatabase.Types
 {
     /// <summary>
     /// A class which represents a doublw oer real data type.

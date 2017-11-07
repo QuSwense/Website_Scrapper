@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
@@ -16,11 +11,13 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data node
         /// </summary>
+        [DXmlAttribute("data", IsMandatory = true)]
         public string Data { get; set; }
 
         /// <summary>
         /// The index of the split array
         /// </summary>
+        [DXmlAttribute("index", IsMandatory = true)]
         public int Index { get; set; }
     }
 }

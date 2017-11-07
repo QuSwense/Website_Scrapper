@@ -1,22 +1,9 @@
-﻿using DynamicDatabase;
-using DynamicDatabase.Interfaces;
-using DynamicDatabase.Model;
-using DynamicDatabase.Scrap;
-using ScrapEngine.Bl;
+﻿using ScrapEngine.Bl;
 using ScrapEngine.Db;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using WebCommon.Config;
-using WebCommon.Error;
 using WebCommon.PathHelp;
-using WebReader.Csv;
 using WebReader.Xml;
-using WebScrapper.Db.Ctx;
 
 namespace ScrapEngine
 {

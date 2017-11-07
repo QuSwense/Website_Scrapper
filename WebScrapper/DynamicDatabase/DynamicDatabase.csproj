@@ -107,6 +107,7 @@
     <Compile Include="Interfaces\IDbContext.cs" />
     <Compile Include="Interfaces\IDbRow.cs" />
     <Compile Include="Interfaces\IDbTable.cs" />
+    <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Meta\DDColumnAttribute.cs" />
     <Compile Include="Meta\DDNotNullAttribute.cs" />
     <Compile Include="Meta\DDPrimaryKeyAttribute.cs" />
@@ -118,9 +119,12 @@
     <Compile Include="Meta\DTNumericAttribute.cs" />
     <Compile Include="Meta\DTVarcharAttribute.cs" />
     <Compile Include="Model\ArgsContextInitialize.cs" />
+    <Compile Include="Model\DbAppTopicConstantsDefinitionModel.cs" />
     <Compile Include="Model\DbMetaTableColumnsModel.cs" />
     <Compile Include="Model\DbMetaTableModel.cs" />
     <Compile Include="Model\DbMetaTableRowModel.cs" />
+    <Compile Include="Model\DbTablesDefinitionModel.cs" />
+    <Compile Include="Model\DbTablesMetdataDefinitionModel.cs" />
     <Compile Include="Model\TableDataColumnModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sqlite\SqliteColumnMetadata.cs" />

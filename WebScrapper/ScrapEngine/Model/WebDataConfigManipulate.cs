@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
 
 namespace ScrapEngine.Model
 {
@@ -15,11 +10,20 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The tags which is used to split the data
         /// </summary>
-        public WebDataConfigSplit[] Splits { get; set; }
+        public List<WebDataConfigSplit> Splits { get; set; }
 
         /// <summary>
         /// The tag is used to trim the data
         /// </summary>
-        public WebDataConfigTrim Trim { get; set; }
+        public List<WebDataConfigTrim> Trims { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public WebDataConfigManipulate()
+        {
+            Splits = new List<WebDataConfigSplit>();
+            Trims = new List<WebDataConfigTrim>();
+        }
     }
 }

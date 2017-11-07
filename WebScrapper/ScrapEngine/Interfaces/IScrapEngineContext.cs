@@ -1,10 +1,6 @@
 ﻿using ScrapEngine.Bl;
 using ScrapEngine.Db;
 using ScrapEngine.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using WebCommon.PathHelp;
 
 namespace ScrapEngine.Interfaces

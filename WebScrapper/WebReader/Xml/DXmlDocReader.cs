@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using WebReader.Model;
 using WebCommon.Extn;
+using WebCommon.Error;
 
 namespace WebReader.Xml
 {
@@ -44,7 +42,6 @@ namespace WebReader.Xml
             FilePath = filePath;
             xmlDocument = new XmlDocument();
             xmlDocument.Load(filePath);
-            currentElement = xmlDocument.DocumentElement;
         }
 
         /// <summary>
@@ -91,8 +88,10 @@ namespace WebReader.Xml
                 DXmlAttributeAttribute attrAttributeObj = objType.GetCustomAttribute<DXmlAttributeAttribute>();
                 if(attrAttributeObj != null)
                 {
-                    item.SetValue(obj,
-                        objType.ChangeType(currentElement.Attributes[attrAttributeObj.Name].Value));
+                    string value = currentElement.Attributes[attrAttributeObj.Name].Value;
+                    if (attrAttributeObj.IsMandatory && string.IsNullOrEmpty(value))
+                        throw new XmlDocReaderException(attrAttributeObj.Name, XmlDocReaderException.EErrorType.ATRRIBUTE_VALUE_NULL);
+                    item.SetValue(obj, objType.ChangeType(value));
                 }
             }
 

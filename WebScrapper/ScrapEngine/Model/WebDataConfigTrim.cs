@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
+﻿using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
@@ -14,6 +10,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data
         /// </summary>
+        [DXmlAttribute("data", IsMandatory = true)]
         public string Data { get; set; }
     }
 }

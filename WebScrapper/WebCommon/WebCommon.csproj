@@ -47,9 +47,11 @@
     <Compile Include="Error\AppTopicDbConfigException.cs" />
     <Compile Include="Error\CommandLineException.cs" />
     <Compile Include="Error\ConfigException.cs" />
+    <Compile Include="Error\DynamicDbException.cs" />
     <Compile Include="Error\GenericConfigException.cs" />
     <Compile Include="Error\GenericDbConfigException.cs" />
     <Compile Include="Error\PathException.cs" />
+    <Compile Include="Error\XmlDocReaderException.cs" />
     <Compile Include="PathHelp\AppTopicConfigPathHelper.cs" />
     <Compile Include="PathHelp\ConfigHelper.cs" />
     <Compile Include="PathHelp\AppGenericConfigPathHelper.cs" />

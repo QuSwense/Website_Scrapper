@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DynamicDatabase.Model
+﻿namespace DynamicDatabase.Model
 {
     /// <summary>
     /// The metdata table model for storing Column data extarct information

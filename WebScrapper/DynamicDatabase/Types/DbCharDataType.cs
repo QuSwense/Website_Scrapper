@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DynamicDatabase.Types
+﻿namespace DynamicDatabase.Types
 {
     /// <summary>
     /// Char data type class. This class represents any text data type.

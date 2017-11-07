@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using DynamicDatabase.Config;
 using System.Collections;
 using DynamicDatabase.Interfaces;
@@ -74,7 +72,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (var item in configCols)
             {
-                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
+                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(item.Key, item.Value);
                 AddHeader(index, item.Key, colMetadata);
                 index++;
@@ -90,7 +88,7 @@ namespace DynamicDatabase
             int index = 0;
             foreach (PropertyInfo prop in classProperties)
             {
-                IColumnMetadata colMetadata = DynamicDbFactory.Create<IColumnMetadata>();
+                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
                 colMetadata.Parse(prop);
                 AddHeader(index, colMetadata.ColumnName, colMetadata);
                 index++;

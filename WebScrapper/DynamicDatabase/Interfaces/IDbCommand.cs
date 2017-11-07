@@ -1,29 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
 
 namespace DynamicDatabase.Interfaces
 {
     public interface IDbCommand : IDisposable
     {
+        #region Properties
+
+        /// <summary>
+        /// The reference to the database context
+        /// </summary>
+        IDbContext DbContext { get; }
+
         /// <summary>
         /// The sql statement of the command executed in the database
         /// </summary>
         string SQL { get; }
 
         /// <summary>
-        /// Connection context object
+        /// Some Databases have the maximum number of VALUES query that can be executed for a INSERT
+        /// statement in a batch
         /// </summary>
-        IDynamicDbConnection Connection { get; }
+        int MaxInsertCriteriaAllowed { get; }
+
+        #endregion Properties
+
+        #region Constructor
 
         /// <summary>
         /// Constructor with database conetxt object and connection object
         /// </summary>
         /// <param name="dbContext"></param>
-        /// <param name="connectionCtx"></param>
-        void Initialize(IDbContext dbContext, IDynamicDbConnection connectionCtx = null);
+        void Initialize(IDbContext dbContext);
+
+        #endregion Constructor
+
+        #region Create
 
         /// <summary>
         /// Create table command
@@ -32,16 +44,27 @@ namespace DynamicDatabase.Interfaces
         void CreateTable(IDbTable dynTable);
 
         /// <summary>
-        /// Execute delete table command
+        /// Remove the table
         /// </summary>
-        /// <param name="dynTable"></param>
-        void RemoveTable(IDbTable dynTable);
+        /// <param name="tableName"></param>
+        void RemoveTable(string tableName);
 
         /// <summary>
-        /// Execute delete table command from the table name
+        /// Insert a row in a table
         /// </summary>
-        /// <param name="tablename"></param>
-        void RemoveTable(string tablename);
+        /// <param name="dbTable"></param>
+        /// <param name="colIndexData"></param>
+        void Insert(IDbTable dbTable, string[] colIndexData);
+
+        /// <summary>
+        /// Insert or replace all the table data in the Database
+        /// </summary>
+        /// <param name="dbTable"></param>
+        void InsertOrReplace(IDbTable dbTable);
+
+        #endregion Create
+
+        #region Load
 
         /// <summary>
         /// Select all data of the table
@@ -57,6 +80,10 @@ namespace DynamicDatabase.Interfaces
         /// <returns></returns>
         DbDataReader LoadTableMetadata(string name);
 
+        #endregion Load
+
+        #region Execute
+
         /// <summary>
         /// Execute a Data definition Language Query
         /// </summary>
@@ -68,24 +95,6 @@ namespace DynamicDatabase.Interfaces
         /// <returns></returns>
         DbDataReader ExecuteDML();
 
-        /// <summary>
-        /// Load metadata
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        DbDataReader LoadMetadata(string name);
-
-        /// <summary>
-        /// Insert a row in a table
-        /// </summary>
-        /// <param name="dbTable"></param>
-        /// <param name="colIndexData"></param>
-        void Insert(IDbTable dbTable, string[] colIndexData);
-
-        /// <summary>
-        /// Insert or replace all the table data in the Database
-        /// </summary>
-        /// <param name="dbTable"></param>
-        void InsertOrReplace(IDbTable dbTable);
+        #endregion Execute
     }
 }

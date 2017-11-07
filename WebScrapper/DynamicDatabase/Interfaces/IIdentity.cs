@@ -1,4 +1,4 @@
-﻿namespace ScrapEngine.Interfaces
+﻿namespace DynamicDatabase.Interfaces
 {
     /// <summary>
     /// A common interface which contains identity informations to identify the class

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Data.Common;
 using DynamicDatabase.Interfaces;
 using DynamicDatabase.Config;
 using DynamicDatabase.Meta;
 using WebCommon.Extn;
-using System.IO;
 using DynamicDatabase.Model;
-using System.Collections;
 using DynamicDatabase.Types;
 using log4net;
+using WebCommon.Error;
 
 namespace DynamicDatabase
 {
@@ -161,13 +156,13 @@ namespace DynamicDatabase
         /// <summary>
         /// Create multiple tables from the dynamic config data
         /// </summary>
-        public virtual void CreateTable(
-            Dictionary<string, Dictionary<string, ConfigDbColumn>> tableColumnConfigs)
+        /// <param name="tableColumnConfigs"></param>
+        public virtual void CreateTable(DbTablesDefinitionModel tableColumnConfigs)
         {
             if (tableColumnConfigs == null) return;
             logger.DebugFormat("Create {0} tables from ConfigDbColumn", tableColumnConfigs.Count);
 
-            // Create App specific tables
+            // Create all tables
             foreach (var kv in tableColumnConfigs)
                 CreateTable(kv.Key, kv.Value);
         }
@@ -307,17 +302,28 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Add or update tables definition data to the table metdata
+        /// </summary>
+        /// <param name="name">The table name</param>
+        /// <param name="metadataModel"></param>
+        public void AddOrUpdate(string name, DbTablesMetdataDefinitionModel metadataModel)
+        {
+            FindAndLoadTable(name);
+            Tables[name].AddOrUpdate(metadataModel);
+        }
+
+        /// <summary>
         /// Insert into the table. Data is indexed by column
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="colIndexData"></param>
-        void AddOrUpdate(string tableName, string[] colIndexData)
+        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row)
         {
             if (!Tables.ContainsKey(tableName)) Load(tableName);
             if (!Tables.ContainsKey(tableName)) throw new Exception(tableName + " table not created or not found");
 
-            Tables[tableName].AddorUpdate(colIndexData);
-            DbCommand.Insert(Tables[tableName], colIndexData);
+            Tables[tableName].AddorUpdate(row);
+            DbCommand.Insert(Tables[tableName], row);
         }
 
         /// <summary>
@@ -363,7 +369,8 @@ namespace DynamicDatabase
         public virtual void AddOrUpdate(string name, Dictionary<string, ConfigDbTable> tableMetas)
         {
             if (!Tables.ContainsKey(name)) Load(name);
-            if (!Tables.ContainsKey(name)) throw new Exception(name + " table not created or not found");
+            if (!Tables.ContainsKey(name))
+                throw new DynamicDbException(name, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
 
             Tables[name].AddorUpdate(tableMetas);
         }
@@ -384,6 +391,17 @@ namespace DynamicDatabase
             if (Tables == null || Tables.Count <= 0) throw new Exception("No table is loaded yet into memory");
             if (!Tables.ContainsKey(tablename)) throw new Exception(tablename + ": No such table found");
             return Tables[tablename];
+        }
+
+        /// <summary>
+        /// Find the table
+        /// </summary>
+        /// <param name="tableName"></param>
+        protected void FindAndLoadTable(string tableName)
+        {
+            if (!Tables.ContainsKey(name)) Load(name);
+            if (!Tables.ContainsKey(name))
+                throw new DynamicDbException(name, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
         }
 
         #endregion Helper

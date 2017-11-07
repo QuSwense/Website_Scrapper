@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace WebCommon.PathHelp
+﻿namespace WebCommon.PathHelp
 {
     /// <summary>
     /// A helper function to determine all the paths accessed throughout the solution

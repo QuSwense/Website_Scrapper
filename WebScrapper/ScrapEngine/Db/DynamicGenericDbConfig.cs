@@ -1,15 +1,10 @@
-﻿using DynamicDatabase.Config;
-using ScrapEngine.Interfaces;
+﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using WebCommon.Error;
 using WebCommon.PathHelp;
 using WebReader.Csv;
+using System.Linq;
 
 namespace ScrapEngine.Db
 {
@@ -32,6 +27,17 @@ namespace ScrapEngine.Db
         /// This data set stores the table column rows informations
         /// </summary>
         public DbTablesDefinitionModel TableColumnRowMetadataConfigs { get; protected set; }
+
+        /// <summary>
+        /// Get the name of the metdata table
+        /// </summary>
+        public string MetadataTableName
+        {
+            get
+            {
+                return TableMetadataConfigs.Keys.First();
+            }
+        }
 
         /// <summary>
         /// Constructor

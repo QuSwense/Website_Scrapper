@@ -1,16 +1,9 @@
 ﻿using DynamicDatabase.Interfaces;
 using DynamicDatabase.Sqlite;
 using DynamicDatabase.Types;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SQLite;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Unity;
-using Unity.Resolution;
-using WebScrapper.Db.Ctx;
 
 namespace DynamicDatabase
 {

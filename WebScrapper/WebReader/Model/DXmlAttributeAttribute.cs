@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace WebReader.Model
 {
@@ -17,12 +14,18 @@ namespace WebReader.Model
         public string Name { get; set; }
 
         /// <summary>
+        /// Sets a check if the attribute is mandatory
+        /// </summary>
+        public bool IsMandatory { get; set; }
+
+        /// <summary>
         /// Constructor with Name parameter
         /// </summary>
         /// <param name="name"></param>
         public DXmlAttributeAttribute(string name)
         {
             Name = name;
+            IsMandatory = false;
         }
     }
 }

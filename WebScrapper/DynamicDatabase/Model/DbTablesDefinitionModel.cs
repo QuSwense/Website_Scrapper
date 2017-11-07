@@ -1,13 +1,14 @@
 ﻿using DynamicDatabase.Config;
-using ScrapEngine.Interfaces;
+using DynamicDatabase.Interfaces;
 using System.Collections.Generic;
 
-namespace ScrapEngine.Model
+namespace DynamicDatabase.Model
 {
     /// <summary>
-    /// This model resembles the structure of the csv file which contains the table definitions model
+    /// This maps a csv config file whcih contains dynamic database table definitions
+    /// to create multiple tables at runtime
     /// </summary>
-    public class DbTablesMetdataDefinitionModel : Dictionary<string, ConfigDbTable>, IIdentity
+    public class DbTablesDefinitionModel : Dictionary<string, Dictionary<string, ConfigDbColumn>>, IIdentity
     {
         /// <summary>
         /// A name to display
@@ -17,13 +18,13 @@ namespace ScrapEngine.Model
         /// <summary>
         /// Default constructor
         /// </summary>
-        public DbTablesMetdataDefinitionModel() { }
+        public DbTablesDefinitionModel() { }
 
         /// <summary>
         /// Parameterized constructor
         /// </summary>
         /// <param name="name"></param>
-        public DbTablesMetdataDefinitionModel(string name)
+        public DbTablesDefinitionModel(string name)
         {
             Name = name;
         }

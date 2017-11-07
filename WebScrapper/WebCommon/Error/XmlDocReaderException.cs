@@ -2,18 +2,14 @@
 
 namespace WebCommon.Error
 {
-    /// <summary>
-    /// Handles any error in the path.
-    /// IT handles a file, folder types
-    /// </summary>
-    public class PathException : Exception
+    public class XmlDocReaderException : Exception
     {
         /// <summary>
         /// The type of path error
         /// </summary>
         public enum EErrorType
         {
-            NOT_EXISTS
+            ATRRIBUTE_VALUE_NULL
         }
 
         /// <summary>
@@ -24,35 +20,35 @@ namespace WebCommon.Error
         /// <summary>
         /// The path that has error
         /// </summary>
-        public string Path { get; protected set; }
+        public string AttributeName { get; protected set; }
 
         /// <summary>
         /// Default
         /// </summary>
-        public PathException() : base() { }
+        public XmlDocReaderException() : base() { }
 
         /// <summary>
         /// Constructor with path value
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public PathException(string path, EErrorType type) : base(Initialize(path, type))
+        public XmlDocReaderException(string attrName, EErrorType type) : base(Initialize(attrName, type))
         {
-            Path = path;
+            AttributeName = attrName;
             ErrorType = type;
         }
 
         /// <summary>
         /// Initialize message
         /// </summary>
-        private static string Initialize(string path, EErrorType type)
+        private static string Initialize(string attrName, EErrorType type)
         {
             switch (type)
             {
-                case EErrorType.NOT_EXISTS:
-                    return string.Format("The path {0} do not exists", path);
+                case EErrorType.ATRRIBUTE_VALUE_NULL:
+                    return string.Format("The value for the attribute '{0}' cannot be null", attrName);
                 default:
-                    return "Unknwon path error";
+                    return "Unknwon Xml document reader exception error";
             }
         }
     }

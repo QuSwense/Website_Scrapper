@@ -1,11 +1,6 @@
-﻿using DynamicDatabase.Config;
-using ScrapEngine.Interfaces;
+﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using WebReader.Csv;
 
 namespace ScrapEngine.Db

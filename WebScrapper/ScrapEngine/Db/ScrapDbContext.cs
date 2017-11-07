@@ -3,10 +3,9 @@ using DynamicDatabase.Config;
 using DynamicDatabase.Interfaces;
 using DynamicDatabase.Model;
 using ScrapEngine.Interfaces;
+using System.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ScrapEngine.Db
 {
@@ -91,6 +90,7 @@ namespace ScrapEngine.Db
 
             try
             {
+                // Create metadata table
                 CreateTableMetadata();
                 
                 // Create each table column metadata
@@ -105,11 +105,16 @@ namespace ScrapEngine.Db
             }
         }
 
+        /// <summary>
+        /// Create table which contains metadata information about all tables
+        /// </summary>
         private void CreateTableMetadata()
         {
+            // Call the dynamic database context to create the table
             WebScrapDb.CreateTable(ParentEngine.GenericDbConfig.TableMetadataConfigs);
-            // Add table metadata data
-            WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.TableMetadataConfigs.Keys.First(),
+
+            // Add data
+            WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.MetadataTableName,
                 MetaDbConfig.TableMetadatas);
 
             // Create all the data specific tables
@@ -124,7 +129,8 @@ namespace ScrapEngine.Db
                 string tableName = string.Format(
                     ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
 
-                WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values);
+                WebScrapDb.CreateTable(tableName, 
+                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values.First());
             }
 
             // Add column data that is available
@@ -150,11 +156,31 @@ namespace ScrapEngine.Db
                         ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Keys.First(),
                         tableconfig.Key, tablecolconfig.Key);
 
-                    WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Values);
+                    WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Values.First());
                 }
             }
         }
 
+        public void AddOrUpdate(string name, List<TableDataColumnModel> row)
+        {
+            string tableName = string.Format(
+                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), name);
+
+            List<string> ukeys = new List<string>();
+            Dictionary<string, string> dataList = new Dictionary<string, string>();
+
+            foreach (var col in row)
+            {
+                if (col.IsPk)
+                    ukeys.Add(col.Name);
+                else
+                    dataList.Add(col.Name, col.Value);
+            }
+
+            // Add data
+            WebScrapDb.AddOrUpdate(tableName, ukeys, dataList);
+        }
+
         #endregion Create
-    }
+        }
 }
