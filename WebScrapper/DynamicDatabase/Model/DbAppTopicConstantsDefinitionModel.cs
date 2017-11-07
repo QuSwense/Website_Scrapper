@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DynamicDatabase.Interfaces;
+using System.Collections.Generic;
 
 namespace DynamicDatabase.Model
 {
@@ -6,7 +7,7 @@ namespace DynamicDatabase.Model
     /// An application topic can use several constants within itself.
     /// This model resembles the structure of the csv file
     /// </summary>
-    public class DbAppTopicConstantsDefinitionModel : Dictionary<string, Dictionary<int, string>>, IIdentity
+    public class DbAppTopicConstantsDefinitionModel : Dictionary<string, Dictionary<int, string>>, IPrimaryIdentity
     {
         /// <summary>
         /// A name to display
@@ -27,5 +28,4 @@ namespace DynamicDatabase.Model
             Name = name;
         }
     }
-}
 }

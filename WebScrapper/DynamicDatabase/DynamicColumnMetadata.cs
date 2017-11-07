@@ -12,8 +12,10 @@ namespace DynamicDatabase
     /// <summary>
     /// Class represents metdata of a column
     /// </summary>
-    public class DynamicColumnMetadata : IDisposable, IColumnMetadata
+    public class DynamicColumnMetadata : IColumnMetadata
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -40,9 +42,24 @@ namespace DynamicDatabase
         public EColumnConstraint Constraint { get; protected set; }
 
         /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        public bool IsPK
+        {
+            get
+            {
+                return Convert.ToBoolean(Constraint & EColumnConstraint.PRIMARYKEY);
+            }
+        }
+
+        /// <summary>
         /// Get the index of the column
         /// </summary>
         public int Index { get; protected set; }
+
+        #endregion Properties
+
+        #region Load
 
         /// <summary>
         /// Parse the column configuration object
@@ -114,6 +131,8 @@ namespace DynamicDatabase
 
             return constraint;
         }
+
+        #endregion Load
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

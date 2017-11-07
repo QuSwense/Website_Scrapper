@@ -25,6 +25,11 @@ namespace DynamicDatabase.Interfaces
         DynamicColumns Columns { get; }
 
         /// <summary>
+        /// Set the dirty flag for a new insert or update
+        /// </summary>
+        bool IsDirty { get; }
+
+        /// <summary>
         /// Constructor with parent table
         /// </summary>
         /// <param name="table"></param>

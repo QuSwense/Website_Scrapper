@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
 using DynamicDatabase.Types;
+using DynamicDatabase.Model;
 
 namespace DynamicDatabase.Interfaces
 {
@@ -35,6 +36,11 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         IColumnHeaders Headers { get; }
 
+        /// <summary>
+        /// Set the dirty flag for a new insert or update
+        /// </summary>
+        bool IsDirty { get; }
+
         #endregion Properties
 
         #region Initialize
@@ -59,18 +65,12 @@ namespace DynamicDatabase.Interfaces
         #endregion Helper
 
         #region Create
-
-        /// <summary>
-        /// Create table from property type (soft create in memory)
-        /// </summary>
-        /// <param name="classProperties"></param>
-        void CreateTable(PropertyInfo[] classProperties);
-
+        
         /// <summary>
         /// Loop through the column configuration and create a new table
         /// </summary>
         /// <param name="configCols"></param>
-        void CreateTable(Dictionary<string, ConfigDbColumn> configCols);
+        void CreateTable(DbColumnsDefinitionModel configCols);
 
         /// <summary>
         /// Cleanup and soft delete the current table
@@ -92,20 +92,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="reader"></param>
         void LoadData(DbDataReader reader);
-
-        /// <summary>
-        /// Load data in memory by Rowid
-        /// </summary>
-        /// <param name="reader"></param>
-        void LoadData<T>(DbDataReader reader);
-
-        /// <summary>
-        /// Use this method to load data
-        /// Load the table data and metdata from the database
-        /// </summary>
-        /// <param name="name"></param>
-        void LoadData(DbDataReader reader, params string[] args);
-
+        
         /// <summary>
         /// Clear all table data
         /// </summary>
@@ -116,39 +103,24 @@ namespace DynamicDatabase.Interfaces
         #region Insert
 
         /// <summary>
-        /// Add or update a row using the unique keys.
-        /// For this method to work it is mandatory that the tbale class is registered before with 
-        /// <see cref="DynamicSortTable"/>
+        /// Add or update tables definition data to the table metdata
         /// </summary>
-        /// <param name="ukeys"></param>
-        /// <param name="row"></param>
-        void AddOrUpdate(IEnumerable<DbDataType> ukeys, IEnumerable<DbDataType> row);
+        /// <param name="metadataModel"></param>
+        void AddOrUpdate(DbTablesMetdataDefinitionModel metadataModel);
 
         /// <summary>
-        /// Add or update a row using the the unique keys with column names.
+        /// Insert into the table. Data is indexed by column
         /// </summary>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by zero.</param>
-        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IEnumerable<DbDataType> row);
+        /// <param name="colIndexData"></param>
+        void AddOrUpdate(string[] colIndexData);
 
         /// <summary>
-        /// Add or update a row using the the unique keys with column names.
+        /// Insert into the table.
         /// </summary>
-        /// <param name="ukeys">The unique keys which is used to insert the data into table.</param>
-        /// <param name="row">The row data to insert into table indexed by column name.</param>
-        void AddOrUpdate(IDictionary<string, DbDataType> ukeys, IDictionary<string, DbDataType> row);
-
-        /// <summary>
-        /// Add rows of metadata table
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        void AddorUpdate(Dictionary<string, ConfigDbTable> tableMetas);
-
-        /// <summary>
-        /// Add row of data
-        /// </summary>
-        /// <param name="row"></param>
-        void AddorUpdate(IEnumerable<string> pks, IEnumerable<string> dataList);
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        /// <param name="dataList"></param>
+        string AddOrUpdate(List<string> ukeys, Dictionary<string, string> dataList);
 
         #endregion Insert
 

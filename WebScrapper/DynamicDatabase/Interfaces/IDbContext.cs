@@ -92,15 +92,15 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Create multiple tables from the dynamic config data
         /// </summary>
-        void CreateTable(
-            Dictionary<string, Dictionary<string, ConfigDbColumn>> tableColumnConfigs);
+        /// <param name="tableColumnConfigs"></param>
+        void CreateTable(DbTablesDefinitionModel tableColumnConfigs);
 
         /// <summary>
         /// Create a new table in the database from column config. If the table exists then throw error.
         /// </summary>
         /// <param name="tableName">The name of the table</param>
         /// <param name="configCols">The table column configurations to create the table</param>
-        void CreateTable(string tableName, Dictionary<string, ConfigDbColumn> configCols);
+        void CreateTable(string tableName, DbColumnsDefinitionModel configCols);
 
         /// <summary>
         /// Delete a table
@@ -118,16 +118,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="name"></param>
         void Load(string name);
-
-        /// <summary>
-        /// Use this method to load data
-        /// Load the table data and metdata from the database and sort by the unique keys column names
-        /// This method is useful for inserting or updating rows by these unique columns
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="cols">The list of unique keys columns</param>
-        void Load(string name, params string[] cols);
-
+        
         /// <summary>
         /// Load the metadata of the table.
         /// </summary>
@@ -147,7 +138,19 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Commit the chnages to the database
         /// </summary>
+        void Commit();
+
+        /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
         void Commit(string tableName);
+
+        /// <summary>
+        /// Add or update tables definition data to the table metdata
+        /// </summary>
+        /// <param name="name">The table name</param>
+        /// <param name="metadataModel"></param>
+        void AddOrUpdate(string name, DbTablesMetdataDefinitionModel metadataModel);
 
         /// <summary>
         /// Insert into the table. Data is indexed by column
@@ -157,29 +160,13 @@ namespace DynamicDatabase.Interfaces
         void AddOrUpdate(string tableName, string[] colIndexData);
 
         /// <summary>
-        /// Add or update a table row by the given table name.
-        /// Find the row using the unique keys column names provided.
-        /// The 
+        /// Insert into the table.
         /// </summary>
-        /// <param name="tablename"></param>
-        /// <param name="ukeycolNames"></param>
-        /// <param name="row"></param>
-        void AddOrUpdate(string tablename, IEnumerable<string> ukeycolNames,
-            IDictionary<string, DbDataType> row);
-
-        /// <summary>
-        /// Bulk add the table metadata information
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        void AddOrUpdate(Dictionary<string, ConfigDbTable> tableMetas);
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        /// <param name="dataList"></param>
+        string AddOrUpdate(string tableName, List<string> ukeys, Dictionary<string, string> dataList);
         
-        /// <summary>
-        /// Bulk add the table metadata information
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="tableMetas"></param>
-        void AddOrUpdate(string name, Dictionary<string, ConfigDbTable> tableMetas);
-
         #endregion Insert
     }
 }

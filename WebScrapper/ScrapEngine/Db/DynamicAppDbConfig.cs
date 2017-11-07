@@ -1,4 +1,5 @@
-﻿using ScrapEngine.Interfaces;
+﻿using DynamicDatabase.Model;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System;
 using WebReader.Csv;
@@ -49,6 +50,17 @@ namespace ScrapEngine.Db
         }
 
         /// <summary>
+        /// Static initializer
+        /// </summary>
+        /// <param name="pDbContext"></param>
+        public static DynamicAppDbConfig Init(IScrapDbContext pDbContext)
+        {
+            DynamicAppDbConfig dynamicAppDbConfig = new DynamicAppDbConfig();
+            dynamicAppDbConfig.Initialize(pDbContext);
+            return dynamicAppDbConfig;
+        }
+
+        /// <summary>
         /// Do the initialization
         /// </summary>
         /// <param name="pDbContext"></param>
@@ -79,22 +91,6 @@ namespace ScrapEngine.Db
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
         
-        /// <summary>
-        /// Read the table configurations of a database
-        /// </summary>
-        /// <param name="folderpath"></param>
-        public void Read(string folderpath, string appTopic)
-        {
-            if (string.IsNullOrEmpty(folderpath)) folderpath = ".";
-
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableEnumConfigPath(folderpath, appTopic), EnumConfigs))
-                csvReader.Read();
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableMetadataConfigPath(folderpath, appTopic), TableMetadatas))
-                csvReader.Read();
-            using (CSVReader csvReader = new CSVReader(ConfigPathHelper.GetDbTableColumnsConfigPath(folderpath, appTopic), TableColumnConfigs))
-                csvReader.Read();
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

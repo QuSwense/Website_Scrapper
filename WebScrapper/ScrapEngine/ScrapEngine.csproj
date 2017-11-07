@@ -76,9 +76,6 @@
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
     <Compile Include="Model\ApplicationConfig.cs" />
     <Compile Include="Model\ApplicationConfigKey.cs" />
-    <Compile Include="Model\DbAppTopicConstantsDefinitionModel.cs" />
-    <Compile Include="Model\DbTablesDefinitionModel.cs" />
-    <Compile Include="Model\DbTablesMetdataDefinitionModel.cs" />
     <Compile Include="Model\EWebDataConfigType.cs" />
     <Compile Include="Model\ManipulateHtmlData.cs" />
     <Compile Include="Model\WebDataConfig.cs" />

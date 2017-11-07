@@ -10,6 +10,8 @@ namespace DynamicDatabase
     /// </summary>
     public class DynamicRow : IDbRow
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -26,6 +28,15 @@ namespace DynamicDatabase
         public DynamicColumns Columns { get; protected set; }
 
         /// <summary>
+        /// Set the dirty flag for a new insert or update
+        /// </summary>
+        public bool IsDirty { get; protected set; }
+
+        #endregion Properties
+
+        #region Constructor
+
+        /// <summary>
         /// Default constructor not used
         /// </summary>
         public DynamicRow() { }
@@ -38,6 +49,10 @@ namespace DynamicDatabase
         {
             Table = table;
         }
+
+        #endregion Constructor
+
+        #region Insert
 
         /// <summary>
         /// Add a column value
@@ -89,6 +104,10 @@ namespace DynamicDatabase
             }
         }
 
+        #endregion Insert
+
+        #region Utility
+
         /// <summary>
         /// Get the unique key representation of PK
         /// </summary>
@@ -115,6 +134,8 @@ namespace DynamicDatabase
         {
             return string.Join(",", RowId, Columns.ToString());
         }
+
+        #endregion Utility
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

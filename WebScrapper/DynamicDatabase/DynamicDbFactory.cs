@@ -13,10 +13,16 @@ namespace DynamicDatabase
     /// </summary>
     public class DynamicDbFactory : IDbFactory
     {
+        #region Properties
+
         /// <summary>
         /// Unity container
         /// </summary>
         private readonly IUnityContainer container;
+
+        #endregion Properties
+
+        #region Constructor
 
         /// <summary>
         /// Static constructor
@@ -28,6 +34,10 @@ namespace DynamicDatabase
             RegisterDefaults();
         }
 
+        #endregion Constructor
+
+        #region Register
+
         /// <summary>
         /// Register defaults
         /// </summary>
@@ -37,7 +47,7 @@ namespace DynamicDatabase
             container.RegisterType<IDbRow, DynamicRow>();
             container.RegisterType<IColumnHeaders, DynamicColumnHeaders>();
             container.RegisterType<IDbCommand, DynamicDbCommand>();
-            container.RegisterType<IDbTable, DynamicSortTable>();
+            container.RegisterType<IDbTable, DynamicTable>();
             container.RegisterType<IDataTypeContext, DataTypeContext>();
         }
 
@@ -62,7 +72,20 @@ namespace DynamicDatabase
         {
             container.RegisterType<TContract, TImplementation>();
         }
-        
+
+        /// <summary>
+        /// Register database type
+        /// </summary>
+        /// <param name="dbType"></param>
+        public void RegisterDb(string dbType)
+        {
+            if (string.Compare(dbType, "sqlite", true) == 0) RegisterSqlite();
+        }
+
+        #endregion Register
+
+        #region Create
+
         /// <summary>
         /// Create a new instance of the type
         /// </summary>
@@ -84,5 +107,7 @@ namespace DynamicDatabase
             else
                 RegisterSqlite();
         }
+
+        #endregion Create
     }
 }

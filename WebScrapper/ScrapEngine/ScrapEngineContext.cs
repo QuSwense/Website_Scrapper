@@ -28,14 +28,9 @@ namespace ScrapEngine
         public ApplicationConfig AppConfig { get; protected set; }
 
         /// <summary>
-        /// A generic database config
-        /// </summary>
-        public DynamicGenericDbConfig GenericDbConfig { get; protected set; }
-
-        /// <summary>
         /// The Database class layer
         /// </summary>
-        public ScrapDbContext WebDbContext { get; protected set; }
+        public IScrapDbContext WebDbContext { get; protected set; }
 
         /// <summary>
         /// Web scrapper html context
@@ -56,7 +51,7 @@ namespace ScrapEngine
         /// </summary>
         /// <param name="appTopic"></param>
         /// <param name="sqldb"></param>
-        public void Initialize(AppTopicConfigPathHelper appTopicPath, ApplicationConfig appGenericConfig, DynamicGenericDbConfig genericDbConfig)
+        public void Initialize(AppTopicConfigPathHelper appTopicPath, ApplicationConfig appGenericConfig)
         {
             AppTopicPath = appTopicPath;
 
@@ -67,12 +62,10 @@ namespace ScrapEngine
             ReadApplicationConfig(appGenericConfig);
 
             // Initialize the database context
-            WebDbContext = new ScrapDbContext();
-            WebDbContext.Initialize(this);
+            WebDbContext = ScrapDbContext.Init(this);
 
             // Web scrap html context
-            WebScrapHtml = new WebScrapHtmlContext();
-            WebScrapHtml.Initialize(this);
+            WebScrapHtml = WebScrapHtmlContext.Init(this);
         }
 
         /// <summary>
@@ -83,10 +76,10 @@ namespace ScrapEngine
         /// <param name="genericDbConfig"></param>
         /// <returns></returns>
         public static ScrapEngineContext ScrapInitialize(AppTopicConfigPathHelper appTopicPath, 
-            ApplicationConfig appGenericConfig, DynamicGenericDbConfig genericDbConfig)
+            ApplicationConfig appGenericConfig)
         {
             ScrapEngineContext appEngine = new ScrapEngineContext();
-            appEngine.Initialize(appTopicPath, appGenericConfig, genericDbConfig);
+            appEngine.Initialize(appTopicPath, appGenericConfig);
             return appEngine;
         }
 

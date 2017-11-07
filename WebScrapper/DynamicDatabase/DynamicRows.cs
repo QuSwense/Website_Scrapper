@@ -3,11 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using DynamicDatabase.Types;
+using System.Collections;
 
 namespace DynamicDatabase
 {
-    public class DynamicRows : IDisposable
+    public class DynamicRows : IDisposable,
+        IEnumerator<IDbRow>,
+        IEnumerable<IDbRow>
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -24,6 +29,10 @@ namespace DynamicDatabase
         /// </summary>
         public Dictionary<string, IDbRow> ByNames { get; protected set; }
 
+        #endregion Properties
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -38,6 +47,10 @@ namespace DynamicDatabase
             Table = table;
             ByIndices = new List<IDbRow>();
         }
+
+        #endregion Constructor
+
+        #region Indexer
 
         /// <summary>
         /// An indexer to access data like array using index
@@ -77,6 +90,10 @@ namespace DynamicDatabase
             }
         }
 
+        #endregion Indexer
+
+        #region Load
+
         /// <summary>
         /// Load a row from the current reader
         /// </summary>
@@ -88,17 +105,9 @@ namespace DynamicDatabase
             row.AddorUpdate(reader);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fnCriteria"></param>
-        /// <returns></returns>
-        public IDbRow FindByPK(string uniqueKeyString)
-        {
-            IDbRow result = null;
-            ByNames.TryGetValue(uniqueKeyString, out result);
-            return result;
-        }
+        #endregion Load
+
+        #region Insert
 
         /// <summary>
         /// Load data in memory by Rowid
@@ -129,6 +138,71 @@ namespace DynamicDatabase
             if (ByNames.ContainsKey(pkString)) throw new Exception("Duplicate data insertion not allowed by Primary key string : " + pkString);
             ByNames.Add(pkString, row);
         }
+
+        #endregion Insert
+
+        #region Utility
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fnCriteria"></param>
+        /// <returns></returns>
+        public IDbRow FindByPK(string uniqueKeyString)
+        {
+            IDbRow result = null;
+            ByNames.TryGetValue(uniqueKeyString, out result);
+            return result;
+        }
+
+        #endregion Utility
+
+        #region IEnumerator
+        private int _position = -1;
+
+        public IDbRow Current
+        {
+            get
+            {
+                return ByIndices[_position];
+            }
+        }
+
+        object IEnumerator.Current
+        {
+            get
+            {
+                return ByIndices[_position];
+            }
+        }
+
+        public bool MoveNext()
+        {
+            _position++;
+            return (_position < ByIndices.Count);
+        }
+
+        public void Reset()
+        {
+            _position = 0;
+        }
+
+        IEnumerator<IDbRow> GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        IEnumerator<IDbRow> IEnumerable<IDbRow>.GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        #endregion IEnumerator
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

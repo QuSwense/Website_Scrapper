@@ -11,6 +11,8 @@ namespace DynamicDatabase
     /// </summary>
     public abstract class DynamicDbConnection : IDynamicDbConnection
     {
+        #region Properties
+
         /// <summary>
         /// The main db Connection object
         /// Use <see cref="DynamicDbFactory"/> to create the main class
@@ -82,6 +84,10 @@ namespace DynamicDatabase
             get { return Connection.ConnectionString; }
         }
 
+        #endregion Properties
+
+        #region Constructor
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -120,6 +126,10 @@ namespace DynamicDatabase
             
         }
 
+        #endregion Constructor
+
+        #region Database
+
         /// <summary>
         /// Create the Sqlite database
         /// </summary>
@@ -139,6 +149,10 @@ namespace DynamicDatabase
         /// </summary>
         public virtual void DeleteDatabase() { }
 
+        #endregion Database
+
+        #region Connection
+
         /// <summary>
         /// Open a connection
         /// </summary>
@@ -154,6 +168,8 @@ namespace DynamicDatabase
         {
             Connection.Close();
         }
+
+        #endregion Connection
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

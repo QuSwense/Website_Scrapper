@@ -20,14 +20,9 @@ namespace ScrapEngine.Interfaces
         ApplicationConfig AppConfig { get; }
 
         /// <summary>
-        /// A generic database config
-        /// </summary>
-        DynamicGenericDbConfig GenericDbConfig { get; }
-
-        /// <summary>
         /// The Database class layer
         /// </summary>
-        ScrapDbContext WebDbContext { get; }
+        IScrapDbContext WebDbContext { get; }
 
         /// <summary>
         /// Web scrapper html context
@@ -43,8 +38,7 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="appTopic"></param>
         /// <param name="sqldb"></param>
-        void Initialize(AppTopicConfigPathHelper appTopicPath, ApplicationConfig appGenericConfig,
-            DynamicGenericDbConfig genericDbConfig);
+        void Initialize(AppTopicConfigPathHelper appTopicPath, ApplicationConfig appGenericConfig);
 
         #endregion Constructor
 

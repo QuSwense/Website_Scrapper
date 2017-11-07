@@ -50,6 +50,7 @@
     <Compile Include="Error\DynamicDbException.cs" />
     <Compile Include="Error\GenericConfigException.cs" />
     <Compile Include="Error\GenericDbConfigException.cs" />
+    <Compile Include="Error\HtmlNodeException.cs" />
     <Compile Include="Error\PathException.cs" />
     <Compile Include="Error\XmlDocReaderException.cs" />
     <Compile Include="PathHelp\AppTopicConfigPathHelper.cs" />

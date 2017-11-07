@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Xml.XPath;
+using WebCommon.Error;
 
 namespace ScrapEngine.Bl
 {

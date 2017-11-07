@@ -223,10 +223,6 @@ namespace DynamicDatabase
             {
                 if (disposing)
                 {
-                    if (Connection != null)
-                    {
-                        Connection.Dispose();
-                    }
                 }
 
                 disposedValue = true;

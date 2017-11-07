@@ -7,7 +7,7 @@ namespace DynamicDatabase.Model
     /// <summary>
     /// This model resembles the structure of the csv file which contains the table definitions model
     /// </summary>
-    public class DbTablesMetdataDefinitionModel : Dictionary<string, ConfigDbTable>, IIdentity
+    public class DbTablesMetdataDefinitionModel : Dictionary<string, ConfigDbTable>, IPrimaryIdentity
     {
         /// <summary>
         /// A name to display

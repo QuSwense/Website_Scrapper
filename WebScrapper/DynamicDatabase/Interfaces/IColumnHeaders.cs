@@ -1,4 +1,5 @@
 ﻿using DynamicDatabase.Config;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
@@ -7,8 +8,10 @@ namespace DynamicDatabase.Interfaces
 {
     public interface IColumnHeaders :
         IEnumerator<IColumnMetadata>,
-        IEnumerable<IColumnMetadata>
+        IEnumerable<IColumnMetadata>, IDisposable
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -24,6 +27,10 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         List<IColumnMetadata> ByIndices { get; }
 
+        #endregion Properties
+
+        #region Indexer
+
         /// <summary>
         /// An indexer to access data like array using index
         /// </summary>
@@ -38,6 +45,10 @@ namespace DynamicDatabase.Interfaces
         /// <returns></returns>
         IColumnMetadata this[string name] { get; set; }
 
+        #endregion Indexer
+
+        #region Constructor
+
         /// <summary>
         /// Initialize the column headers using config
         /// </summary>
@@ -45,10 +56,14 @@ namespace DynamicDatabase.Interfaces
         void Initialize(Dictionary<string, ConfigDbColumn> configCols);
 
         /// <summary>
-        /// Initialize Headers using Column metdata models
+        /// Initialize from the metdata reader
         /// </summary>
-        /// <param name="classProperties"></param>
-        void Initialize(PropertyInfo[] classProperties);
+        /// <param name="reader"></param>
+        void Initialize(DbDataReader reader);
+
+        #endregion Constructor
+
+        #region Utility
 
         /// <summary>
         /// Get the index of the column
@@ -58,15 +73,11 @@ namespace DynamicDatabase.Interfaces
         int GetColumnIndex(string name);
 
         /// <summary>
-        /// Initialize from the metdata reader
-        /// </summary>
-        /// <param name="reader"></param>
-        void Initialize(DbDataReader reader);
-
-        /// <summary>
         /// Get the list of PKs
         /// </summary>
         /// <returns></returns>
         List<IColumnMetadata> GetPKs();
+
+        #endregion Utility
     }
 }

@@ -15,6 +15,12 @@
         void Register<TContract, TImplementation>() where TImplementation : TContract;
 
         /// <summary>
+        /// Register database type
+        /// </summary>
+        /// <param name="dbType"></param>
+        void RegisterDb(string dbType);
+
+        /// <summary>
         /// Create a new instance of the type
         /// </summary>
         /// <typeparam name="T"></typeparam>

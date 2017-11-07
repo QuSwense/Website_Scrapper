@@ -23,11 +23,10 @@ namespace WebScrapper
             if (!Parser.Default.ParseArguments(args, options))
                 throw new CommandLineException(args, CommandLineException.EErrorType.PARSE_ERROR);
 
-            // Initialize the root config path (Always)
+            // Initialize the root config path at the beginning (Always)
             AppGenericConfigPathHelper.I.Initialize(options.ScrapperFolderPath);
             
-            // Check path
-            AppGenericConfigPathHelper.I.ScrapperApps.AssertExists();
+            // Check mandatory path
             AppGenericConfigPathHelper.I.GlobalAppConfig.AssertExists();
 
             // Read the generic application configuration file independent of any application topic
@@ -35,8 +34,7 @@ namespace WebScrapper
                 AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
 
             // Read database generic config
-            DynamicGenericDbConfig genericDbConfig = new DynamicGenericDbConfig();
-            genericDbConfig.Read();
+            DynamicGenericDbConfig.I.Read();
 
             // If application topic value is "*" run scrapper for all
             // available application folders
@@ -46,15 +44,15 @@ namespace WebScrapper
                 foreach (var appTopicPath in AppTopicConfigPathHelper.GetAppTopics())
                 {
                     ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(appTopicPath, 
-                        appGenericConfig, genericDbConfig);
+                        appGenericConfig);
                     engineContext.Run();
                 }
             }
             else
             {
                 // For specific application topic value
-                ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(new AppTopicConfigPathHelper(options.AppTopic), 
-                    appGenericConfig, genericDbConfig);
+                ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(
+                    new AppTopicConfigPathHelper(options.AppTopic), appGenericConfig);
                 engineContext.Run();
             }
         }

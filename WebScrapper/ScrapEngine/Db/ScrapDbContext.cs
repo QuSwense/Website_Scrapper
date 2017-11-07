@@ -20,7 +20,7 @@ namespace ScrapEngine.Db
         /// The application name topic for which the web scrapper Database is to be generated
         /// </summary>
         public IScrapEngineContext ParentEngine { get; protected set; }
-        
+
         /// <summary>
         /// Read the Database configuration
         /// </summary>
@@ -41,6 +41,18 @@ namespace ScrapEngine.Db
         public ScrapDbContext() { }
 
         /// <summary>
+        /// A static initialize method
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        public static IScrapDbContext Init(IScrapEngineContext parent)
+        {
+            IScrapDbContext dbContext = new ScrapDbContext();
+            dbContext.Initialize(parent);
+            return dbContext;
+        }
+
+        /// <summary>
         /// Initialize
         /// </summary>
         public void Initialize(IScrapEngineContext parent)
@@ -48,8 +60,7 @@ namespace ScrapEngine.Db
             ParentEngine = parent;
 
             // Read aplication specific database config
-            MetaDbConfig = new DynamicAppDbConfig();
-            MetaDbConfig.Initialize(this);
+            MetaDbConfig = DynamicAppDbConfig.Init(this);
             MetaDbConfig.Read();
 
             // Create database context
@@ -61,14 +72,11 @@ namespace ScrapEngine.Db
         /// </summary>
         private void InitializeDbContext()
         {
-            WebScrapDb = new DynamicDbContext();
-            WebScrapDb.DbFactory.Initialize(ParentEngine.AppConfig.Db());
-
             ArgsContextInitialize dbContextArgs = new ArgsContextInitialize();
             dbContextArgs.DbFilePath = ParentEngine.AppTopicPath.AppTopicMain.FullPath;
             dbContextArgs.Name = ParentEngine.AppTopicPath.AppTopic;
 
-            WebScrapDb.Initialize(dbContextArgs);
+            WebScrapDb = DynamicDbContext.Init(dbContextArgs, ParentEngine.AppConfig.Db());
 
             if (ParentEngine.AppConfig.DoCreateDb())
                 WebScrapDb.CreateDatabase();
@@ -92,15 +100,17 @@ namespace ScrapEngine.Db
             {
                 // Create metadata table
                 CreateTableMetadata();
-                
+
                 // Create each table column metadata
                 CreateTableColumnMetadata();
-                
+
                 // Create each table column rows metadata
                 CreateTableColumnRowsMetadata();
             }
             finally
             {
+                // Commit all the data in one go
+                WebScrapDb.Commit();
                 WebScrapDb.Close();
             }
         }
@@ -121,15 +131,18 @@ namespace ScrapEngine.Db
             WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
         }
 
+        /// <summary>
+        /// Create and update table column metadata
+        /// </summary>
         private void CreateTableColumnMetadata()
         {
             // Create tables
             foreach (var item in MetaDbConfig.TableColumnConfigs)
             {
                 string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
+                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, item.Key);
 
-                WebScrapDb.CreateTable(tableName, 
+                WebScrapDb.CreateTable(tableName,
                     ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values.First());
             }
 
@@ -137,7 +150,7 @@ namespace ScrapEngine.Db
             foreach (var item in MetaDbConfig.TableColumnConfigs)
             {
                 string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), item.Key);
+                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, item.Key);
 
                 foreach (var coldata in item.Value)
                 {
@@ -146,6 +159,9 @@ namespace ScrapEngine.Db
             }
         }
 
+        /// <summary>
+        /// Create table rows metadata
+        /// </summary>
         private void CreateTableColumnRowsMetadata()
         {
             foreach (var tableconfig in MetaDbConfig.TableColumnConfigs)
@@ -153,7 +169,7 @@ namespace ScrapEngine.Db
                 foreach (var tablecolconfig in tableconfig.Value)
                 {
                     string tableName = string.Format(
-                        ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Keys.First(),
+                        ParentEngine.GenericDbConfig.RowMetadataTableName,
                         tableconfig.Key, tablecolconfig.Key);
 
                     WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Values.First());
@@ -161,10 +177,15 @@ namespace ScrapEngine.Db
             }
         }
 
-        public void AddOrUpdate(string name, List<TableDataColumnModel> row)
+        /// <summary>
+        /// Add or update the data scrapped from the webpages including the metadata information
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="row"></param>
+        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row)
         {
-            string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Keys.First(), name);
+            string colMetadatatableName = string.Format(
+                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, tableName);
 
             List<string> ukeys = new List<string>();
             Dictionary<string, string> dataList = new Dictionary<string, string>();
@@ -178,9 +199,15 @@ namespace ScrapEngine.Db
             }
 
             // Add data
-            WebScrapDb.AddOrUpdate(tableName, ukeys, dataList);
+            string pk = WebScrapDb.AddOrUpdate(tableName, ukeys, dataList);
+
+            foreach (var colDataKv in row)
+            {
+                // Add metadata
+                WebScrapDb.AddOrUpdate(colMetadatatableName, new string[] { pk, null, null, colDataKv.Url, colDataKv.XPath });
+            }
         }
 
         #endregion Create
-        }
+    }
 }

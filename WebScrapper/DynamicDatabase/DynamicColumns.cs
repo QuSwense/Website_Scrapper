@@ -1,13 +1,18 @@
 ﻿using DynamicDatabase.Interfaces;
 using DynamicDatabase.Types;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DynamicDatabase
 {
-    public class DynamicColumns : IDisposable
+    public class DynamicColumns : IDisposable,
+        IEnumerator<DbDataType>,
+        IEnumerable<DbDataType>
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -22,6 +27,10 @@ namespace DynamicDatabase
         /// The data set which contains column data by index
         /// </summary>
         public List<DbDataType> ByIndices { get; protected set; }
+
+        #endregion Properties
+
+        #region Indexer
 
         /// <summary>
         /// An indexer to access data like array using index
@@ -60,6 +69,10 @@ namespace DynamicDatabase
                 ByNames[name] = value;
             }
         }
+
+        #endregion Indexer
+
+        #region Insert
 
         /// <summary>
         /// Add or update a column data in the Dictionary data set.
@@ -103,6 +116,10 @@ namespace DynamicDatabase
             dt.Value = data;
         }
 
+        #endregion Insert
+
+        #region Utility
+
         /// <summary>
         /// Create a unique string identifier for this Coloumn data using only the primary keys
         /// </summary>
@@ -145,6 +162,55 @@ namespace DynamicDatabase
             return string.Join(",",ByNames.Where(c => pkCols.Contains(c.Key))
                 .Select(p => p.Value.Value).ToList());
         }
+
+        #endregion Utility
+
+        #region IEnumerator
+        private int _position = -1;
+
+        public DbDataType Current
+        {
+            get
+            {
+                return ByIndices[_position];
+            }
+        }
+
+        object IEnumerator.Current
+        {
+            get
+            {
+                return ByIndices[_position];
+            }
+        }
+
+        public bool MoveNext()
+        {
+            _position++;
+            return (_position < ByIndices.Count);
+        }
+
+        public void Reset()
+        {
+            _position = 0;
+        }
+
+        IEnumerator<DbDataType> GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        IEnumerator<DbDataType> IEnumerable<DbDataType>.GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ByIndices.GetEnumerator();
+        }
+
+        #endregion IEnumerator
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

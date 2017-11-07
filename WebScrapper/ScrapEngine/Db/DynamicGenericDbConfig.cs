@@ -5,6 +5,7 @@ using WebCommon.Error;
 using WebCommon.PathHelp;
 using WebReader.Csv;
 using System.Linq;
+using DynamicDatabase.Model;
 
 namespace ScrapEngine.Db
 {
@@ -13,6 +14,8 @@ namespace ScrapEngine.Db
     /// </summary>
     public class DynamicGenericDbConfig
     {
+        #region Properties
+
         /// <summary>
         /// This data set stores the table informations
         /// </summary>
@@ -40,14 +43,61 @@ namespace ScrapEngine.Db
         }
 
         /// <summary>
+        /// Get the table name for the column metadata information
+        /// </summary>
+        public string ColumnMetadataTableName
+        {
+            get
+            {
+                return TableColumnMetadataConfigs.Keys.First();
+            }
+        }
+
+        /// <summary>
+        /// Get the table name for the row metadata information
+        /// </summary>
+        public string RowMetadataTableName
+        {
+            get
+            {
+                return TableColumnRowMetadataConfigs.Keys.First();
+            }
+        }
+
+        #endregion Properties
+
+        #region Constructor
+
+        /// <summary>
+        /// A static object to the self but inaccessible outside the class
+        /// </summary>
+        private static DynamicGenericDbConfig _this;
+
+        /// <summary>
+        /// A public member to access this object
+        /// </summary>
+        public static DynamicGenericDbConfig I
+        {
+            get
+            {
+                if (_this == null) _this = new DynamicGenericDbConfig();
+                return _this;
+            }
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
-        public DynamicGenericDbConfig()
+        protected DynamicGenericDbConfig()
         {
             TableMetadataConfigs = new DbTablesDefinitionModel("Table Metadata");
             TableColumnMetadataConfigs = new DbTablesDefinitionModel("Table column metadata");
             TableColumnRowMetadataConfigs = new DbTablesDefinitionModel("Table rows metadata");
         }
+
+        #endregion Constructor
+
+        #region Load
 
         /// <summary>
         /// Read the config files
@@ -67,6 +117,10 @@ namespace ScrapEngine.Db
             AssertConfig(TableColumnRowMetadataConfigs);
         }
 
+        #endregion Load
+
+        #region Assert
+
         /// <summary>
         /// Validates and checks the table metdata object read from the file
         /// </summary>
@@ -83,5 +137,7 @@ namespace ScrapEngine.Db
             if (configDictionary.Keys.Count != 1)
                 throw new GenericDbConfigException(configIdentity.Name, GenericDbConfigException.EErrorType.MULTIPLE_TABLE_STORE);
         }
+
+        #endregion Assert
     }
 }

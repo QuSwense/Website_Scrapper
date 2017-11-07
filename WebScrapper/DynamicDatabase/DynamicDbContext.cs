@@ -80,6 +80,19 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Static initializer
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        public static IDbContext Init(ArgsContextInitialize arg, string dbType)
+        {
+            IDbContext dbContext = new DynamicDbContext();
+            dbContext.Initialize(arg);
+            dbContext.DbFactory.RegisterDb(dbType);
+            return dbContext;
+        }
+
+        /// <summary>
         /// Initialize with db database file and name
         /// </summary>
         /// <param name="arg">The argument to initialize conext object</param>
@@ -87,7 +100,7 @@ namespace DynamicDatabase
         {
             if (arg == null) throw new Exception("The context initialize argument is null");
             DbConnection.Initialize(arg.DbFilePath, arg.Name, arg.ConnectionString);
-            DbCommand.Initialize(this, DbConnection);
+            DbCommand.Initialize(this);
 
             logger.Debug("The Db connection object and the Db command object is initialized");
         }
@@ -172,7 +185,7 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="tableName">The name of the table</param>
         /// <param name="configCols">The table column configurations to create the table</param>
-        public virtual void CreateTable(string tableName, Dictionary<string, ConfigDbColumn> configCols)
+        public virtual void CreateTable(string tableName, DbColumnsDefinitionModel configCols)
             => CreateTable(tableName, (dynTable) => dynTable.CreateTable(configCols));
 
         /// <summary>
@@ -233,22 +246,7 @@ namespace DynamicDatabase
             LoadMetadata(name);
             LoadData(name);
         }        
-
-        /// <summary>
-        /// Use this method to load data
-        /// Load the table data and metdata from the database and sort by the unique keys column names
-        /// This method is useful for inserting or updating rows by these unique columns
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="cols">The list of unique keys columns</param>
-        public virtual void Load(string name, params string[] cols)
-        {
-            LoadMetadata(name);
-            Load(name, (dynTable) => {
-                dynTable.LoadData(DbCommand.LoadData(name), cols);
-            });
-        }
-
+        
         /// <summary>
         /// Load the metadata of the table.
         /// </summary>
@@ -287,18 +285,35 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="name"></param>
         public void Clear(string tablename) => GetTable(tablename).Clear();
-        
+
         #endregion Load
 
         #region Insert
 
         /// <summary>
-        /// Commit the chnages to the database
+        /// Commit all the changes to the database
+        /// This uses the IsDirty flag of <see cref="IDbTable"/> and <see cref="IDbRow"/> to 
+        /// check if the Table or row needs to be created / updated
+        /// </summary>
+        public void Commit()
+        {
+            foreach (var table in Tables) Commit(table.Key);
+        }
+
+        /// <summary>
+        /// Commit the table change to the database
+        /// This uses the IsDirty flag of <see cref="IDbTable"/> and <see cref="IDbRow"/> to 
+        /// check if the Table or row needs to be created / updated
         /// </summary>
         public void Commit(string tableName)
         {
-            if (!Tables.ContainsKey(tableName)) throw new Exception(tableName + " table not created or not found");
-            DbCommand.InsertOrReplace(Tables[tableName]);
+            // if the table is not loaded in memory then there is no update
+            if (!Tables.ContainsKey(tableName)) return;
+
+            if (Tables[tableName].IsDirty)
+                DbCommand.CreateTable(Tables[tableName]);
+            else
+                DbCommand.InsertOrReplace(Tables[tableName]);
         }
 
         /// <summary>
@@ -317,62 +332,21 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="colIndexData"></param>
-        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row)
+        public void AddOrUpdate(string tableName, string[] colIndexData)
         {
-            if (!Tables.ContainsKey(tableName)) Load(tableName);
-            if (!Tables.ContainsKey(tableName)) throw new Exception(tableName + " table not created or not found");
-
-            Tables[tableName].AddorUpdate(row);
-            DbCommand.Insert(Tables[tableName], row);
+            FindAndLoadTable(tableName);
+            Tables[tableName].AddOrUpdate(colIndexData);
         }
 
         /// <summary>
-        /// Add or update a table row by the given table name.
-        /// Find the row using the unique keys column names provided.
-        /// The 
+        /// Insert into the table.
         /// </summary>
-        /// <param name="tablename"></param>
-        /// <param name="ukeycolNames"></param>
-        /// <param name="row"></param>
-        public virtual void AddOrUpdate(string tablename, IEnumerable<string> ukeycolNames,
-            IDictionary<string, DbDataType> row)
-            => AddOrUpdate(tablename, (table) => table.AddorUpdate(ukeys, row));
-        
-        /// <summary>
-        /// Bulk add the table metadata information
-        /// </summary>
-        /// <param name="tableMetas"></param>
-        public virtual void AddOrUpdate(Dictionary<string, ConfigDbTable> tableMetas)
+        /// <param name="tableName"></param>
+        /// <param name="colIndexData"></param>
+        public string AddOrUpdate(string tableName, List<string> ukeys, Dictionary<string, string> dataList)
         {
-            Type tableMetaType = typeof(DbMetaTableModel);
-            DDTableAttribute tableAttr = tableMetaType.GetCustomAttribute<DDTableAttribute>();
-
-            if (tableAttr == null) throw new Exception("Table name attribute on DbMetaTableModel class not found");
-            if (!Tables.ContainsKey(tableAttr.Name)) LoadMetadata(tableAttr.Name);
-
-            Tables[tableAttr.Name].AddorUpdate(tableMetas);
-        }
-
-        /// <summary>
-        /// A common helper method to execute common set of Add or update methods
-        /// </summary>
-        /// <param name="tablename"></param>
-        /// <param name="fnAddorUpdate"></param>
-        protected void AddOrUpdate(string tablename, Action<IDbTable> fnAddorUpdate)
-            => fnAddorUpdate(GetTable(tablename));
-
-        /// <summary>
-        /// Bulk add the table metadata information
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="tableMetas"></param>
-        public virtual void AddOrUpdate(string name, Dictionary<string, ConfigDbTable> tableMetas)
-        {
-            if (!Tables.ContainsKey(name)) Load(name);
-            if (!Tables.ContainsKey(name))
-                throw new DynamicDbException(name, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
-
-            Tables[name].AddorUpdate(tableMetas);
+            FindAndLoadTable(tableName);
+            return Tables[tableName].AddOrUpdate(ukeys, dataList);
         }
 
         #endregion Insert
@@ -399,9 +373,9 @@ namespace DynamicDatabase
         /// <param name="tableName"></param>
         protected void FindAndLoadTable(string tableName)
         {
-            if (!Tables.ContainsKey(name)) Load(name);
-            if (!Tables.ContainsKey(name))
-                throw new DynamicDbException(name, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
+            if (!Tables.ContainsKey(tableName)) Load(tableName);
+            if (!Tables.ContainsKey(tableName))
+                throw new DynamicDbException(tableName, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
         }
 
         #endregion Helper

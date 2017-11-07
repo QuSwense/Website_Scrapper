@@ -10,6 +10,8 @@ namespace DynamicDatabase
 {
     public class DynamicColumnHeaders : IColumnHeaders
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -24,6 +26,10 @@ namespace DynamicDatabase
         /// The list of column headers by index
         /// </summary>
         public List<IColumnMetadata> ByIndices { get; protected set; }
+
+        #endregion Properties
+
+        #region Indexer
 
         /// <summary>
         /// An indexer to access data like array using index
@@ -63,6 +69,10 @@ namespace DynamicDatabase
             }
         }
 
+        #endregion Indexer
+
+        #region Constructor
+
         /// <summary>
         /// Initialize the column headers using config
         /// </summary>
@@ -77,34 +87,6 @@ namespace DynamicDatabase
                 AddHeader(index, item.Key, colMetadata);
                 index++;
             }
-        }
-
-        /// <summary>
-        /// Initialize Headers using Column metdata models
-        /// </summary>
-        /// <param name="classProperties"></param>
-        public void Initialize(PropertyInfo[] classProperties)
-        {
-            int index = 0;
-            foreach (PropertyInfo prop in classProperties)
-            {
-                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
-                colMetadata.Parse(prop);
-                AddHeader(index, colMetadata.ColumnName, colMetadata);
-                index++;
-            }
-        }
-
-        /// <summary>
-        /// Get the index of the column
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public int GetColumnIndex(string name)
-        {
-            if (ByNames.ContainsKey(name)) throw new Exception(string.Format("Column name {0} not found.", name));
-            if (ByNames[name].Index < 0 || ByNames[name].Index > ByIndices.Count) throw new Exception(string.Format("Invalid Column Index of {0}", name));
-            return ByNames[name].Index;
         }
 
         /// <summary>
@@ -123,6 +105,43 @@ namespace DynamicDatabase
             }
         }
 
+        #endregion Constructor
+
+        #region Utility
+
+        /// <summary>
+        /// Get the index of the column
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int GetColumnIndex(string name)
+        {
+            if (ByNames.ContainsKey(name)) throw new Exception(string.Format("Column name {0} not found.", name));
+            if (ByNames[name].Index < 0 || ByNames[name].Index > ByIndices.Count) throw new Exception(string.Format("Invalid Column Index of {0}", name));
+            return ByNames[name].Index;
+        }
+
+        /// <summary>
+        /// Get the list of PKs
+        /// </summary>
+        /// <returns></returns>
+        public List<IColumnMetadata> GetPKs()
+        {
+            List<IColumnMetadata> pkList = new List<IColumnMetadata>();
+
+            foreach (var item in ByIndices)
+            {
+                if ((item.Constraint & EColumnConstraint.PRIMARYKEY) > 0)
+                    pkList.Add(item);
+            }
+
+            return pkList;
+        }
+
+        #endregion Utility
+
+        #region Insert
+
         /// <summary>
         /// Add header to the table
         /// </summary>
@@ -137,22 +156,7 @@ namespace DynamicDatabase
             ByIndices.Insert(index, dynCol);
         }
 
-        /// <summary>
-        /// Get the list of PKs
-        /// </summary>
-        /// <returns></returns>
-        public List<IColumnMetadata> GetPKs()
-        {
-            List<IColumnMetadata> pkList = new List<IColumnMetadata>();
-
-            foreach(var item in ByIndices)
-            {
-                if ((item.Constraint & EColumnConstraint.PRIMARYKEY) > 0)
-                    pkList.Add(item);
-            }
-
-            return pkList;
-        }
+        #endregion Insert
 
         #region IEnumerator
         private int _position = -1;
@@ -184,11 +188,6 @@ namespace DynamicDatabase
             _position = 0;
         }
         
-        public void Dispose()
-        {
-            
-        }
-
         IEnumerator<IColumnMetadata> GetEnumerator()
         {
             return ByIndices.GetEnumerator();
@@ -203,6 +202,45 @@ namespace DynamicDatabase
         {
             return ByIndices.GetEnumerator();
         }
+
         #endregion IEnumerator
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~DynamicColumnHeaders() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
     }
 }

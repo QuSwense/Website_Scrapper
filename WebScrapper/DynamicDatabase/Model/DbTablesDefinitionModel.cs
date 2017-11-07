@@ -8,7 +8,7 @@ namespace DynamicDatabase.Model
     /// This maps a csv config file whcih contains dynamic database table definitions
     /// to create multiple tables at runtime
     /// </summary>
-    public class DbTablesDefinitionModel : Dictionary<string, Dictionary<string, ConfigDbColumn>>, IIdentity
+    public class DbTablesDefinitionModel : Dictionary<string, DbColumnsDefinitionModel>, IPrimaryIdentity
     {
         /// <summary>
         /// A name to display

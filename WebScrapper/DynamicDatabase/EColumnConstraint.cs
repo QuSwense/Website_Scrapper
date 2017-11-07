@@ -1,5 +1,8 @@
 ﻿namespace DynamicDatabase
 {
+    /// <summary>
+    /// Types of Column constriants
+    /// </summary>
     public enum EColumnConstraint
     {
         NONE = 1,

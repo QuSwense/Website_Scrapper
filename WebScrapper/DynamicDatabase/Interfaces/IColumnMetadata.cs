@@ -11,6 +11,8 @@ namespace DynamicDatabase.Interfaces
     /// </summary>
     public interface IColumnMetadata : IDisposable
     {
+        #region Properties
+
         /// <summary>
         /// Refers to the parent table
         /// </summary>
@@ -37,9 +39,18 @@ namespace DynamicDatabase.Interfaces
         EColumnConstraint Constraint { get; }
 
         /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        bool IsPK { get; }
+
+        /// <summary>
         /// Get the index of the column
         /// </summary>
         int Index { get; }
+
+        #endregion Properties
+
+        #region Load
 
         /// <summary>
         /// Parse the column configuration object
@@ -63,5 +74,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="prop"></param>
         void Parse(PropertyInfo prop);
+
+        #endregion Load
     }
 }

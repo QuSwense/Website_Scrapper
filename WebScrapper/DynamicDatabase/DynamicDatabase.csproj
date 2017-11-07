@@ -95,7 +95,6 @@
     <Compile Include="DynamicDbHelper.cs" />
     <Compile Include="DynamicRow.cs" />
     <Compile Include="DynamicRows.cs" />
-    <Compile Include="DynamicSortTable.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EColumnConstraint.cs" />
     <Compile Include="Interfaces\IColumnHeaders.cs" />
@@ -120,6 +119,7 @@
     <Compile Include="Meta\DTVarcharAttribute.cs" />
     <Compile Include="Model\ArgsContextInitialize.cs" />
     <Compile Include="Model\DbAppTopicConstantsDefinitionModel.cs" />
+    <Compile Include="Model\DbColumnsDefinitionModel.cs" />
     <Compile Include="Model\DbMetaTableColumnsModel.cs" />
     <Compile Include="Model\DbMetaTableModel.cs" />
     <Compile Include="Model\DbMetaTableRowModel.cs" />
