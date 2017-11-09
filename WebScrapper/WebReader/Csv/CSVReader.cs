@@ -103,6 +103,13 @@ namespace WebReader.Csv
 
             // The dictionary generic arguments type
             Type[] genericArguments = dictObjStoreType.GetGenericArguments();
+            if(genericArguments != null && genericArguments.Length <= 0)
+            {
+                if(dictObjStoreType.BaseType.IsGenericType &&
+                    dictObjStoreType.BaseType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    dictObjStoreType = dictObjStoreType.BaseType;
+                genericArguments = dictObjStoreType.GetGenericArguments();
+            }
 
             // The Dictionary value
             object objValueStore = null;
@@ -139,9 +146,9 @@ namespace WebReader.Csv
         /// A static helper functio nto read a file and save it to data structure
         /// </summary>
         /// <param name="path"></param>
-        public static T Read<T>(string path)
+        public static T Read<T>(string path) where T: new()
         {
-            T fileObj = default(T);
+            T fileObj = new T();
             using (CSVReader reader = new CSVReader(path, fileObj)) reader.Read();
             return fileObj;
         }

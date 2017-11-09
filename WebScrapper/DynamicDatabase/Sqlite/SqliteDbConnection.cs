@@ -39,7 +39,18 @@ namespace DynamicDatabase.Sqlite
             Connection = new SQLiteConnection(string.Format("Data Source={0}.{1}",
                 Path.Combine(FullPath, DbName), FileExtension));
         }
-        
+
+        /// <summary>
+        /// Constructor with db file path and name and connection string
+        /// </summary>
+        /// <param name="dbfilepath"></param>
+        /// <param name="name"></param>
+        /// <param name="connectionString"></param>
+        public override void Initialize(string dbfilepath, string name, string connectionString)
+        {
+            Initialize(dbfilepath, name);
+        }
+
         /// <summary>
         /// Create the Sqlite database
         /// </summary>

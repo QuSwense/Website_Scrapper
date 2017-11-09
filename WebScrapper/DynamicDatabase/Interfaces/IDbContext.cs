@@ -108,6 +108,13 @@ namespace DynamicDatabase.Interfaces
         /// <param name="tablename">The name of the table</param>
         void DeleteTable(string tablename);
 
+        /// <summary>
+        /// Check the existence of the table
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        EExists TableExists(string name);
+
         #endregion Create
 
         #region Load

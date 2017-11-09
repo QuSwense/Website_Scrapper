@@ -44,6 +44,16 @@ namespace DynamicDatabase.Interfaces
         bool IsPK { get; }
 
         /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        bool IsNotNull { get; }
+
+        /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        bool IsUnique { get; }
+
+        /// <summary>
         /// Get the index of the column
         /// </summary>
         int Index { get; }

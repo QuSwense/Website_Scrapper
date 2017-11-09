@@ -50,7 +50,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ScrapperApps\AppConfig.xml" />
+    <Content Include="ScrapperApps\AppConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ScrapperApps\AppCountry\CountryConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ScrapperApps\AppCountry\Scrap\CountryScrap.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -66,9 +71,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="ScrapperApps\Config\DbScipts\table_column_mdt.csv" />
-    <None Include="ScrapperApps\Config\DbScipts\table_column_rows_mdt.csv" />
-    <None Include="ScrapperApps\Config\DbScipts\table_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScripts\table_column_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScripts\table_column_rows_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScripts\table_mdt.csv" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DynamicDatabase.Types;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
@@ -27,7 +28,7 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Set the dirty flag for a new insert or update
         /// </summary>
-        bool IsDirty { get; }
+        bool IsDirty { get; set; }
 
         /// <summary>
         /// Constructor with parent table
@@ -56,6 +57,12 @@ namespace DynamicDatabase.Interfaces
         void AddorUpdate(int index, object data);
 
         /// <summary>
+        /// Update this instance of row from the argument
+        /// </summary>
+        /// <param name="row"></param>
+        void Update(IDbRow row);
+
+        /// <summary>
         /// Get the unique key representation of PK
         /// </summary>
         /// <returns></returns>
@@ -72,5 +79,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="dataList"></param>
         void AddorUpdate(List<string> dataList);
+
+        DbDataType TryGetValue(int index);
     }
 }

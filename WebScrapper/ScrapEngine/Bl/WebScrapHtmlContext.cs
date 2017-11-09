@@ -8,8 +8,6 @@ namespace ScrapEngine.Bl
     /// </summary>
     public class WebScrapHtmlContext
     {
-        #region Properties
-
         /// <summary>
         /// Reference to the Scrapper Engine context class
         /// </summary>
@@ -30,10 +28,6 @@ namespace ScrapEngine.Bl
         /// </summary>
         private WebScrapConfigParser WebScrapParser;
 
-        #endregion Properties
-
-        #region Constructor
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -52,21 +46,7 @@ namespace ScrapEngine.Bl
             WebScrapParser = new WebScrapConfigParser();
             WebScrapParser.Initialize(this);
         }
-
-        /// <summary>
-        /// Static initialize
-        /// </summary>
-        /// <param name="engineContext"></param>
-        /// <returns></returns>
-        public static WebScrapHtmlContext Init(IScrapEngineContext engineContext)
-        {
-            WebScrapHtmlContext webScrapHtmlContext = new WebScrapHtmlContext();
-            webScrapHtmlContext.Initialize(engineContext);
-            return webScrapHtmlContext;
-        }
-
-        #endregion Constructor
-
+        
         /// <summary>
         /// Execute
         /// </summary>

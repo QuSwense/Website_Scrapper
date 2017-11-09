@@ -6,6 +6,7 @@ using WebCommon.PathHelp;
 using WebReader.Csv;
 using System.Linq;
 using DynamicDatabase.Model;
+using DynamicDatabase.Interfaces;
 
 namespace ScrapEngine.Db
 {
@@ -88,7 +89,7 @@ namespace ScrapEngine.Db
         /// <summary>
         /// Constructor
         /// </summary>
-        protected DynamicGenericDbConfig()
+        public DynamicGenericDbConfig()
         {
             TableMetadataConfigs = new DbTablesDefinitionModel("Table Metadata");
             TableColumnMetadataConfigs = new DbTablesDefinitionModel("Table column metadata");
@@ -127,7 +128,7 @@ namespace ScrapEngine.Db
         public void AssertConfig(object configObj)
         {
             IDictionary configDictionary = (IDictionary)configObj;
-            IIdentity configIdentity = (IIdentity)configObj;
+            IPrimaryIdentity configIdentity = (IPrimaryIdentity)configObj;
             if (configDictionary == null)
                 throw new GenericDbConfigException(configIdentity.Name, GenericDbConfigException.EErrorType.NULL_STORE);
 

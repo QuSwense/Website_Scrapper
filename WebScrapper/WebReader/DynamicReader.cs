@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using WebCommon.Error;
 
 namespace WebReader
 {
@@ -58,7 +59,7 @@ namespace WebReader
         /// </summary>
         public virtual void Read()
         {
-            if (Store == null) throw new Exception("The store object is null");
+            if (Store == null) throw new DynamicReaderException(DynamicReaderException.EErrorType.STORE_NULL);
 
             using (var txtreader = new StreamReader(Path.Combine(FullPath, FileName)))
             {

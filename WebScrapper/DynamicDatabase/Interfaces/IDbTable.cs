@@ -52,20 +52,14 @@ namespace DynamicDatabase.Interfaces
         void Initialize(IDbContext dbContext, string tablename);
 
         #endregion Initialize
-
-        #region Helper
+        
+        #region Create
 
         /// <summary>
-        /// Get the index from the column name
+        /// Commit the whole table to the database if the Dirty flag is set including create and insert
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        int GetColumnIndex(string name);
+        void Commit();
 
-        #endregion Helper
-
-        #region Create
-        
         /// <summary>
         /// Loop through the column configuration and create a new table
         /// </summary>
@@ -127,10 +121,24 @@ namespace DynamicDatabase.Interfaces
         #region Helper
 
         /// <summary>
+        /// Get the index from the column name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        int GetColumnIndex(string name);
+
+        /// <summary>
         /// Get the list of Primary keys by name
         /// </summary>
         /// <returns></returns>
         List<string> GetPKNames();
+
+        /// <summary>
+        /// The table is saved in the database.
+        /// It doesnt mean that the data in the table is saved yet
+        /// </summary>
+        /// <returns></returns>
+        void Commited();
 
         #endregion Helper
     }

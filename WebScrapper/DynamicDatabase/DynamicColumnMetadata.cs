@@ -53,6 +53,28 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        public bool IsNotNull
+        {
+            get
+            {
+                return Convert.ToBoolean(Constraint & EColumnConstraint.NOTNULL);
+            }
+        }
+
+        /// <summary>
+        /// A boolean value to check if this column is primary key
+        /// </summary>
+        public bool IsUnique
+        {
+            get
+            {
+                return Convert.ToBoolean(Constraint & EColumnConstraint.UNQIUE);
+            }
+        }
+
+        /// <summary>
         /// Get the index of the column
         /// </summary>
         public int Index { get; protected set; }

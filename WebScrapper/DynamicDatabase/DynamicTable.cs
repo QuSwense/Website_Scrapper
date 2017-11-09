@@ -43,7 +43,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Set the dirty flag for a new insert or update
         /// </summary>
-        public bool IsDirty { get; protected set; }
+        public bool IsDirty { get; set; }
 
         #endregion Properties
 
@@ -67,18 +67,21 @@ namespace DynamicDatabase
 
         #endregion Initialize
 
-        #region Helper
+        #region Create
 
         /// <summary>
-        /// Get the index from the column name
+        /// Commit the whole table to the database if the Dirty flag is set including create and insert
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public int GetColumnIndex(string name) => Headers.GetColumnIndex(name);
+        public void Commit()
+        {
+            if(IsDirty)
+            {
+                DbContext.DbCommand.CreateTable(this);
+                IsDirty = false;
+            }
 
-        #endregion Helper
-
-        #region Create
+            Rows.Commit();
+        }
 
         /// <summary>
         /// Loop through the column configuration and create a new table
@@ -88,7 +91,8 @@ namespace DynamicDatabase
         {
             // Reinitialize headers. It will destroy the previous loaded data
             Headers = DbContext.DbFactory.Create<IColumnHeaders>();
-            Headers.Initialize(configCols);
+            Headers.Initialize(this, configCols);
+            IsDirty = true;
         }
 
         /// <summary>
@@ -112,7 +116,7 @@ namespace DynamicDatabase
         {
             // Reinitialize headers. It will destroy the previous loaded data
             Headers = DbContext.DbFactory.Create<IColumnHeaders>();
-            Headers.Initialize(reader);
+            Headers.Initialize(this, reader);
         }
 
         /// <summary>
@@ -126,7 +130,7 @@ namespace DynamicDatabase
             // Destroys previous data if exists
             Rows = new DynamicRows(this);
 
-            while (reader.Read()) Rows.AddOrUpdate(reader);
+            while (reader.Read()) Rows.AddorUpdate(reader);
         }
 
         /// <summary>
@@ -159,10 +163,11 @@ namespace DynamicDatabase
                 {
                     row = DbContext.DbFactory.Create<IDbRow>();
                     row.Initialize(this);
-                    row.Columns[0].Value = rowToInsert.Key;
+                    row.AddorUpdate(0, rowToInsert.Key);
                 }
 
-                row.Columns[1].Value = rowToInsert.Value.Display;
+                row.AddorUpdate(1, rowToInsert.Value.Display);
+                Rows.AddorUpdate(row);
             }
         }
 
@@ -172,6 +177,8 @@ namespace DynamicDatabase
         /// <param name="colIndexData"></param>
         public void AddOrUpdate(string[] colIndexData)
         {
+            if (Rows == null) Rows = new DynamicRows(this);
+
             List<string> ukeys = new List<string>();
             for(int i = 0; i < Headers.ByIndices.Count; ++i)
             {
@@ -221,6 +228,15 @@ namespace DynamicDatabase
 
         #endregion Insert
 
+        #region Helper
+
+        /// <summary>
+        /// Get the index from the column name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int GetColumnIndex(string name) => Headers.GetColumnIndex(name);
+
         /// <summary>
         /// Get the list of Primary keys by name
         /// </summary>
@@ -234,6 +250,18 @@ namespace DynamicDatabase
             else
                 return null;
         }
+
+        /// <summary>
+        /// The table is saved in the database.
+        /// It doesnt mean that the data in the table is saved yet
+        /// </summary>
+        /// <returns></returns>
+        public void Commited()
+        {
+            IsDirty = false;
+        }
+
+        #endregion Helper
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

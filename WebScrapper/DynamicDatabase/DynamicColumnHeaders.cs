@@ -77,8 +77,9 @@ namespace DynamicDatabase
         /// Initialize the column headers using config
         /// </summary>
         /// <param name="configCols"></param>
-        public void Initialize(Dictionary<string, ConfigDbColumn> configCols)
+        public void Initialize(IDbTable tableParent, Dictionary<string, ConfigDbColumn> configCols)
         {
+            Table = tableParent;
             int index = 0;
             foreach (var item in configCols)
             {
@@ -93,8 +94,9 @@ namespace DynamicDatabase
         /// Initialize from the metdata reader
         /// </summary>
         /// <param name="reader"></param>
-        public void Initialize(DbDataReader reader)
+        public void Initialize(IDbTable tableParent, DbDataReader reader)
         {
+            Table = tableParent;
             int index = 0;
             while (reader.Read())
             {

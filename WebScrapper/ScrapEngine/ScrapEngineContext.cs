@@ -28,9 +28,14 @@ namespace ScrapEngine
         public ApplicationConfig AppConfig { get; protected set; }
 
         /// <summary>
+        /// A generic database config
+        /// </summary>
+        public DynamicGenericDbConfig GenericDbConfig { get; protected set; }
+
+        /// <summary>
         /// The Database class layer
         /// </summary>
-        public IScrapDbContext WebDbContext { get; protected set; }
+        public ScrapDbContext WebDbContext { get; protected set; }
 
         /// <summary>
         /// Web scrapper html context
@@ -62,10 +67,12 @@ namespace ScrapEngine
             ReadApplicationConfig(appGenericConfig);
 
             // Initialize the database context
-            WebDbContext = ScrapDbContext.Init(this);
+            WebDbContext = new ScrapDbContext();
+            WebDbContext.Initialize(this);
 
             // Web scrap html context
-            WebScrapHtml = WebScrapHtmlContext.Init(this);
+            WebScrapHtml = new WebScrapHtmlContext();
+            WebScrapHtml.Initialize(this);
         }
 
         /// <summary>
@@ -75,7 +82,7 @@ namespace ScrapEngine
         /// <param name="appGenericConfig"></param>
         /// <param name="genericDbConfig"></param>
         /// <returns></returns>
-        public static ScrapEngineContext ScrapInitialize(AppTopicConfigPathHelper appTopicPath, 
+        public static ScrapEngineContext Init(AppTopicConfigPathHelper appTopicPath, 
             ApplicationConfig appGenericConfig)
         {
             ScrapEngineContext appEngine = new ScrapEngineContext();

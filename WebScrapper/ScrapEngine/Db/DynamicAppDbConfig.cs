@@ -50,17 +50,6 @@ namespace ScrapEngine.Db
         }
 
         /// <summary>
-        /// Static initializer
-        /// </summary>
-        /// <param name="pDbContext"></param>
-        public static DynamicAppDbConfig Init(IScrapDbContext pDbContext)
-        {
-            DynamicAppDbConfig dynamicAppDbConfig = new DynamicAppDbConfig();
-            dynamicAppDbConfig.Initialize(pDbContext);
-            return dynamicAppDbConfig;
-        }
-
-        /// <summary>
         /// Do the initialization
         /// </summary>
         /// <param name="pDbContext"></param>

@@ -43,7 +43,7 @@ namespace WebScrapper
                 // Get a list of all application scrap folders and generate application scrapper context
                 foreach (var appTopicPath in AppTopicConfigPathHelper.GetAppTopics())
                 {
-                    ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(appTopicPath, 
+                    ScrapEngineContext engineContext = ScrapEngineContext.Init(appTopicPath, 
                         appGenericConfig);
                     engineContext.Run();
                 }
@@ -51,8 +51,8 @@ namespace WebScrapper
             else
             {
                 // For specific application topic value
-                ScrapEngineContext engineContext = ScrapEngineContext.ScrapInitialize(
-                    new AppTopicConfigPathHelper(options.AppTopic), appGenericConfig);
+                ScrapEngineContext engineContext = ScrapEngineContext.Init(new AppTopicConfigPathHelper(options.AppTopic), 
+                    appGenericConfig);
                 engineContext.Run();
             }
         }

@@ -30,7 +30,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Set the dirty flag for a new insert or update
         /// </summary>
-        public bool IsDirty { get; protected set; }
+        public bool IsDirty { get; set; }
 
         #endregion Properties
 
@@ -48,6 +48,7 @@ namespace DynamicDatabase
         public void Initialize(IDbTable table)
         {
             Table = table;
+            IsDirty = false;
         }
 
         #endregion Constructor
@@ -61,8 +62,13 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public virtual void AddorUpdate(string name, object data)
         {
-            if (Columns == null) Columns = new DynamicColumns();
+            if (Columns == null)
+            {
+                Columns = new DynamicColumns();
+                Columns.Initialize(this);
+            }
             Columns.AddorUpdate(name, data);
+            IsDirty = true;
         }
 
         /// <summary>
@@ -72,8 +78,13 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public virtual void AddorUpdate(int index, object data)
         {
-            if (Columns == null) Columns = new DynamicColumns();
+            if (Columns == null)
+            {
+                Columns = new DynamicColumns();
+                Columns.Initialize(this);
+            }
             Columns.AddorUpdate(index, data);
+            IsDirty = true;
         }
 
         /// <summary>
@@ -82,11 +93,17 @@ namespace DynamicDatabase
         /// <param name="dataList"></param>
         public void AddorUpdate(List<string> dataList)
         {
+            if (Columns == null)
+            {
+                Columns = new DynamicColumns();
+                Columns.Initialize(this);
+            }
             for (int i = 0; i < dataList.Count; i++)
             {
                 Columns[i] = DbDataTypeHelper.Clone(Table.Headers[i].DataType);
                 Columns[i].Value = dataList[i];
             }
+            IsDirty = true;
         }
 
         /// <summary>
@@ -95,13 +112,28 @@ namespace DynamicDatabase
         /// <param name="reader"></param>
         public void AddorUpdate(DbDataReader reader)
         {
-            if (Columns == null) Columns = new DynamicColumns();
+            if (Columns == null)
+            {
+                Columns = new DynamicColumns();
+                Columns.Initialize(this);
+            }
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 Columns[i] = DbDataTypeHelper.ParseDataType(reader.GetFieldType(i));
                 Columns[i].Value = reader.GetValue(i);
             }
+            IsDirty = true;
+        }
+
+        /// <summary>
+        /// Update this instance of row from the argument
+        /// </summary>
+        /// <param name="row"></param>
+        public void Update(IDbRow row)
+        {
+            Columns.Update(row.Columns);
+            IsDirty = true;
         }
 
         #endregion Insert
@@ -114,7 +146,10 @@ namespace DynamicDatabase
         /// <returns></returns>
         public string ToStringByPK()
         {
-            return string.Join(",", RowId, Columns.ToStringPK());
+            if (RowId != null)
+                return string.Join(",", RowId, Columns.ToStringPK());
+            else
+                return Columns.ToStringPK();
         }
 
         /// <summary>
@@ -132,7 +167,16 @@ namespace DynamicDatabase
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Join(",", RowId, Columns.ToString());
+            if (RowId != null)
+                return string.Join(",", RowId, Columns.ToString());
+            else
+                return Columns.ToString();
+        }
+
+        public DbDataType TryGetValue(int index)
+        {
+            if (Columns == null || Columns.ByIndices.Count <= index) return null;
+            return Columns[index];
         }
 
         #endregion Utility

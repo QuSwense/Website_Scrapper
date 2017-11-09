@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using DynamicDatabase.Types;
 using System.Collections;
+using WebCommon.Error;
 
 namespace DynamicDatabase
 {
@@ -29,6 +30,18 @@ namespace DynamicDatabase
         /// </summary>
         public Dictionary<string, IDbRow> ByNames { get; protected set; }
 
+        /// <summary>
+        /// Set the dirty flag for a new insert or update
+        /// </summary>
+        public bool IsDirty
+        {
+            get
+            {
+                foreach (var item in ByNames) if (item.Value.IsDirty) return true;
+                return false;
+            }
+        }
+
         #endregion Properties
 
         #region Constructor
@@ -46,6 +59,7 @@ namespace DynamicDatabase
         {
             Table = table;
             ByIndices = new List<IDbRow>();
+            ByNames = new Dictionary<string, IDbRow>();
         }
 
         #endregion Constructor
@@ -110,10 +124,22 @@ namespace DynamicDatabase
         #region Insert
 
         /// <summary>
+        /// Commit the whole table to the database if the Dirty flag is set including create and insert
+        /// </summary>
+        public void Commit()
+        {
+            if(IsDirty)
+            {
+                Table.DbContext.DbCommand.InsertOrReplace(Table);
+                Commited();
+            }
+        }
+
+        /// <summary>
         /// Load data in memory by Rowid
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void AddOrUpdate(DbDataReader reader)
+        public virtual void AddorUpdate(DbDataReader reader)
         {
             var row = Table.DbContext.DbFactory.Create<IDbRow>();
             row.Initialize(Table);
@@ -122,21 +148,37 @@ namespace DynamicDatabase
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                row.Columns[i] = DbDataTypeHelper.ParseDataType(reader.GetFieldType(i));
+                row.Columns[i] = Table.DbContext.DbDataType.ParseDataType(reader.GetFieldType(i));
                 row.Columns[i].Value = reader.GetValue(i);
 
                 if ((Table.Headers[i].Constraint & EColumnConstraint.PRIMARYKEY) > 0)
                     pks.Add(row.Columns[i]);
             }
-
-            if (ByIndices == null) ByIndices = new List<IDbRow>();
-            ByIndices.Add(row);
-
-            if (ByNames == null) ByNames = new Dictionary<string, IDbRow>();
+            
             string pkString = DynamicDbHelper.GetPrimaryKeyString(pks);
 
-            if (ByNames.ContainsKey(pkString)) throw new Exception("Duplicate data insertion not allowed by Primary key string : " + pkString);
+            if (ByNames.ContainsKey(pkString))
+                throw new DynamicDbException(DynamicDbException.EErrorType.DUPLICATE_ROW, 
+                    new string[] { Table.TableName, pkString });
             ByNames.Add(pkString, row);
+            ByIndices.Add(row);
+        }
+
+        /// <summary>
+        /// Add or update a row
+        /// </summary>
+        /// <param name="row"></param>
+        public void AddorUpdate(IDbRow row)
+        {
+            string ukeyString = row.ToStringByPK();
+
+            if (ByNames.ContainsKey(ukeyString))
+                ByNames[ukeyString].Update(row);
+            else
+            {
+                ByNames.Add(ukeyString, row);
+                ByIndices.Add(row);
+            }
         }
 
         #endregion Insert
@@ -151,8 +193,20 @@ namespace DynamicDatabase
         public IDbRow FindByPK(string uniqueKeyString)
         {
             IDbRow result = null;
-            ByNames.TryGetValue(uniqueKeyString, out result);
+
+            if(ByNames != null && ByIndices != null)
+                ByNames.TryGetValue(uniqueKeyString, out result);
             return result;
+        }
+
+        /// <summary>
+        /// The table is saved in the database.
+        /// It doesnt mean that the data in the table is saved yet
+        /// </summary>
+        /// <returns></returns>
+        public void Commited()
+        {
+            foreach (var item in ByNames) if (item.Value.IsDirty) item.Value.IsDirty = false;
         }
 
         #endregion Utility

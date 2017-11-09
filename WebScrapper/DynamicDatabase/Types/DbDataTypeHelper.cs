@@ -63,6 +63,12 @@ namespace DynamicDatabase.Types
             else throw new Exception("Unknwon database dta type");
         }
 
+        /// <summary>
+        /// Get the value from the data type
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string GetValue(DbDataType dataType, object value)
         {
             if (value == null) return "NULL";
@@ -85,6 +91,32 @@ namespace DynamicDatabase.Types
             else if (dataType is DbIntDataType)
             {
                 return value.ToString();
+            }
+            else throw new Exception("Unknwon database dta type");
+        }
+
+        public static string GetValue(DbDataType data)
+        {
+            if (data == null) return "NULL";
+            if (data is DbCharDataType || data is DbDateTimeDataType)
+            {
+                return string.Format("'{0}'", data.Value.ToString());
+            }
+            else if (data is DbDateTimeDataType)
+            {
+                return string.Format("'{0}'", data.Value.ToString());
+            }
+            else if (data is DbDoubleDataType)
+            {
+                DbDoubleDataType doubleDt = data as DbDoubleDataType;
+                string format = null;
+                if (doubleDt.CountAfterDecimal >= 0) format = "{0:N" + doubleDt.CountAfterDecimal + "}";
+                else format = "{0}";
+                return string.Format(format, data.Value.ToString());
+            }
+            else if (data is DbIntDataType)
+            {
+                return data.Value.ToString();
             }
             else throw new Exception("Unknwon database dta type");
         }

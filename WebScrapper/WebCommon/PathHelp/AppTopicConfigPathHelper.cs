@@ -101,7 +101,8 @@ namespace WebCommon.PathHelp
                 Directory.GetDirectories(AppGenericConfigPathHelper.I.ScrapperApps.FullPath, "App*"))
             {
                 // Remove "App" from the folder name
-                string appTopic = folderAppTopic.Remove(0, 3);
+                DirectoryInfo di = new DirectoryInfo(folderAppTopic);
+                string appTopic = di.Name.Remove(0, 3);
                 AppTopicConfigPathHelper appTopicConfigPath = new AppTopicConfigPathHelper(appTopic);
 
                 yield return appTopicConfigPath;

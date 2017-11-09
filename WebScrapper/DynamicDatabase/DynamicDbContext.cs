@@ -12,11 +12,16 @@ using WebCommon.Error;
 namespace DynamicDatabase
 {
     /// <summary>
-    /// The main database class which contains and stores all the necessary states, data, and
-    /// objects which forms a the database basis.
-    /// This template class uses other classes that is provided as a template parameters by
-    /// the derived class.
-    /// This Database context class is responsible for all sorts of database activities.
+    /// The database context class which represents and stores all the necessary states, data, and
+    /// objects related to a database. This is the primary class that is responsible for interacting
+    /// with the database. The context class manipulates the data, connection and manages the entities
+    /// at runtime.
+    /// The class implements the interface <see cref="IDbContext"/> and contains generic implementation
+    /// for all types of databases. In case you need a specific functionality for a specific database.
+    /// 1. Extend this class and override the method(s).
+    /// 2. Add a new 'Register' method in the <see cref="DynamicDbFactory"/> class
+    /// Use this class or any class derived from this class as the main context per database instance.
+    /// There is a one-to-one mapping between database context and database.
     /// </summary>
     public class DynamicDbContext : IDbContext
     {
@@ -32,12 +37,13 @@ namespace DynamicDatabase
         #region Properties
 
         /// <summary>
-        /// A Database factory instance which is used to create all database objects
+        /// A Database factory instance which is used to create all context objects
+        /// used by the Database activities
         /// </summary>
         public IDbFactory DbFactory { get; protected set; }
 
         /// <summary>
-        /// The Database data type context
+        /// The Database data type context object for any manipulation of the data
         /// </summary>
         public IDataTypeContext DbDataType { get; protected set; }
 
@@ -47,12 +53,13 @@ namespace DynamicDatabase
         public IDynamicDbConnection DbConnection { get; protected set; }
 
         /// <summary>
-        /// The list of all tables in the database
+        /// The list of all tables loaded into memory from the database.
+        /// This might also contain temporary tables which are not yet commited to database.
         /// </summary>
         public Dictionary<string, IDbTable> Tables { get; protected set; }
 
         /// <summary>
-        /// The object which builds and execute any database query of rthe database context.
+        /// The object which builds and execute any database query of the database context.
         /// To retrieve the current sql query executed in the database use the <see cref="SQL"/>
         /// property
         /// </summary>
@@ -63,34 +70,10 @@ namespace DynamicDatabase
         #region Initialize
 
         /// <summary>
-        /// Default constructor
+        /// Default constructor (only for legacy purpose to be used in array,
+        /// list or other enumerables)
         /// </summary>
-        public DynamicDbContext() : this(new DynamicDbFactory()) { }
-
-        /// <summary>
-        /// Constructor which provides its own factory class
-        /// </summary>
-        public DynamicDbContext(IDbFactory dbfactory)
-        {
-            DbFactory = dbfactory;
-            DbConnection = DbFactory.Create<IDynamicDbConnection>();
-            DbCommand = DbFactory.Create<IDbCommand>();
-
-            logger.Debug("New instance created");
-        }
-
-        /// <summary>
-        /// Static initializer
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        public static IDbContext Init(ArgsContextInitialize arg, string dbType)
-        {
-            IDbContext dbContext = new DynamicDbContext();
-            dbContext.Initialize(arg);
-            dbContext.DbFactory.RegisterDb(dbType);
-            return dbContext;
-        }
+        public DynamicDbContext() { }
 
         /// <summary>
         /// Initialize with db database file and name
@@ -98,11 +81,19 @@ namespace DynamicDatabase
         /// <param name="arg">The argument to initialize conext object</param>
         public virtual void Initialize(ArgsContextInitialize arg)
         {
-            if (arg == null) throw new Exception("The context initialize argument is null");
+            if (arg == null) throw new DynamicDbException(DynamicDbException.EErrorType.INIT_ARG_NULL);
+
+            DbFactory = DynamicDbFactory.Init(arg.DbType);
+
+            DbConnection = DbFactory.Create<IDynamicDbConnection>();
             DbConnection.Initialize(arg.DbFilePath, arg.Name, arg.ConnectionString);
+
+            DbCommand = DbFactory.Create<IDbCommand>();
             DbCommand.Initialize(this);
 
-            logger.Debug("The Db connection object and the Db command object is initialized");
+            DbDataType = DbFactory.Create<IDataTypeContext>();
+
+            logger.Debug("The Database context object is initialized successfully");
         }
 
         #endregion Initialize
@@ -110,7 +101,7 @@ namespace DynamicDatabase
         #region Database
 
         /// <summary>
-        /// An empty virtual method whose purpose is to create database
+        /// An method whose purpose is to create the database
         /// </summary>
         public virtual void CreateDatabase()
         {
@@ -120,7 +111,7 @@ namespace DynamicDatabase
         }
         
         /// <summary>
-        /// An empty virtual method whose purpose is to check if the database already exists or not
+        /// An method whose purpose is to check if the database already exists or not
         /// </summary>
         /// <returns></returns>
         public virtual bool DatabaseExists()
@@ -129,7 +120,7 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// An empty virtual method whose purpose is to delete database
+        /// An method whose purpose is to delete the database
         /// </summary>
         public virtual void DeleteDatabase()
         {
@@ -208,6 +199,20 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Check the existence of the table
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public EExists TableExists(string name)
+        {
+            EExists eExists = EExists.NONE;
+            if (Tables.ContainsKey(name)) eExists |= EExists.IN_MEMORY;
+            if(DbCommand.TableExists(name)) eExists |= EExists.IN_DB;
+
+            return eExists;
+        }
+
+        /// <summary>
         /// A generic private method to create table
         /// </summary>
         /// <param name="name"></param>
@@ -229,7 +234,7 @@ namespace DynamicDatabase
             Tables.Add(name, dynTable);
 
             // Call Database command to create table
-            DbCommand.CreateTable(dynTable);
+            Commit(name);
         }
 
         #endregion Create
@@ -297,6 +302,7 @@ namespace DynamicDatabase
         /// </summary>
         public void Commit()
         {
+            if (!DatabaseExists()) CreateDatabase();
             foreach (var table in Tables) Commit(table.Key);
         }
 
@@ -310,10 +316,7 @@ namespace DynamicDatabase
             // if the table is not loaded in memory then there is no update
             if (!Tables.ContainsKey(tableName)) return;
 
-            if (Tables[tableName].IsDirty)
-                DbCommand.CreateTable(Tables[tableName]);
-            else
-                DbCommand.InsertOrReplace(Tables[tableName]);
+            Tables[tableName].Commit();
         }
 
         /// <summary>

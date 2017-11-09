@@ -16,6 +16,11 @@
         public string Name { get; set; }
 
         /// <summary>
+        /// The database type
+        /// </summary>
+        public string DbType { get; set; }
+
+        /// <summary>
         /// The conenction string
         /// </summary>
         public string ConnectionString { get; set; }

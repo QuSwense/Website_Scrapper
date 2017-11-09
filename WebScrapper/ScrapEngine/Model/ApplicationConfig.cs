@@ -14,7 +14,7 @@ namespace ScrapEngine.Model
 
         public string Key(string name)
         {
-            return Keys.Where(item => item.Name == "db").First().Value;
+            return Keys.Where(item => item.Name == name).First().Value;
         }
 
         public string Db()

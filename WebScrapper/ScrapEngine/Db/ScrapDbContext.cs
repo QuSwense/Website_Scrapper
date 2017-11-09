@@ -41,18 +41,6 @@ namespace ScrapEngine.Db
         public ScrapDbContext() { }
 
         /// <summary>
-        /// A static initialize method
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <returns></returns>
-        public static IScrapDbContext Init(IScrapEngineContext parent)
-        {
-            IScrapDbContext dbContext = new ScrapDbContext();
-            dbContext.Initialize(parent);
-            return dbContext;
-        }
-
-        /// <summary>
         /// Initialize
         /// </summary>
         public void Initialize(IScrapEngineContext parent)
@@ -60,7 +48,8 @@ namespace ScrapEngine.Db
             ParentEngine = parent;
 
             // Read aplication specific database config
-            MetaDbConfig = DynamicAppDbConfig.Init(this);
+            MetaDbConfig = new DynamicAppDbConfig();
+            MetaDbConfig.Initialize(this);
             MetaDbConfig.Read();
 
             // Create database context
@@ -72,11 +61,14 @@ namespace ScrapEngine.Db
         /// </summary>
         private void InitializeDbContext()
         {
+            WebScrapDb = new DynamicDbContext();
+
             ArgsContextInitialize dbContextArgs = new ArgsContextInitialize();
             dbContextArgs.DbFilePath = ParentEngine.AppTopicPath.AppTopicMain.FullPath;
             dbContextArgs.Name = ParentEngine.AppTopicPath.AppTopic;
+            dbContextArgs.DbType = ParentEngine.AppConfig.Db();
 
-            WebScrapDb = DynamicDbContext.Init(dbContextArgs, ParentEngine.AppConfig.Db());
+            WebScrapDb.Initialize(dbContextArgs);
 
             if (ParentEngine.AppConfig.DoCreateDb())
                 WebScrapDb.CreateDatabase();
@@ -121,10 +113,10 @@ namespace ScrapEngine.Db
         private void CreateTableMetadata()
         {
             // Call the dynamic database context to create the table
-            WebScrapDb.CreateTable(ParentEngine.GenericDbConfig.TableMetadataConfigs);
+            WebScrapDb.CreateTable(DynamicGenericDbConfig.I.TableMetadataConfigs);
 
             // Add data
-            WebScrapDb.AddOrUpdate(ParentEngine.GenericDbConfig.MetadataTableName,
+            WebScrapDb.AddOrUpdate(DynamicGenericDbConfig.I.MetadataTableName,
                 MetaDbConfig.TableMetadatas);
 
             // Create all the data specific tables
@@ -140,17 +132,17 @@ namespace ScrapEngine.Db
             foreach (var item in MetaDbConfig.TableColumnConfigs)
             {
                 string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, item.Key);
+                    DynamicGenericDbConfig.I.ColumnMetadataTableName, item.Key);
 
                 WebScrapDb.CreateTable(tableName,
-                    ParentEngine.GenericDbConfig.TableColumnMetadataConfigs.Values.First());
+                    DynamicGenericDbConfig.I.TableColumnMetadataConfigs.Values.First());
             }
 
             // Add column data that is available
             foreach (var item in MetaDbConfig.TableColumnConfigs)
             {
                 string tableName = string.Format(
-                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, item.Key);
+                    DynamicGenericDbConfig.I.ColumnMetadataTableName, item.Key);
 
                 foreach (var coldata in item.Value)
                 {
@@ -169,10 +161,10 @@ namespace ScrapEngine.Db
                 foreach (var tablecolconfig in tableconfig.Value)
                 {
                     string tableName = string.Format(
-                        ParentEngine.GenericDbConfig.RowMetadataTableName,
+                        DynamicGenericDbConfig.I.RowMetadataTableName,
                         tableconfig.Key, tablecolconfig.Key);
 
-                    WebScrapDb.CreateTable(tableName, ParentEngine.GenericDbConfig.TableColumnRowMetadataConfigs.Values.First());
+                    WebScrapDb.CreateTable(tableName, DynamicGenericDbConfig.I.TableColumnRowMetadataConfigs.Values.First());
                 }
             }
         }
@@ -185,7 +177,7 @@ namespace ScrapEngine.Db
         public void AddOrUpdate(string tableName, List<TableDataColumnModel> row)
         {
             string colMetadatatableName = string.Format(
-                    ParentEngine.GenericDbConfig.ColumnMetadataTableName, tableName);
+                    DynamicGenericDbConfig.I.ColumnMetadataTableName, tableName);
 
             List<string> ukeys = new List<string>();
             Dictionary<string, string> dataList = new Dictionary<string, string>();

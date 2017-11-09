@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 
 namespace DynamicDatabase.Interfaces
@@ -15,7 +16,7 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// The sql statement of the command executed in the database
         /// </summary>
-        string SQL { get; }
+        List<string> SQLs { get; }
 
         /// <summary>
         /// Some Databases have the maximum number of VALUES query that can be executed for a INSERT
@@ -48,19 +49,25 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="tableName"></param>
         void RemoveTable(string tableName);
-
-        /// <summary>
-        /// Insert a row in a table
-        /// </summary>
-        /// <param name="dbTable"></param>
-        /// <param name="colIndexData"></param>
-        void Insert(IDbTable dbTable, string[] colIndexData);
-
+        
         /// <summary>
         /// Insert or replace all the table data in the Database
         /// </summary>
         /// <param name="dbTable"></param>
         void InsertOrReplace(IDbTable dbTable);
+
+        /// <summary>
+        /// Insert all the table data in the Database
+        /// </summary>
+        /// <param name="dbTable"></param>
+        void Insert(IDbTable dbTable);
+
+        /// <summary>
+        /// Check the existence of the table
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        bool TableExists(string name);
 
         #endregion Create
 
@@ -96,5 +103,69 @@ namespace DynamicDatabase.Interfaces
         DbDataReader ExecuteDML();
 
         #endregion Execute
+
+        #region Format
+
+        /// <summary>
+        /// The Not null string
+        /// </summary>
+        string NotNullString { get; }
+
+        /// <summary>
+        /// The Unique string
+        /// </summary>
+        string UniqueString { get; }
+
+        /// <summary>
+        /// Get the format for the column definition line
+        /// </summary>
+        string ColumnDefinitionString { get; }
+
+        /// <summary>
+        /// Get the format for the primary key contraint
+        /// </summary>
+        string PrimaryKeyConstraintString { get; }
+
+        /// <summary>
+        /// Get the format for the create table
+        /// </summary>
+        string CreateTableString { get; }
+
+        /// <summary>
+        /// Get the format for the delete table
+        /// </summary>
+        string DeleteTableString { get; }
+
+        /// <summary>
+        /// Gets the Insert query format for the database
+        /// </summary>
+        string InsertQueryString { get; }
+
+        /// <summary>
+        /// Gets the Insert query format for the database by column names
+        /// </summary>
+        string InsertByColumnQueryString { get; }
+
+        /// <summary>
+        /// Gets the Insert or replace query format for the database
+        /// </summary>
+        string InsertOrReplaceQueryString { get; }
+
+        /// <summary>
+        /// Gets the select query format for the database
+        /// </summary>
+        string SelectQueryString { get; }
+
+        /// <summary>
+        /// Gets the information / metdata about a table from the database
+        /// </summary>
+        string TableInformationString { get; }
+
+        /// <summary>
+        /// Gets the existence of a table from the database
+        /// </summary>
+        string TableExistenceString { get; }
+
+        #endregion Format
     }
 }

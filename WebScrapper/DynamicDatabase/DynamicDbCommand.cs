@@ -1,4 +1,5 @@
-﻿using DynamicDatabase.Interfaces;
+﻿using DynamicDatabase.Command;
+using DynamicDatabase.Interfaces;
 using DynamicDatabase.Types;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -28,7 +29,7 @@ namespace DynamicDatabase
         /// <summary>
         /// The sql statement of the command executed in the database
         /// </summary>
-        public string SQL { get; protected set; }
+        public List<string> SQLs { get; protected set; }
 
         /// <summary>
         /// Some Databases have the maximum number of VALUES query that can be executed for a INSERT
@@ -52,6 +53,7 @@ namespace DynamicDatabase
         public void Initialize(IDbContext dbContext)
         {
             this.DbContext = dbContext;
+            SQLs = new List<string>();
         }
 
         #endregion Constructor
@@ -64,28 +66,9 @@ namespace DynamicDatabase
         /// <param name="dynTable"></param>
         public virtual void CreateTable(IDbTable dynTable)
         {
-            List<string> colDefList = new List<string>();
-            List<string> pkList = new List<string>();
-
-            foreach (var item in dynTable.Headers.ByNames)
-            {
-                IColumnMetadata header = item.Value;
-                string colDDT = string.Format("{0} {1} {2} {3}", header.ColumnName,
-                    DbContext.DbDataType.GetDataType(header.DataType.GetType()),
-                    (((header.Constraint & EColumnConstraint.NOTNULL) == EColumnConstraint.NOTNULL) ? "NOT NULL" : ""),
-                    (((header.Constraint & EColumnConstraint.UNQIUE) == EColumnConstraint.UNQIUE) ? "UNIQUE" : "")
-                    );
-                colDefList.Add(colDDT.Trim());
-
-                if ((header.Constraint & EColumnConstraint.PRIMARYKEY) == EColumnConstraint.PRIMARYKEY)
-                    pkList.Add(header.ColumnName);
-            }
-
-            SQL = string.Format("CREATE TABLE {0} ( {1} {2} )", dynTable.TableName, string.Join(",", colDefList),
-                    ((pkList.Count > 0) ? string.Format(", PRIMARY KEY ({0})", string.Join(",", pkList)) : "")
-                    );
-
-            ExecuteDDL();
+            CreateTableQuery createTableQueryObj = new CreateTableQuery(this);
+            createTableQueryObj.Generate(dynTable);
+            SetSQL(createTableQueryObj.SQLs);
         }
 
         /// <summary>
@@ -94,34 +77,7 @@ namespace DynamicDatabase
         /// <param name="tableName"></param>
         public virtual void RemoveTable(string tableName)
         {
-            SQL = string.Format("DROP TABLE {0};", tableName);
-            ExecuteDDL();
-        }
-
-        /// <summary>
-        /// Insert a row in a table
-        /// </summary>
-        /// <param name="dbTable"></param>
-        /// <param name="colIndexData"></param>
-        public virtual void Insert(IDbTable dbTable, string[] colIndexData)
-        {
-            List<string> colInsList = new List<string>();
-            List<string> valueList = new List<string>();
-
-            for (int i = 0; i < colIndexData.Length; i++)
-            {
-                colInsList.Add(dbTable.Headers[i].ColumnName);
-            }
-
-            for (int i = 0; i < colIndexData.Length; i++)
-            {
-                valueList.Add(DbDataTypeHelper.GetValue(dbTable.Headers[i].DataType, colIndexData[i]));
-            }
-
-            SQL = string.Format("INSERT INTO TABLE {0} ( {1} ) VALUES ( {2} )", dbTable.TableName,
-                string.Join(",", colInsList), string.Join(",", valueList)
-                    );
-
+            SetSQL(string.Format(DeleteTableString, tableName));
             ExecuteDDL();
         }
 
@@ -131,41 +87,38 @@ namespace DynamicDatabase
         /// <param name="dbTable"></param>
         public virtual void InsertOrReplace(IDbTable dbTable)
         {
-            List<string> valueList = new List<string>();
+            InsertOrUpdateIntoTableQuery insorUpdtIntoTableQueryObj = new InsertOrUpdateIntoTableQuery(this);
+            insorUpdtIntoTableQueryObj.GenerateAllColumns(dbTable);
+            SetSQL(insorUpdtIntoTableQueryObj.SQLs);
 
-            for (int row = 0; row < dbTable.Rows.ByIndices.Count; row++)
-            {
-                List<string> rowData = new List<string>();
-                for (int col = 0; col < dbTable.Rows[row].Columns.ByIndices.Count; col++)
-                {
-                    rowData.Add(DbDataTypeHelper.GetValue(dbTable.Headers[col].DataType, dbTable.Rows[row].Columns[col]));
-                }
+            for (int row = 0; row < dbTable.Rows.ByIndices.Count; row++) dbTable.Rows[row].IsDirty = false;
+        }
 
-                valueList.Add(string.Join(",", rowData));
-            }
+        /// <summary>
+        /// Insert all the table data in the Database
+        /// </summary>
+        /// <param name="dbTable"></param>
+        public virtual void Insert(IDbTable dbTable)
+        {
+            InsertOrUpdateIntoTableQuery insorUpdtIntoTableQueryObj = new InsertOrUpdateIntoTableQuery(this);
+            insorUpdtIntoTableQueryObj.GenerateOnlyInsertAllColumns(dbTable);
+            SetSQL(insorUpdtIntoTableQueryObj.SQLs);
 
-            if (MaxInsertCriteriaAllowed > 0)
-            {
-                int counter = 0;
-                while (counter < MaxInsertCriteriaAllowed)
-                {
-                    List<string> buffered = valueList.GetRange(counter, MaxInsertCriteriaAllowed).ToList();
-                    SQL = string.Format("INSERT INTO TABLE {0} VALUES ( {2} )", dbTable.TableName,
-                        string.Join("),(", buffered)
-                    );
+            for (int row = 0; row < dbTable.Rows.ByIndices.Count; row++) dbTable.Rows[row].IsDirty = false;
+        }
 
-                    ExecuteDDL();
-                    counter += MaxInsertCriteriaAllowed;
-                }
-            }
-            else
-            {
-                SQL = string.Format("INSERT INTO TABLE {0} VALUES ( {2} )", dbTable.TableName,
-                        string.Join("),(", valueList)
-                    );
-                ExecuteDDL();
-            }
+        /// <summary>
+        /// Check the existence of the table
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool TableExists(string name)
+        {
+            SetSQL(string.Format(TableExistenceString, name));
+            DbDataReader dbReader = ExecuteDML();
 
+            if (dbReader.HasRows) return true;
+            return false;
         }
 
         #endregion Create
@@ -179,7 +132,9 @@ namespace DynamicDatabase
         /// <returns></returns>
         public virtual DbDataReader LoadData(string name)
         {
-            SQL = string.Format("SELECT * FROM {0}", name);
+            SelectTableQuery selectTableQueryObj = new SelectTableQuery(this);
+            selectTableQueryObj.GenerateAll(name);
+            SetSQL(selectTableQueryObj.SQLs);
             return ExecuteDML();
         }
 
@@ -214,6 +169,102 @@ namespace DynamicDatabase
 
         #endregion Execute
 
+        #region Format
+
+        /// <summary>
+        /// The Not null string
+        /// </summary>
+        public virtual string NotNullString { get { return "NOT NULL"; } }
+
+        /// <summary>
+        /// The Unique string
+        /// </summary>
+        public virtual string UniqueString { get { return "UNQIUE"; } }
+
+        /// <summary>
+        /// Get the format for the column definition line
+        /// </summary>
+        /// <returns></returns>
+        public virtual string ColumnDefinitionString
+        { get { return "{Name} {DataType} {ConstraintNotNull} {ConstraintUnique}"; } }
+
+        /// <summary>
+        /// Get the format for the primary key contraint
+        /// </summary>
+        /// <returns></returns>
+        public virtual string PrimaryKeyConstraintString { get { return ", PRIMARY KEY ({0})"; } }
+
+        /// <summary>
+        /// Get the format for the create table
+        /// </summary>
+        /// <returns></returns>
+        public virtual string CreateTableString { get { return "CREATE TABLE {TableName} ( {ColDefs} {PKs} )"; } }
+
+        /// <summary>
+        /// Get the format for the delete table
+        /// </summary>
+        /// <returns></returns>
+        public virtual string DeleteTableString { get { return "DROP TABLE {0}"; } }
+
+        /// <summary>
+        /// Gets the Insert query format for the database
+        /// </summary>
+        /// <returns></returns>
+        public virtual string InsertQueryString { get { return "INSERT INTO {0} VALUES ( {1} )"; } }
+
+        /// <summary>
+        /// Gets the Insert query format for the database by column names
+        /// </summary>
+        /// <returns></returns>
+        public virtual string InsertByColumnQueryString { get { return "INSERT INTO TABLE {0} ( {1} ) VALUES ( {2} )"; } }
+
+        /// <summary>
+        /// Gets the Insert query format for the database
+        /// </summary>
+        /// <returns></returns>
+        public virtual string InsertOrReplaceQueryString { get { return ""; } }
+
+        /// <summary>
+        /// Gets the select query format for the database
+        /// </summary>
+        /// <returns></returns>
+        public virtual string SelectQueryString { get { return "SELECT {Columns} FROM {TableName}"; } }
+
+        /// <summary>
+        /// Gets the information / metdata about a table from the database
+        /// </summary>
+        public virtual string TableInformationString { get { return ""; } }
+
+        /// <summary>
+        /// Gets the existence of a table from the database
+        /// </summary>
+        public virtual string TableExistenceString { get { return ""; } }
+
+        #endregion Format
+
+        #region Helper
+
+        /// <summary>
+        /// Set the sql list
+        /// </summary>
+        /// <param name="sqls"></param>
+        protected void SetSQL(List<string> sqls)
+        {
+            SQLs = new List<string>(sqls);
+        }
+
+        /// <summary>
+        /// Set the sql list
+        /// </summary>
+        /// <param name="sqls"></param>
+        protected void SetSQL(string sql)
+        {
+            SQLs.Clear();
+            SQLs.Add(sql);
+        }
+
+        #endregion Helper
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -236,8 +287,6 @@ namespace DynamicDatabase
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }

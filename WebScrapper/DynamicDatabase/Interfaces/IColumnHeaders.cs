@@ -53,13 +53,13 @@ namespace DynamicDatabase.Interfaces
         /// Initialize the column headers using config
         /// </summary>
         /// <param name="configCols"></param>
-        void Initialize(Dictionary<string, ConfigDbColumn> configCols);
+        void Initialize(IDbTable tableParent, Dictionary<string, ConfigDbColumn> configCols);
 
         /// <summary>
         /// Initialize from the metdata reader
         /// </summary>
         /// <param name="reader"></param>
-        void Initialize(DbDataReader reader);
+        void Initialize(IDbTable tableParent, DbDataReader reader);
 
         #endregion Constructor
 

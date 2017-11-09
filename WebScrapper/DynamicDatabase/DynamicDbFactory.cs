@@ -34,6 +34,29 @@ namespace DynamicDatabase
             RegisterDefaults();
         }
 
+        /// <summary>
+        /// Initialize using the database name type
+        /// </summary>
+        /// <param name="dbType"></param>
+        public void Initialize(string dbType)
+        {
+            if (string.Compare(dbType, "sqlite", true) == 0)
+                RegisterSqlite();
+            else
+                RegisterSqlite();
+        }
+
+        /// <summary>
+        /// Initialize using the database name type
+        /// </summary>
+        /// <param name="dbType"></param>
+        public static DynamicDbFactory Init(string dbType)
+        {
+            DynamicDbFactory dbFactory = new DynamicDbFactory();
+            dbFactory.Initialize(dbType);
+            return dbFactory;
+        }
+
         #endregion Constructor
 
         #region Register
@@ -73,15 +96,6 @@ namespace DynamicDatabase
             container.RegisterType<TContract, TImplementation>();
         }
 
-        /// <summary>
-        /// Register database type
-        /// </summary>
-        /// <param name="dbType"></param>
-        public void RegisterDb(string dbType)
-        {
-            if (string.Compare(dbType, "sqlite", true) == 0) RegisterSqlite();
-        }
-
         #endregion Register
 
         #region Create
@@ -94,18 +108,6 @@ namespace DynamicDatabase
         public T Create<T>()
         {
             return container.Resolve<T>();
-        }
-
-        /// <summary>
-        /// Initialize using the database name type
-        /// </summary>
-        /// <param name="dbType"></param>
-        public void Initialize(string dbType)
-        {
-            if (string.Compare(dbType, "sqlite", true) == 0)
-                RegisterSqlite();
-            else
-                RegisterSqlite();
         }
 
         #endregion Create

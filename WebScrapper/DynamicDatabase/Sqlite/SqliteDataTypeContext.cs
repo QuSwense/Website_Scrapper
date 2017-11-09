@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace DynamicDatabase.Sqlite
 {
+    /// <summary>
+    /// A class for data type activity for sqlite
+    /// </summary>
     public class SqliteDataTypeContext : DataTypeContext
     {
         /// <summary>

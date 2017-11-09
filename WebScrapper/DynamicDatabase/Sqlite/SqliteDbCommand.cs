@@ -41,7 +41,7 @@ namespace DynamicDatabase.Sqlite
         /// <returns></returns>
         public override DbDataReader LoadTableMetadata(string name)
         {
-            SQL = string.Format("PRAGMA table_info('{0}')", name);
+            SetSQL(string.Format(TableInformationString, name));
             return ExecuteDML();
         }
 
@@ -54,10 +54,13 @@ namespace DynamicDatabase.Sqlite
         /// </summary>
         public override void ExecuteDDL()
         {
-            if (!string.IsNullOrEmpty(SQL))
+            foreach (var sqlQuery in SQLs)
             {
-                SQLiteCommand command = new SQLiteCommand(SQL, (SQLiteConnection)(DbContext.DbConnection.Connection));
-                command.ExecuteNonQuery();
+                if (!string.IsNullOrEmpty(sqlQuery))
+                {
+                    SQLiteCommand command = new SQLiteCommand(sqlQuery, (SQLiteConnection)(DbContext.DbConnection.Connection));
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -67,13 +70,16 @@ namespace DynamicDatabase.Sqlite
         /// <returns></returns>
         public override DbDataReader ExecuteDML()
         {
-            if (!string.IsNullOrEmpty(SQL))
+            foreach (var sqlQuery in SQLs)
             {
-                using (SQLiteCommand fmd = ((SQLiteCommand)DbContext.DbConnection.Connection.CreateCommand()))
+                if (!string.IsNullOrEmpty(sqlQuery))
                 {
-                    fmd.CommandText = SQL;
-                    fmd.CommandType = CommandType.Text;
-                    return fmd.ExecuteReader();
+                    using (SQLiteCommand fmd = ((SQLiteCommand)DbContext.DbConnection.Connection.CreateCommand()))
+                    {
+                        fmd.CommandText = sqlQuery;
+                        fmd.CommandType = CommandType.Text;
+                        return fmd.ExecuteReader();
+                    }
                 }
             }
 
@@ -81,5 +87,31 @@ namespace DynamicDatabase.Sqlite
         }
 
         #endregion Execute
+
+        #region Helper
+        
+        /// <summary>
+        /// Gets the Insert query format for the database
+        /// </summary>
+        /// <returns></returns>
+        public override string InsertOrReplaceQueryString
+        { get { return "INSERT OR REPLACE INTO {TableName} VALUES ( {Values} )"; } }
+
+        #endregion Helper
+
+        #region Format
+
+        /// <summary>
+        /// Gets the information / metdata about a table from the database
+        /// </summary>
+        public override string TableInformationString { get { return "PRAGMA table_info('{0}')"; } }
+
+        /// <summary>
+        /// Gets the existence of a table from the database
+        /// </summary>
+        public override string TableExistenceString
+        { get { return "SELECT DISTINCT tbl_name from sqlite_master where tbl_name = '{0}'"; } }
+
+        #endregion Format
     }
 }

@@ -93,7 +93,6 @@ namespace ScrapEngine.Bl
             {
                 ProcessAsHtmlTableType(webScrapConfigObj, scrapNode, webChildNodeNavigator);
             }
-            
         }
 
         /// <summary>
@@ -142,6 +141,8 @@ namespace ScrapEngine.Bl
 
                 nodeIndex++;
             }
+
+            WebContext.EngineContext.WebDbContext.WebScrapDb.Commit();
         }
 
         /// <summary>

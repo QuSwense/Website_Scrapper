@@ -16,7 +16,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Refers to the parent table
         /// </summary>
-        public IDbTable Table { get; protected set; }
+        public IDbRow Row { get; protected set; }
 
         /// <summary>
         /// The data set which contains column data by name
@@ -29,6 +29,19 @@ namespace DynamicDatabase
         public List<DbDataType> ByIndices { get; protected set; }
 
         #endregion Properties
+
+        #region Constructor
+
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="rowParent"></param>
+        public void Initialize(IDbRow rowParent)
+        {
+            Row = rowParent;
+        }
+
+        #endregion Constructor
 
         #region Indexer
 
@@ -83,6 +96,8 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public void AddorUpdate(string name, object data)
         {
+            if (ByIndices == null) ByIndices = new List<DbDataType>();
+            if (ByNames == null) ByNames = new Dictionary<string, DbDataType>();
             DbDataType dt;
 
             // Check if Dictionary contains the data if not add
@@ -90,9 +105,11 @@ namespace DynamicDatabase
             {
                 dt = DbDataTypeHelper.ParseDataType(data.GetType());
                 ByNames.Add(name, dt);
+                ByIndices.Add(dt);
             }
+            else dt = ByNames[name];
 
-            ByNames[name].Value = data;
+            dt.Value = data;
         }
 
         /// <summary>
@@ -104,16 +121,30 @@ namespace DynamicDatabase
         public void AddorUpdate(int index, object data)
         {
             if (ByIndices == null) ByIndices = new List<DbDataType>();
+            if (ByNames == null) ByNames = new Dictionary<string, DbDataType>();
             DbDataType dt;
 
             if (ByIndices.Count >= index || ByIndices[index] == null)
             {
                 dt = DbDataTypeHelper.ParseDataType(data.GetType());
                 ByIndices.Insert(index, dt);
+                ByNames.Add(Row.Table.Headers[index].ColumnName, dt);
             }
             else dt = ByIndices[index];
 
             dt.Value = data;
+        }
+
+        /// <summary>
+        /// Update the columns of this instance from the passed instance
+        /// </summary>
+        /// <param name="columns"></param>
+        public void Update(DynamicColumns columns)
+        {
+            for (int i = 0; i < ByIndices.Count; i++)
+            {
+                ByIndices[i] = columns.ByIndices[i];
+            }
         }
 
         #endregion Insert
@@ -126,9 +157,9 @@ namespace DynamicDatabase
         /// <returns></returns>
         public string ToStringPK()
         {
-            if (Table == null) throw new Exception("This class is not associated with any Table");
+            if (Row == null) throw new Exception("This class is not associated with any row");
 
-            List<string> pkList = Table.GetPKNames();
+            List<string> pkList = Row.Table.GetPKNames();
             string pkString = "";
 
             if(pkList != null && pkList.Count > 0 && ByNames != null)
