@@ -8,7 +8,9 @@ using DynamicDatabase.Interfaces;
 
 namespace DynamicDatabase
 {
-    public class DynamicColumnHeaders : IColumnHeaders
+    public class DynamicColumnHeaders : IColumnHeaders,
+        IEnumerator<IColumnMetadata>,
+        IEnumerable<IColumnMetadata>
     {
         #region Properties
 

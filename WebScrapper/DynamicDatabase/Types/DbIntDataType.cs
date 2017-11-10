@@ -29,5 +29,17 @@
         /// </summary>
         /// <param name="value"></param>
         public DbIntDataType(object value) : base(value) { }
+
+        /// <summary>
+        /// Copy the data from the parameter
+        /// </summary>
+        /// <param name="dataType"></param>
+        public override void CopyFrom(DbDataType dataType)
+        {
+            base.CopyFrom(dataType);
+            DbIntDataType dataTypeActual = dataType as DbIntDataType;
+            if (dataTypeActual == null) return;
+            Count = dataTypeActual.Count;
+        }
     }
 }

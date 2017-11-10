@@ -16,11 +16,6 @@ namespace DynamicDatabase.Interfaces
         IDbTable Table { get; }
 
         /// <summary>
-        /// The unique row id of the table
-        /// </summary>
-        string RowId { get; }
-
-        /// <summary>
         /// The data by column
         /// </summary>
         DynamicColumns Columns { get; }
@@ -80,6 +75,12 @@ namespace DynamicDatabase.Interfaces
         /// <param name="dataList"></param>
         void AddorUpdate(List<string> dataList);
 
+        /// <summary>
+        /// Try to get the column data without throwing any exception.
+        /// If not found then return null
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         DbDataType TryGetValue(int index);
     }
 }

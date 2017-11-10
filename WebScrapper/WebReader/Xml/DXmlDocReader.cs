@@ -18,7 +18,6 @@ namespace WebReader.Xml
         /// The file path
         /// </summary>
         public string FilePath { get; protected set; }
-        public object DXmlAttributeAttribute { get; private set; }
 
         /// <summary>
         /// The xml document
@@ -85,13 +84,13 @@ namespace WebReader.Xml
 
             foreach (var item in properties)
             {
-                DXmlAttributeAttribute attrAttributeObj = objType.GetCustomAttribute<DXmlAttributeAttribute>();
+                DXmlAttributeAttribute attrAttributeObj = item.GetCustomAttribute<DXmlAttributeAttribute>();
                 if(attrAttributeObj != null)
                 {
-                    string value = currentElement.Attributes[attrAttributeObj.Name].Value;
-                    if (attrAttributeObj.IsMandatory && string.IsNullOrEmpty(value))
+                    XmlAttribute attribute = currentElement.Attributes[attrAttributeObj.Name];
+                    if (attrAttributeObj.IsMandatory && attribute == null)
                         throw new XmlDocReaderException(attrAttributeObj.Name, XmlDocReaderException.EErrorType.ATRRIBUTE_VALUE_NULL);
-                    item.SetValue(obj, objType.ChangeType(value));
+                    if(attribute != null) item.SetValue(obj, item.PropertyType.ChangeType(attribute.Value));
                 }
             }
 

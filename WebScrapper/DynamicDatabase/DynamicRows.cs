@@ -8,6 +8,10 @@ using WebCommon.Error;
 
 namespace DynamicDatabase
 {
+    /// <summary>
+    /// This class represents the list of rows of a database table.
+    /// This class is used alongwith the <see cref="IDbTable"/> class types.
+    /// </summary>
     public class DynamicRows : IDisposable,
         IEnumerator<IDbRow>,
         IEnumerable<IDbRow>
@@ -62,6 +66,18 @@ namespace DynamicDatabase
             ByNames = new Dictionary<string, IDbRow>();
         }
 
+        /// <summary>
+        /// Create a new instacne of a row and return
+        /// </summary>
+        /// <param name="dyntable"></param>
+        /// <returns></returns>
+        public IDbRow NewRow(IDbTable dyntable)
+        {
+            IDbRow row = dyntable.DbContext.DbFactory.Create<IDbRow>();
+            row.Initialize(dyntable);
+            return row;
+        }
+
         #endregion Constructor
 
         #region Indexer
@@ -109,13 +125,13 @@ namespace DynamicDatabase
         #region Load
 
         /// <summary>
-        /// Load a row from the current reader
+        /// Load a row from the current database data reader object
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="cols"></param>
         public void Load(DbDataReader reader, string[] cols)
         {
-            IDbRow row = Table.DbContext.DbFactory.Create<IDbRow>();
+            IDbRow row = NewRow(Table);
             row.AddorUpdate(reader);
         }
 
@@ -141,8 +157,7 @@ namespace DynamicDatabase
         /// <param name="reader"></param>
         public virtual void AddorUpdate(DbDataReader reader)
         {
-            var row = Table.DbContext.DbFactory.Create<IDbRow>();
-            row.Initialize(Table);
+            var row = NewRow(Table);
 
             List<DbDataType> pks = new List<DbDataType>();
 
@@ -151,17 +166,18 @@ namespace DynamicDatabase
                 row.Columns[i] = Table.DbContext.DbDataType.ParseDataType(reader.GetFieldType(i));
                 row.Columns[i].Value = reader.GetValue(i);
 
-                if ((Table.Headers[i].Constraint & EColumnConstraint.PRIMARYKEY) > 0)
-                    pks.Add(row.Columns[i]);
+                if (Table.Headers[i].IsPK) pks.Add(row.Columns[i]);
             }
             
             string pkString = DynamicDbHelper.GetPrimaryKeyString(pks);
+            var rowExists = FindByPK(pkString);
 
-            if (ByNames.ContainsKey(pkString))
-                throw new DynamicDbException(DynamicDbException.EErrorType.DUPLICATE_ROW, 
-                    new string[] { Table.TableName, pkString });
-            ByNames.Add(pkString, row);
-            ByIndices.Add(row);
+            if(rowExists != null) rowExists.Update(row);
+            else
+            {
+                ByNames.Add(pkString, row);
+                ByIndices.Add(row);
+            }
         }
 
         /// <summary>
@@ -186,9 +202,9 @@ namespace DynamicDatabase
         #region Utility
 
         /// <summary>
-        /// 
+        /// Find the row by the unique key string
         /// </summary>
-        /// <param name="fnCriteria"></param>
+        /// <param name="uniqueKeyString"></param>
         /// <returns></returns>
         public IDbRow FindByPK(string uniqueKeyString)
         {
@@ -212,8 +228,15 @@ namespace DynamicDatabase
         #endregion Utility
 
         #region IEnumerator
+
+        /// <summary>
+        /// Enumerators are positioned before the first element until the first MoveNext() call
+        /// </summary>
         private int _position = -1;
 
+        /// <summary>
+        /// Gets the element in the collection at the current position of the enumerator
+        /// </summary>
         public IDbRow Current
         {
             get
@@ -222,6 +245,10 @@ namespace DynamicDatabase
             }
         }
 
+        /// <summary>
+        /// Gets the element in the collection at the current position of the enumerator
+        /// (Explicit implementation)
+        /// </summary>
         object IEnumerator.Current
         {
             get
@@ -230,27 +257,46 @@ namespace DynamicDatabase
             }
         }
 
+        /// <summary>
+        /// Advances the enumerator to the next element of the collection.
+        /// </summary>
+        /// <returns></returns>
         public bool MoveNext()
         {
             _position++;
             return (_position < ByIndices.Count);
         }
 
+        /// <summary>
+        /// Sets the enumerator to its initial position, which is before the first element in the collection
+        /// </summary>
         public void Reset()
         {
             _position = 0;
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection
+        /// </summary>
+        /// <returns></returns>
         IEnumerator<IDbRow> GetEnumerator()
         {
             return ByIndices.GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection
+        /// </summary>
+        /// <returns></returns>
         IEnumerator<IDbRow> IEnumerable<IDbRow>.GetEnumerator()
         {
             return ByIndices.GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection
+        /// </summary>
+        /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ByIndices.GetEnumerator();

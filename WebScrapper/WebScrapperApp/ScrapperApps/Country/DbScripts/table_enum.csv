@@ -1,9 +1,0 @@
-WORLD_REG,1,World Region
-WORLD_REG,2,Continent
-WORLD_REG,3,Region
-WORLD_REG,4,Sub Region
-WORLD_REG,5,Country
-WB_IND,1,High
-WB_IND,2,Low
-CPTL_TYP,1,Administrative
-CPTL_TYP,2,Judicial

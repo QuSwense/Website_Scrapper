@@ -92,6 +92,7 @@ namespace DynamicDatabase
             DbCommand.Initialize(this);
 
             DbDataType = DbFactory.Create<IDataTypeContext>();
+            Tables = new Dictionary<string, IDbTable>();
 
             logger.Debug("The Database context object is initialized successfully");
         }
@@ -232,9 +233,6 @@ namespace DynamicDatabase
             fnTableCreate(dynTable);
 
             Tables.Add(name, dynTable);
-
-            // Call Database command to create table
-            Commit(name);
         }
 
         #endregion Create
@@ -278,7 +276,13 @@ namespace DynamicDatabase
         /// <param name="fnTableLoad"></param>
         private void Load(string tablename, Action<IDbTable> fnTableLoad)
         {
-            IDbTable dynTable = GetTable(tablename);
+            if (string.IsNullOrEmpty(tablename)) throw new Exception("The name of the table is empty");
+            IDbTable dynTable = null;
+
+            if (Tables.ContainsKey(tablename))
+                dynTable = Tables[tablename];
+            else
+                dynTable = DbFactory.Create<IDbTable>();
             
             fnTableLoad(dynTable);
 
@@ -378,7 +382,8 @@ namespace DynamicDatabase
         {
             if (!Tables.ContainsKey(tableName)) Load(tableName);
             if (!Tables.ContainsKey(tableName))
-                throw new DynamicDbException(tableName, DynamicDbException.EErrorType.TABLE_NOT_FOUND);
+                throw new DynamicDbException(DynamicDbException.EErrorType.TABLE_NOT_FOUND,
+                    new string[] { tableName });
         }
 
         #endregion Helper

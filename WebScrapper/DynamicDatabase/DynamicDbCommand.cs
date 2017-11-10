@@ -69,6 +69,7 @@ namespace DynamicDatabase
             CreateTableQuery createTableQueryObj = new CreateTableQuery(this);
             createTableQueryObj.Generate(dynTable);
             SetSQL(createTableQueryObj.SQLs);
+            ExecuteDDL();
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
-  <Scrap name="unsd_m49" dbtbl="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
+  <Scrap name="rgn" dbtbl="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//table[@id='GeoGroupsENG']/tr[position() > 1]" type="table">
     <Column name="m49" xpath="./@data-tt-id" ispk="1"></Column>
     <Column name="nm" xpath="td[1]"></Column>
     <Column name="m49p" xpath="./@data-tt-parent-id"></Column>

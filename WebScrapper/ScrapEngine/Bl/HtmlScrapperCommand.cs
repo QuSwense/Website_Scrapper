@@ -124,14 +124,15 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public HtmlNode LoadOnline(string url)
-        {
-            var htmlWeb = new HtmlWeb();
-            htmlWeb.OverrideEncoding = Encoding.UTF8;
-            var doc = htmlWeb.Load(url);
+        //public HtmlNode LoadOnline(string url)
+        //{
+        //    var htmlWeb = new HtmlWeb();
+        //    htmlWeb.OverrideEncoding = Encoding.UTF8;
+        //    htmlWeb.
+        //    var doc = htmlWeb.Load(url);
 
-            return doc.DocumentNode;
-        }
+        //    return doc.DocumentNode;
+        //}
 
         #endregion Load
 

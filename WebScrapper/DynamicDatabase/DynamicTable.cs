@@ -12,6 +12,8 @@ namespace DynamicDatabase
 {
     /// <summary>
     /// Represents a Database table.
+    /// This class is part of the<see cref="IDbContext"/> type classes. This class has no use as a seperate
+    /// entity. It keeps a reference to the parent Context class.
     /// </summary>
     /// <typeparam name="TDynRow"></typeparam>
     /// <typeparam name="TDynColMetadata"></typeparam>
@@ -77,10 +79,10 @@ namespace DynamicDatabase
             if(IsDirty)
             {
                 DbContext.DbCommand.CreateTable(this);
-                IsDirty = false;
+                Commited();
             }
 
-            Rows.Commit();
+            if(Rows != null) Rows.Commit();
         }
 
         /// <summary>
@@ -161,8 +163,7 @@ namespace DynamicDatabase
                 var row = Rows.FindByPK(rowToInsert.Key);
                 if (row == null)
                 {
-                    row = DbContext.DbFactory.Create<IDbRow>();
-                    row.Initialize(this);
+                    row = Rows.NewRow(this);
                     row.AddorUpdate(0, rowToInsert.Key);
                 }
 
@@ -172,33 +173,20 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Insert into the table. Data is indexed by column
+        /// Insert into the table. Data is indexed by column id
         /// </summary>
-        /// <param name="colIndexData"></param>
-        public void AddOrUpdate(string[] colIndexData)
+        /// <param name="rowData"></param>
+        public void AddOrUpdate(string[] rowData)
         {
             if (Rows == null) Rows = new DynamicRows(this);
 
-            List<string> ukeys = new List<string>();
-            for(int i = 0; i < Headers.ByIndices.Count; ++i)
-            {
-                if (Headers.ByIndices[i].IsPK) ukeys.Add(colIndexData[i]);
-            }
-
-            string ukeyString = DynamicDbHelper.GetPrimaryKeyString(ukeys);
+            string ukeyString = DynamicDbHelper.GetPrimaryKeyString(GetUniqueKeys(rowData));
 
             var row = Rows.FindByPK(ukeyString);
 
-            if(row == null)
-            {
-                row = DbContext.DbFactory.Create<IDbRow>();
-                row.Initialize(this);
-            }
+            if(row == null) row = Rows.NewRow(this);
 
-            for(int i = 0; i < colIndexData.Length; ++i)
-            {
-                row.AddorUpdate(i, colIndexData[i]);
-            }
+            for (int i = 0; i < rowData.Length; ++i) row.AddorUpdate(i, rowData[i]);
         }
 
         /// <summary>
@@ -212,16 +200,9 @@ namespace DynamicDatabase
             if (Rows == null) Rows = new DynamicRows(this);
             var row = Rows.FindByPK(DynamicDbHelper.GetPrimaryKeyString(ukeys));
 
-            if (row == null)
-            {
-                row = DbContext.DbFactory.Create<IDbRow>();
-                row.Initialize(this);
-            }
+            if (row == null) row = Rows.NewRow(this);
 
-            foreach (var kv in dataList)
-            {
-                row.AddorUpdate(kv.Key, kv.Value);
-            }
+            foreach (var kv in dataList) row.AddorUpdate(kv.Key, kv.Value);
 
             return row.ToStringByPK();
         }
@@ -261,6 +242,20 @@ namespace DynamicDatabase
             IsDirty = false;
         }
 
+        /// <summary>
+        /// Get a list of unique keys for the row
+        /// </summary>
+        /// <param name="rowData"></param>
+        /// <returns></returns>
+        private List<string> GetUniqueKeys(string[] rowData)
+        {
+            List<string> ukeys = new List<string>();
+            for (int i = 0; i < Headers.Count(); ++i)
+                if (Headers[i].IsPK) ukeys.Add(rowData[i]);
+
+            return ukeys;
+        }
+
         #endregion Helper
 
         #region IDisposable Support
@@ -272,21 +267,8 @@ namespace DynamicDatabase
             {
                 if (disposing)
                 {
-                    if (Rows != null)
-                    {
-                        foreach (var item in Rows)
-                        {
-                            item.Dispose();
-                        }
-                    }
-
-                    if (Headers != null)
-                    {
-                        foreach (var item in Headers)
-                        {
-                            item.Dispose();
-                        }
-                    }
+                    if (Rows != null) foreach (var item in Rows) item.Dispose();
+                    if (Headers != null) foreach (var item in Headers) item.Dispose();
                 }
 
                 disposedValue = true;
@@ -300,8 +282,6 @@ namespace DynamicDatabase
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
 
         #endregion

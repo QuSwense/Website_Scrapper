@@ -86,8 +86,7 @@ namespace DynamicDatabase.Command
 
                 columnDefinitions.Add(colDefinitionStringValue);
 
-                if ((colHeader.Constraint & EColumnConstraint.PRIMARYKEY) == EColumnConstraint.PRIMARYKEY)
-                    primaryKeys.Add(colHeader.ColumnName);
+                if (colHeader.IsPK) primaryKeys.Add(colHeader.ColumnName);
             }
 
             string primaryKeyStringValue =

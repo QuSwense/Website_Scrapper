@@ -26,7 +26,7 @@ namespace DynamicDatabase.Sqlite
         /// <param name="tableName"></param>
         public override void RemoveTable(string tableName)
         {
-            SQL = string.Format("DROP TABLE [IF EXISTS] {0};", tableName);
+            SetSQL(string.Format("DROP TABLE [IF EXISTS] {0};", tableName));
             ExecuteDDL();
         }
 

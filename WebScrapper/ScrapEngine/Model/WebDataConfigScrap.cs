@@ -47,12 +47,7 @@ namespace ScrapEngine.Model
         /// The list of column nodes
         /// </summary>
         public List<WebDataConfigColumn> Columns { get; set; }
-
-        /// <summary>
-        /// The state of the node
-        /// </summary>
-        public WebPageHtmlState State { get; set; }
-
+        
         /// <summary>
         /// The parent node
         /// </summary>
@@ -63,7 +58,6 @@ namespace ScrapEngine.Model
         /// </summary>
         public WebDataConfigScrap()
         {
-            State = new WebPageHtmlState();
             Scraps = new List<WebDataConfigScrap>();
             Columns = new List<WebDataConfigColumn>();
         }

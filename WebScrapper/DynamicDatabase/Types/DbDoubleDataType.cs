@@ -30,5 +30,18 @@
             Count = count;
             CountAfterDecimal = afterDecimal;
         }
+
+        /// <summary>
+        /// Copy the data from the parameter
+        /// </summary>
+        /// <param name="dataType"></param>
+        public override void CopyFrom(DbDataType dataType)
+        {
+            base.CopyFrom(dataType);
+            DbDoubleDataType dataTypeActual = dataType as DbDoubleDataType;
+            if (dataTypeActual == null) return;
+            Count = dataTypeActual.Count;
+            CountAfterDecimal = dataTypeActual.CountAfterDecimal;
+        }
     }
 }

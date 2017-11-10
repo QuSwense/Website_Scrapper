@@ -20,17 +20,7 @@ namespace ScrapEngine.Bl
         /// Reference to the parent Web context object
         /// </summary>
         public WebScrapHtmlContext WebContext { get; protected set; }
-
-        /// <summary>
-        /// A store to save named Scrap element nodes
-        /// </summary>
-        public Dictionary<string, WebDataConfigScrap> WebScrapsConfig { get; set; }
-
-        /// <summary>
-        /// The html page is loaded as xml document and stored in memory
-        /// </summary>
-        private XmlDocument xmlDocument;
-
+        
         /// <summary>
         /// A xml configuration reader
         /// </summary>
@@ -55,7 +45,7 @@ namespace ScrapEngine.Bl
             WebContext = context;
 
             // Initialize the data store
-            WebScrapsConfig = new Dictionary<string, WebDataConfigScrap>();
+            ScrapperCommand = new HtmlScrapperCommand();
         }
 
         /// <summary>
@@ -69,7 +59,7 @@ namespace ScrapEngine.Bl
             xmlConfigReader = DXmlDocReader.Create(WebContext.EngineContext.AppTopicPath.AppTopicScrap.FullPath);
 
             // Read the Scraps nodes which are the individual reader config nodes
-            foreach (XmlNode rootScrapNode in xmlConfigReader.ReadNodes("/WebData/Scrap"))
+            foreach (XmlNode rootScrapNode in xmlConfigReader.ReadNodes("//WebData/Scrap"))
                 ParseScrapElement(rootScrapNode);
         }
 
@@ -77,21 +67,19 @@ namespace ScrapEngine.Bl
         /// Parse Root Scrap Element
         /// </summary>
         /// <param name="reader"></param>
-        private void ParseScrapElement(XmlNode scrapNode, WebDataConfigScrap parentScrapNode = null,
+        private void ParseScrapElement(XmlNode scrapNode, WebDataConfigScrap parentScrapConfigObj = null,
             HtmlNodeNavigator webNodeNavigator = null)
         {
             // Construct the scrap element state
-            WebDataConfigScrap webScrapConfigObj = ParseScrapElementAttributes(scrapNode, parentScrapNode, webNodeNavigator);
-            WebScrapsConfig.Add(webScrapConfigObj.Name, webScrapConfigObj);
-
-            // This finally scraps the html webpage data
-            List<HtmlNodeNavigator> webChildNodeNavigator = ProcessScrapElement(webScrapConfigObj);
+            WebDataConfigScrap webScrapConfigObj = ParseScrapElementAttributes(scrapNode, parentScrapConfigObj, webNodeNavigator);
 
             // If the scrap element type is TABLE type that means
             // The child data needs to be processed in a loop
             if (webScrapConfigObj.Type == EWebDataConfigType.TABLE)
             {
-                ProcessAsHtmlTableType(webScrapConfigObj, scrapNode, webChildNodeNavigator);
+                // This finally scraps the html webpage data
+                List<HtmlNodeNavigator> webChildNodeNavigators = ProcessHtmlTableScrapElement(webScrapConfigObj);
+                ProcessAsHtmlTableType(webScrapConfigObj, scrapNode, webChildNodeNavigators);
             }
         }
 
@@ -99,15 +87,15 @@ namespace ScrapEngine.Bl
         /// Parse scrap element attributes
         /// </summary>
         /// <param name="scrapNode"></param>
-        /// <param name="parentScrapNode"></param>
+        /// <param name="parentScrapConfigObj"></param>
         /// <returns></returns>
         private WebDataConfigScrap ParseScrapElementAttributes(XmlNode scrapNode,
-            WebDataConfigScrap parentScrapNode, HtmlNodeNavigator webNodeNavigator = null)
+            WebDataConfigScrap parentScrapConfigObj, HtmlNodeNavigator webNodeNavigator = null)
         {
             WebDataConfigScrap webScrapConfigObj = xmlConfigReader.ReadElement<WebDataConfigScrap>(scrapNode);
-            webScrapConfigObj.Parent = parentScrapNode;
+            webScrapConfigObj.Parent = parentScrapConfigObj;
             webScrapConfigObj.Name = ParseName(webScrapConfigObj.Name);
-            webScrapConfigObj.Url = ParseUrlValue(webScrapConfigObj.Url, webNodeNavigator, parentScrapNode);
+            webScrapConfigObj.Url = ParseUrlValue(webScrapConfigObj.Url, webNodeNavigator, parentScrapConfigObj);
             return webScrapConfigObj;
         }
 
@@ -116,9 +104,9 @@ namespace ScrapEngine.Bl
         /// This method uses the xml config Scrap information to get to the Html webpage path
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        private List<HtmlNodeNavigator> ProcessScrapElement(WebDataConfigScrap webScrapConfigObj)
+        private List<HtmlNodeNavigator> ProcessHtmlTableScrapElement(WebDataConfigScrap webScrapConfigObj)
         {
-            HtmlNode htmlDoc = ScrapperCommand.LoadOnline(webScrapConfigObj.Url);
+            HtmlNode htmlDoc = ScrapperCommand.Load(webScrapConfigObj.Url);
             return ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
         }
 
@@ -319,7 +307,7 @@ namespace ScrapEngine.Bl
             {
                 WebDataConfigColumn columnConfig = scrapConfig.Columns[indx];
                 XPathNavigator scrappedXPathNavigator = webnodeNavigator.SelectSingleNode(columnConfig.XPath);
-                ManipulateHtmlData manipulateHtml = Manipulate(scrapConfig, columnConfig.Manipulations, scrappedXPathNavigator);
+                ManipulateHtmlData manipulateHtml = Manipulate(columnConfig, columnConfig.Manipulations, scrappedXPathNavigator);
                 
                 TableDataColumnModel tableDataColumn = new TableDataColumnModel();
                 row.Add(tableDataColumn);
@@ -342,14 +330,14 @@ namespace ScrapEngine.Bl
         /// <param name="manipulateNodeList"></param>
         /// <param name="dataNode"></param>
         /// <returns></returns>
-        private ManipulateHtmlData Manipulate(WebDataConfigScrap scrapConfig, 
+        private ManipulateHtmlData Manipulate(WebDataConfigColumn columnConfig, 
             List<WebDataConfigManipulate> manipulateNodeList, XPathNavigator dataNode)
         {
             ManipulateHtmlData result = new ManipulateHtmlData();
 
             string data = "";
             if (dataNode != null) data = dataNode.Value;
-            if (manipulateNodeList != null)
+            if (manipulateNodeList != null && manipulateNodeList.Count > 0)
             {
                 foreach (WebDataConfigManipulate manipulate in manipulateNodeList)
                 {
@@ -378,8 +366,8 @@ namespace ScrapEngine.Bl
                 result.Value = data;
             }
 
-            result.Url = dataNode.BaseURI;
-            result.XPath = scrapConfig.XPath;
+            result.Url = (dataNode != null) ? dataNode.BaseURI : "";
+            result.XPath = columnConfig.XPath;
             result.Value = HtmlEntity.DeEntitize(result.Value);
 
             return result;

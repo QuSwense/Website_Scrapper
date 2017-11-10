@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace DynamicDatabase
 {
+    /// <summary>
+    /// Represents the data stored in a single row in terms of column information
+    /// </summary>
     public class DynamicColumns : IDisposable,
         IEnumerator<DbDataType>,
         IEnumerable<DbDataType>
@@ -14,7 +17,7 @@ namespace DynamicDatabase
         #region Properties
 
         /// <summary>
-        /// Refers to the parent table
+        /// Refers to the parent row
         /// </summary>
         public IDbRow Row { get; protected set; }
 
@@ -28,17 +31,35 @@ namespace DynamicDatabase
         /// </summary>
         public List<DbDataType> ByIndices { get; protected set; }
 
+        /// <summary>
+        /// A internal property to simplify the access to the DataType Context object
+        /// </summary>
+        protected IDataTypeContext DbDataType
+        {
+            get
+            {
+                return Row.Table.DbContext.DbDataType;
+            }
+        }
+
         #endregion Properties
 
         #region Constructor
 
         /// <summary>
-        /// Initialize
+        /// Default constructor
+        /// </summary>
+        public DynamicColumns() { }
+
+        /// <summary>
+        /// Parameterized constructor
         /// </summary>
         /// <param name="rowParent"></param>
-        public void Initialize(IDbRow rowParent)
+        public DynamicColumns(IDbRow rowParent)
         {
             Row = rowParent;
+            ByIndices = new List<DbDataType>();
+            ByNames = new Dictionary<string, DbDataType>();
         }
 
         #endregion Constructor
@@ -96,14 +117,12 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public void AddorUpdate(string name, object data)
         {
-            if (ByIndices == null) ByIndices = new List<DbDataType>();
-            if (ByNames == null) ByNames = new Dictionary<string, DbDataType>();
             DbDataType dt;
 
             // Check if Dictionary contains the data if not add
             if (!ByNames.ContainsKey(name))
             {
-                dt = DbDataTypeHelper.ParseDataType(data.GetType());
+                dt = DbDataType.ParseDataType(data.GetType());
                 ByNames.Add(name, dt);
                 ByIndices.Add(dt);
             }
@@ -120,13 +139,11 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public void AddorUpdate(int index, object data)
         {
-            if (ByIndices == null) ByIndices = new List<DbDataType>();
-            if (ByNames == null) ByNames = new Dictionary<string, DbDataType>();
             DbDataType dt;
 
             if (ByIndices.Count >= index || ByIndices[index] == null)
             {
-                dt = DbDataTypeHelper.ParseDataType(data.GetType());
+                dt = DbDataType.ParseDataType(data.GetType());
                 ByIndices.Insert(index, dt);
                 ByNames.Add(Row.Table.Headers[index].ColumnName, dt);
             }
@@ -141,9 +158,9 @@ namespace DynamicDatabase
         /// <param name="columns"></param>
         public void Update(DynamicColumns columns)
         {
-            for (int i = 0; i < ByIndices.Count; i++)
+            for (int i = 0; i < this.Count(); i++)
             {
-                ByIndices[i] = columns.ByIndices[i];
+                this[i] = columns.ByIndices[i];
             }
         }
 
@@ -266,8 +283,6 @@ namespace DynamicDatabase
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }

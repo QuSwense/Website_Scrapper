@@ -23,5 +23,17 @@
         {
             Format = format;
         }
+
+        /// <summary>
+        /// Copy the data from the parameter
+        /// </summary>
+        /// <param name="dataType"></param>
+        public override void CopyFrom(DbDataType dataType)
+        {
+            base.CopyFrom(dataType);
+            DbDateTimeDataType dataTypeActual = dataType as DbDateTimeDataType;
+            if (dataTypeActual == null) return;
+            Format = dataTypeActual.Format;
+        }
     }
 }

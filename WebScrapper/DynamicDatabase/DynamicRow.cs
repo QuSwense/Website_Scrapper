@@ -6,7 +6,7 @@ using System.Data.Common;
 namespace DynamicDatabase
 {
     /// <summary>
-    /// The class represents the row of a table
+    /// The class represents a single row of a table
     /// </summary>
     public class DynamicRow : IDbRow
     {
@@ -16,12 +16,7 @@ namespace DynamicDatabase
         /// Refers to the parent table
         /// </summary>
         public IDbTable Table { get; protected set; }
-
-        /// <summary>
-        /// The unique row id of the table
-        /// </summary>
-        public string RowId { get; protected set; }
-
+        
         /// <summary>
         /// The data by column
         /// </summary>
@@ -62,11 +57,7 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public virtual void AddorUpdate(string name, object data)
         {
-            if (Columns == null)
-            {
-                Columns = new DynamicColumns();
-                Columns.Initialize(this);
-            }
+            if (Columns == null) Columns = new DynamicColumns(this);
             Columns.AddorUpdate(name, data);
             IsDirty = true;
         }
@@ -78,11 +69,7 @@ namespace DynamicDatabase
         /// <param name="data"></param>
         public virtual void AddorUpdate(int index, object data)
         {
-            if (Columns == null)
-            {
-                Columns = new DynamicColumns();
-                Columns.Initialize(this);
-            }
+            if (Columns == null) Columns = new DynamicColumns(this);
             Columns.AddorUpdate(index, data);
             IsDirty = true;
         }
@@ -93,14 +80,10 @@ namespace DynamicDatabase
         /// <param name="dataList"></param>
         public void AddorUpdate(List<string> dataList)
         {
-            if (Columns == null)
-            {
-                Columns = new DynamicColumns();
-                Columns.Initialize(this);
-            }
+            if (Columns == null) Columns = new DynamicColumns(this);
             for (int i = 0; i < dataList.Count; i++)
             {
-                Columns[i] = DbDataTypeHelper.Clone(Table.Headers[i].DataType);
+                Columns[i] = Table.DbContext.DbDataType.Clone(Table.Headers[i].DataType);
                 Columns[i].Value = dataList[i];
             }
             IsDirty = true;
@@ -112,11 +95,7 @@ namespace DynamicDatabase
         /// <param name="reader"></param>
         public void AddorUpdate(DbDataReader reader)
         {
-            if (Columns == null)
-            {
-                Columns = new DynamicColumns();
-                Columns.Initialize(this);
-            }
+            if (Columns == null) Columns = new DynamicColumns(this);
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -146,10 +125,7 @@ namespace DynamicDatabase
         /// <returns></returns>
         public string ToStringByPK()
         {
-            if (RowId != null)
-                return string.Join(",", RowId, Columns.ToStringPK());
-            else
-                return Columns.ToStringPK();
+            return Columns.ToStringPK();
         }
 
         /// <summary>
@@ -167,12 +143,15 @@ namespace DynamicDatabase
         /// <returns></returns>
         public override string ToString()
         {
-            if (RowId != null)
-                return string.Join(",", RowId, Columns.ToString());
-            else
-                return Columns.ToString();
+            return Columns.ToString();
         }
 
+        /// <summary>
+        /// Try to get the column data without throwing any exception.
+        /// If not found then return null
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public DbDataType TryGetValue(int index)
         {
             if (Columns == null || Columns.ByIndices.Count <= index) return null;
@@ -188,10 +167,7 @@ namespace DynamicDatabase
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    Columns.Dispose();
-                }
+                if (disposing) Columns.Dispose();
 
                 disposedValue = true;
             }
@@ -204,8 +180,6 @@ namespace DynamicDatabase
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }

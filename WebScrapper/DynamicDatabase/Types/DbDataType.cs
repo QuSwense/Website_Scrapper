@@ -24,5 +24,14 @@
         {
             Value = value;
         }
+
+        /// <summary>
+        /// Copy the data from the parameter
+        /// </summary>
+        /// <param name="dataType"></param>
+        public virtual void CopyFrom(DbDataType dataType)
+        {
+            Value = dataType.Value;
+        }
     }
 }

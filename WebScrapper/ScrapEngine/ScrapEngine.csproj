@@ -86,6 +86,7 @@
     <Compile Include="Model\WebDataConfigSplit.cs" />
     <Compile Include="Model\WebDataConfigTrim.cs" />
     <Compile Include="Model\WebPageHtmlState.cs" />
+    <Compile Include="Model\WebScrapStateModel.cs" />
     <Compile Include="ScrapEngineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
