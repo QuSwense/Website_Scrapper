@@ -24,5 +24,13 @@ namespace DynamicDatabase
         /// <returns></returns>
         public static string GetPrimaryKeyString(IEnumerable<string> uKeys)
             => string.Join(",", uKeys);
+
+        /// <summary>
+        /// Get the string representation of a set of unique keys in database
+        /// </summary>
+        /// <param name="uKeys"></param>
+        /// <returns></returns>
+        public static string GetUniqueKeyString(IEnumerable<string> uKeys)
+            => string.Join(",", uKeys);
     }
 }

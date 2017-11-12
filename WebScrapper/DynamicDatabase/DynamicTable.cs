@@ -5,6 +5,7 @@ using DynamicDatabase.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -49,6 +50,18 @@ namespace DynamicDatabase
 
         #endregion Properties
 
+        #region Properties Helper
+
+        /// <summary>
+        /// Get the Database factory
+        /// </summary>
+        protected IDbFactory DbFactory
+        {
+            get { return DbContext.DbFactory; }
+        }
+
+        #endregion
+
         #region Initialize
 
         /// <summary>
@@ -92,8 +105,7 @@ namespace DynamicDatabase
         public void CreateTable(DbColumnsDefinitionModel configCols)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = DbContext.DbFactory.Create<IColumnHeaders>();
-            Headers.Initialize(this, configCols);
+            Headers = DbFactory.CreateColumnHeaders(this, configCols);
             IsDirty = true;
         }
 
@@ -109,16 +121,28 @@ namespace DynamicDatabase
         #endregion Create
 
         #region Load
+
+        /// <summary>
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        public virtual void LoadMetadataPartial(DbDataReader reader,
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            // Reinitialize headers. It will destroy the previous loaded data
+            Headers = DbContext.DbFactory.CreateColumnHeaders(this, reader, columns);
+        }
         
         /// <summary>
-        /// Load table metadata. This is the metadata query result
+        /// Load table metadata. This recreates the header information
         /// </summary>
         /// <param name="reader"></param>
         public void LoadTableMetadata(DbDataReader reader)
         {
             // Reinitialize headers. It will destroy the previous loaded data
-            Headers = DbContext.DbFactory.Create<IColumnHeaders>();
-            Headers.Initialize(this, reader);
+            Headers = DbFactory.CreateColumnHeaders(this, reader);
         }
 
         /// <summary>
@@ -127,12 +151,12 @@ namespace DynamicDatabase
         /// <param name="reader"></param>
         public virtual void LoadData(DbDataReader reader)
         {
-            if (Headers == null) throw new Exception("Table metadata must be loaded before data");
+            Debug.Assert(Headers != null && Headers.Count() > 0);
 
             // Destroys previous data if exists
             Rows = new DynamicRows(this);
 
-            while (reader.Read()) Rows.AddorUpdate(reader);
+            while (reader.Read()) Rows.Add(reader);
         }
 
         /// <summary>
@@ -164,11 +188,11 @@ namespace DynamicDatabase
                 if (row == null)
                 {
                     row = Rows.NewRow(this);
-                    row.AddorUpdate(0, rowToInsert.Key);
+                    row.AddOrUpdate(0, rowToInsert.Key);
                 }
 
-                row.AddorUpdate(1, rowToInsert.Value.Display);
-                Rows.AddorUpdate(row);
+                row.AddOrUpdate(1, rowToInsert.Value.Display);
+                Rows.AddOrUpdate(row);
             }
         }
 
@@ -176,24 +200,23 @@ namespace DynamicDatabase
         /// Insert into the table. Data is indexed by column id
         /// </summary>
         /// <param name="rowData"></param>
-        public void AddOrUpdate(string[] rowData)
+        public string AddOrUpdate(string[] rowData)
         {
             if (Rows == null) Rows = new DynamicRows(this);
-
             string ukeyString = DynamicDbHelper.GetPrimaryKeyString(GetUniqueKeys(rowData));
-
             var row = Rows.FindByPK(ukeyString);
-
             if(row == null) row = Rows.NewRow(this);
+            Rows.AddOrUpdate(rowData);
 
-            for (int i = 0; i < rowData.Length; ++i) row.AddorUpdate(i, rowData[i]);
+            for (int i = 0; i < rowData.Length; ++i) row.AddOrUpdate(i, rowData[i]);
+
+            return ukeyString;
         }
 
         /// <summary>
         /// Insert into the table.
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="colIndexData"></param>
+        /// <param name="ukeys"></param>
         /// <param name="dataList"></param>
         public string AddOrUpdate(List<string> ukeys, Dictionary<string, string> dataList)
         {
@@ -202,9 +225,10 @@ namespace DynamicDatabase
 
             if (row == null) row = Rows.NewRow(this);
 
-            foreach (var kv in dataList) row.AddorUpdate(kv.Key, kv.Value);
+            foreach (var kv in dataList) row.AddOrUpdate(kv.Key, kv.Value);
+            Rows.AddOrUpdate(row);
 
-            return row.ToStringByPK();
+            return row.ToStringByUK();
         }
 
         #endregion Insert
@@ -222,12 +246,26 @@ namespace DynamicDatabase
         /// Get the list of Primary keys by name
         /// </summary>
         /// <returns></returns>
-        public List<string> GetPKNames()
+        public List<string> GetPKColumnNames()
         {
             List<IColumnMetadata> pkColumns = Headers.GetPKs();
 
             if (pkColumns != null || pkColumns.Count > 0)
                 return pkColumns.Select(p => p.ColumnName).ToList();
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Get the list of Primary keys by name
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetUKColumnNames()
+        {
+            List<IColumnMetadata> ukColumns = Headers.GetUKs();
+
+            if (ukColumns != null || ukColumns.Count > 0)
+                return ukColumns.Select(p => p.ColumnName).ToList();
             else
                 return null;
         }

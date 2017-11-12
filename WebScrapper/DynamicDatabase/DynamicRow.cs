@@ -1,7 +1,9 @@
 ﻿using DynamicDatabase.Interfaces;
 using DynamicDatabase.Types;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 
 namespace DynamicDatabase
 {
@@ -29,6 +31,15 @@ namespace DynamicDatabase
 
         #endregion Properties
 
+        #region Properties Helper
+
+        public IDataTypeContext DbDataType
+        {
+            get { return Table.DbContext.DbDataType; }
+        }
+
+        #endregion Properties Helper
+
         #region Constructor
 
         /// <summary>
@@ -51,59 +62,65 @@ namespace DynamicDatabase
         #region Insert
 
         /// <summary>
-        /// Add a column value
+        /// 
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="data"></param>
-        public virtual void AddorUpdate(string name, object data)
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="K"></typeparam>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="fAddAction"></param>
+        protected void AddHelper(Action fAddAction)
         {
             if (Columns == null) Columns = new DynamicColumns(this);
-            Columns.AddorUpdate(name, data);
+            fAddAction();
             IsDirty = true;
         }
+
+        /// <summary>
+        /// Add a new row
+        /// </summary>
+        /// <param name="colMetadata"></param>
+        /// <param name="reader"></param>
+        public virtual void Add(IColumnMetadata colMetadata, DbDataReader reader)
+            => AddHelper(() => Columns.Add(colMetadata, reader));
 
         /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        public virtual void AddorUpdate(int index, object data)
-        {
-            if (Columns == null) Columns = new DynamicColumns(this);
-            Columns.AddorUpdate(index, data);
-            IsDirty = true;
-        }
+        public virtual void AddOrUpdate(string name, object data)
+            => AddHelper(() => Columns.AddOrUpdate(name, data));
+
+        /// <summary>
+        /// Add a column value
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        public virtual void AddOrUpdate(int index, object data)
+            => AddHelper(() => Columns.AddOrUpdate(index, data));
 
         /// <summary>
         /// Add data by indexed list
         /// </summary>
         /// <param name="dataList"></param>
-        public void AddorUpdate(List<string> dataList)
-        {
-            if (Columns == null) Columns = new DynamicColumns(this);
-            for (int i = 0; i < dataList.Count; i++)
+        public void AddOrUpdate(IEnumerable<string> colDataArray)
+            => AddHelper(() =>
             {
-                Columns[i] = Table.DbContext.DbDataType.Clone(Table.Headers[i].DataType);
-                Columns[i].Value = dataList[i];
-            }
-            IsDirty = true;
-        }
+                List<string> dataList = colDataArray.ToList();
+                for (int i = 0; i < dataList.Count(); i++) Columns.AddOrUpdate(i, dataList[i]);
+            });
 
         /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="reader"></param>
-        public void AddorUpdate(DbDataReader reader)
-        {
-            if (Columns == null) Columns = new DynamicColumns(this);
-
-            for (int i = 0; i < reader.FieldCount; i++)
+        public void AddOrUpdate(DbDataReader reader)
+            => AddHelper(() =>
             {
-                Columns[i] = DbDataTypeHelper.ParseDataType(reader.GetFieldType(i));
-                Columns[i].Value = reader.GetValue(i);
-            }
-            IsDirty = true;
-        }
+                for (int i = 0; i < reader.FieldCount; i++)
+                    Columns.AddOrUpdate(i, reader.GetValue(i));
+            });
 
         /// <summary>
         /// Update this instance of row from the argument
@@ -123,28 +140,26 @@ namespace DynamicDatabase
         /// Get the unique key representation of PK
         /// </summary>
         /// <returns></returns>
-        public string ToStringByPK()
-        {
-            return Columns.ToStringPK();
-        }
+        public string ToStringByPK() => Columns.ToStringPK();
+
+        /// <summary>
+        /// Get the unique key representation of unique keys
+        /// </summary>
+        /// <returns></returns>
+        public string ToStringByUK() => Columns.ToStringUK();
 
         /// <summary>
         /// Get the unique key representation of PK
         /// </summary> 
         /// <returns></returns>
         public virtual string ToStringByPK(List<string> pkCols)
-        {
-            return Columns.ToStringPK(pkCols);
-        }
+            => Columns.ToStringPK(pkCols);
 
         /// <summary>
         /// Get all keys by PK
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return Columns.ToString();
-        }
+        public override string ToString() => Columns.ToString();
 
         /// <summary>
         /// Try to get the column data without throwing any exception.

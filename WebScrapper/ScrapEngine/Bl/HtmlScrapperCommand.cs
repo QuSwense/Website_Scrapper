@@ -1,5 +1,7 @@
 ﻿using HtmlAgilityPack;
 using log4net;
+using ScrapEngine.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace ScrapEngine.Bl
     /// <summary>
     /// The class which helps in Website queries / commands like loading, querying xpath
     /// </summary>
-    public class HtmlScrapperCommand
+    public class HtmlScrapperCommand : IScrapperCommand
     {
         #region Properties
 
@@ -51,11 +53,14 @@ namespace ScrapEngine.Bl
         }
 
         /// <summary>
-        /// Load a html page from online or offline
+        /// Common Load method
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
+        /// <param name="fManipulateWebStream"></param>
         /// <returns></returns>
-        public HtmlNode Load(string url)
+        private T Load<T>(string url, Func<Stream, T> fManipulateWebStream)
+            where T: class
         {
             WebRequest webRequestObj = WebRequest.Create(url);
 
@@ -78,8 +83,18 @@ namespace ScrapEngine.Bl
                 }
             }
 
+            return fManipulateWebStream(webResponseObj.GetResponseStream());
+        }
+
+        /// <summary>
+        /// Load a html page from online or offline
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private HtmlNode ManipulateWebStreamForPage(Stream stream)
+        {
             string htmlText = "";
-            using (StreamReader reader = new StreamReader(webResponseObj.GetResponseStream()))
+            using (StreamReader reader = new StreamReader(stream))
                 htmlText = reader.ReadToEnd();
 
             HtmlDocument document = new HtmlDocument();
@@ -93,46 +108,26 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public StreamReader LoadFile(string url)
+        public StreamReader ManipulateWebStreamForFile(Stream stream)
         {
-            WebRequest webRequestObj = WebRequest.Create(url);
-
-            if (IsOnlineWebPage(url)) HttpWebRequestSettings(webRequestObj);
-
-            WebResponse webResponseObj = webRequestObj.GetResponse();
-
-            if (webResponseObj == null)
-            {
-                logger.Error("No web response found for " + url);
-                return null;
-            }
-            else if (IsOnlineWebPage(url))
-            {
-                HttpWebResponse httpResponse = (HttpWebResponse)webResponseObj;
-                if (httpResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    logger.ErrorFormat("Http web response for url {0} status code {1}", url, httpResponse.StatusCode);
-                    return null;
-                }
-            }
-
-            return new StreamReader(webResponseObj.GetResponseStream());
+            return new StreamReader(stream);
         }
 
         /// <summary>
-        /// Load Online webpage (using HAP utility method)
+        /// Load a html page from online or offline
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        //public HtmlNode LoadOnline(string url)
-        //{
-        //    var htmlWeb = new HtmlWeb();
-        //    htmlWeb.OverrideEncoding = Encoding.UTF8;
-        //    htmlWeb.
-        //    var doc = htmlWeb.Load(url);
+        public HtmlNode Load(string url)
+            => Load(url, ManipulateWebStreamForPage);
 
-        //    return doc.DocumentNode;
-        //}
+        /// <summary>
+        /// Load a file from the online or offline
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public StreamReader LoadFile(string url)
+            => Load(url, ManipulateWebStreamForFile);
 
         #endregion Load
 

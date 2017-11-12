@@ -58,6 +58,18 @@ namespace ScrapEngine.Db
             ParentDbContext = pDbContext;
         }
 
+        /// <summary>
+        /// Create and Initialize an object of DynamicAppDbConfig
+        /// </summary>
+        /// <param name="pDbContext"></param>
+        /// <returns></returns>
+        public static DynamicAppDbConfig Init(IScrapDbContext pDbContext)
+        {
+            DynamicAppDbConfig appDbConfig = new DynamicAppDbConfig();
+            appDbConfig.Initialize(pDbContext);
+            return appDbConfig;
+        }
+
         #endregion Constructor
 
         /// <summary>

@@ -5,6 +5,8 @@ using System.Data.Common;
 using DynamicDatabase.Types;
 using System.Collections;
 using WebCommon.Error;
+using DynamicDatabase.Config;
+using System.Linq;
 
 namespace DynamicDatabase
 {
@@ -132,7 +134,7 @@ namespace DynamicDatabase
         public void Load(DbDataReader reader, string[] cols)
         {
             IDbRow row = NewRow(Table);
-            row.AddorUpdate(reader);
+            row.AddOrUpdate(reader);
         }
 
         #endregion Load
@@ -152,41 +154,52 @@ namespace DynamicDatabase
         }
 
         /// <summary>
-        /// Load data in memory by Rowid
+        /// Load data in memory by primary key
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void AddorUpdate(DbDataReader reader)
+        public virtual void Add(DbDataReader reader)
         {
             var row = NewRow(Table);
-
-            List<DbDataType> pks = new List<DbDataType>();
-
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                row.Columns[i] = Table.DbContext.DbDataType.ParseDataType(reader.GetFieldType(i));
-                row.Columns[i].Value = reader.GetValue(i);
-
-                if (Table.Headers[i].IsPK) pks.Add(row.Columns[i]);
-            }
             
-            string pkString = DynamicDbHelper.GetPrimaryKeyString(pks);
-            var rowExists = FindByPK(pkString);
+            for(int i = 0; i < Table.Headers.Count(); ++i) row.Add(Table.Headers[i], reader);
 
-            if(rowExists != null) rowExists.Update(row);
-            else
+            string ukeyString = row.ToStringByUK();
+            if (string.IsNullOrEmpty(ukeyString))
+                throw new DynamicDbException(DynamicDbException.EErrorType.COLUMN_INDEX_INVALID,
+                    new string[] { Table.TableName });
+
+            ByNames.Add(ukeyString, row);
+            ByIndices.Add(row);
+        }
+
+        /// <summary>
+        /// Insert into the table. Data is indexed by column id
+        /// </summary>
+        /// <param name="rowData"></param>
+        public string AddOrUpdate(string[] rowData)
+        {
+            string ukeyString = GetUniqueKeyString(rowData);
+            IDbRow rowObj = (ByNames.ContainsKey(ukeyString))?
+                ByNames[ukeyString] : NewRow(Table);
+
+            rowObj.AddOrUpdate(rowData);
+
+            if (!ByNames.ContainsKey(ukeyString))
             {
-                ByNames.Add(pkString, row);
-                ByIndices.Add(row);
+                ByNames.Add(ukeyString, rowObj);
+                ByIndices.Add(rowObj);
             }
+
+            return ukeyString;
         }
 
         /// <summary>
         /// Add or update a row
         /// </summary>
         /// <param name="row"></param>
-        public void AddorUpdate(IDbRow row)
+        public void AddOrUpdate(IDbRow row)
         {
-            string ukeyString = row.ToStringByPK();
+            string ukeyString = row.ToStringByUK();
 
             if (ByNames.ContainsKey(ukeyString))
                 ByNames[ukeyString].Update(row);
@@ -223,6 +236,20 @@ namespace DynamicDatabase
         public void Commited()
         {
             foreach (var item in ByNames) if (item.Value.IsDirty) item.Value.IsDirty = false;
+        }
+
+        /// <summary>
+        /// Get the unique key string from the row (as an string array)
+        /// </summary>
+        /// <param name="rowData"></param>
+        /// <returns></returns>
+        public string GetUniqueKeyString(string[] rowData)
+        {
+            List<string> ukeys = new List<string>();
+            for (int i = 0; i < Table.Headers.Count(); ++i)
+                if (Table.Headers[i].IsPK) ukeys.Add(rowData[i]);
+
+            return DynamicDbHelper.GetUniqueKeyString(ukeys);
         }
 
         #endregion Utility

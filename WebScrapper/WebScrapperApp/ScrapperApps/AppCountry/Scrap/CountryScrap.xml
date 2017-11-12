@@ -6,11 +6,24 @@
     <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
     <Column name="iso31661a3" xpath="td[3]"></Column>
   </Scrap>
-  <Scrap name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="//ul[@id='GetAppendix_D']/li//tr[position() = 1 and /td[3]/table//tr[1]/td[1] != '-']" type="table">
+  <Scrap name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="//ul[@id='GetAppendix_D']/li//tr[position() = 1]" type="table">
+    <Column name="nm" xpath="td[1]"></Column>
     <Column name="genc_2a" xpath="td[2]"></Column>
-    <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]"></Column>
-    <Column name="iso3166_no" xpath="td[3]/table//tr[1]/td[3]"></Column>
-    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]" ispk="1"></Column>
+    <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="iso3166_no" xpath="td[3]/table//tr[1]/td[3]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
     <Column name="stanag" xpath="td[4]">
       <Manipulate>
         <Trim data="-"></Trim>

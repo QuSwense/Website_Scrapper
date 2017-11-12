@@ -1,5 +1,8 @@
 ﻿using DynamicDatabase.Interfaces;
+using DynamicDatabase.Model;
 using ScrapEngine.Db;
+using ScrapEngine.Model;
+using System.Collections.Generic;
 
 namespace ScrapEngine.Interfaces
 {
@@ -35,5 +38,18 @@ namespace ScrapEngine.Interfaces
         void Initialize(IScrapEngineContext parent);
 
         #endregion Constructor
+
+        /// <summary>
+        /// Add or update the data scrapped from the webpages including the metadata information
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="row"></param>
+        void AddOrUpdate(string tableName, List<TableDataColumnModel> row, EWebDataConfigType scrapType);
+
+        /// <summary>
+        /// Load partial
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        void LoadPartial(WebDataConfigScrap webScrapConfigObj);
     }
 }

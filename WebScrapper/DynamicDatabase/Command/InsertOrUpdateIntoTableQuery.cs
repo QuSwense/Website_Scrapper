@@ -31,6 +31,11 @@ namespace DynamicDatabase.Command
         private List<string> columnValues;
 
         /// <summary>
+        /// List of column names
+        /// </summary>
+        private List<string> columnNames;
+
+        /// <summary>
         /// The SQL statement
         /// </summary>
         public List<string> SQLs { get; protected set; }
@@ -47,6 +52,7 @@ namespace DynamicDatabase.Command
             this.dbCommand = dbCommand;
             columnInsertions = new List<string>();
             columnValues = new List<string>();
+            columnNames = new List<string>();
             SQLs = new List<string>();
         }
 
@@ -87,14 +93,21 @@ namespace DynamicDatabase.Command
             Debug.Assert(dynTable.Headers.ByNames.Count() == dynTable.Headers.ByIndices.Count());
             Debug.Assert(dynTable.Rows != null);
 
-            for (int row = 0; row < dynTable.Rows.ByIndices.Count; row++)
+            for(int col = 0; col < dynTable.Headers.Count(); ++col)
+            {
+                columnNames.Add(dynTable.Headers[col].ColumnName);
+            }
+
+            for (int row = 0; row < dynTable.Rows.Count(); row++)
             {
                 if (dynTable.Rows[row].IsDirty)
                 {
                     List<string> rowData = new List<string>();
                     for (int col = 0; col < dynTable.Headers.Count(); col++)
                     {
-                        rowData.Add(dbCommand.DbContext.DbDataType.GetValue(dynTable.Rows[row].TryGetValue(col)));
+                        string colValue = dbCommand.DbContext.DbDataType.GetValue(
+                            dynTable.Rows[row].TryGetValue(col), Normalize);
+                        rowData.Add(colValue);
                     }
                     columnValues.Add(string.Join(",", rowData));
                 }
@@ -110,7 +123,8 @@ namespace DynamicDatabase.Command
                     queryFormat.Inject(new Dictionary<string, string>()
                     {
                         { "TableName", dynTable.TableName },
-                        { "Values", string.Join("),(", buffered) }
+                        { "ColumnList", string.Join(",", columnNames) },
+                        { "Values", string.Join(")," + Environment.NewLine + "(", buffered) }
                     }));
 
                     counter += dbCommand.MaxInsertCriteriaAllowed;
@@ -122,9 +136,21 @@ namespace DynamicDatabase.Command
                     queryFormat.Inject(new Dictionary<string, string>()
                     {
                         { "TableName", dynTable.TableName },
-                        { "Values", string.Join("),(", columnValues) }
+                        { "ColumnList", string.Join(",", columnNames) },
+                        { "Values", string.Join(")," + Environment.NewLine + "(", columnValues) }
                     }));
             }
+        }
+
+        /// <summary>
+        /// Check and sanitize the value for SQL query
+        /// </summary>
+        /// <param name="colValue"></param>
+        /// <returns></returns>
+        public string Normalize(string colValue)
+        {
+            colValue = colValue.Replace("'", "''");
+            return colValue;
         }
 
         #endregion Generate

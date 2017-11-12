@@ -26,7 +26,7 @@ namespace DynamicDatabase.Interfaces
         /// <summary>
         /// Default contraint
         /// </summary>
-        string Default { get; }
+        object Default { get; }
 
         /// <summary>
         /// The Database data type
@@ -59,6 +59,22 @@ namespace DynamicDatabase.Interfaces
         int Index { get; }
 
         #endregion Properties
+
+        #region Constructor
+
+        /// <summary>
+        /// Use this initializer
+        /// </summary>
+        /// <param name="dynTable"></param>
+        void Initialize(IDbTable dynTable);
+
+        /// <summary>
+        /// Update the current column metdata using the model object
+        /// </summary>
+        /// <param name="colLoadObj"></param>
+        void Merge(ColumnLoadDataModel colLoadObj);
+
+        #endregion Constructor
 
         #region Load
 

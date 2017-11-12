@@ -32,24 +32,37 @@ namespace DynamicDatabase.Interfaces
         void Initialize(IDbTable table);
 
         /// <summary>
+        /// Add a new row
+        /// </summary>
+        /// <param name="colMetadata"></param>
+        /// <param name="reader"></param>
+        void Add(IColumnMetadata colMetadata, DbDataReader reader);
+
+        /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="reader"></param>
-        void AddorUpdate(DbDataReader reader);
+        void AddOrUpdate(DbDataReader reader);
 
         /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        void AddorUpdate(string name, object data);
+        void AddOrUpdate(string name, object data);
 
         /// <summary>
         /// Add a column value
         /// </summary>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        void AddorUpdate(int index, object data);
+        void AddOrUpdate(int index, object data);
+
+        /// <summary>
+        /// Add data by indexed list
+        /// </summary>
+        /// <param name="dataList"></param>
+        void AddOrUpdate(IEnumerable<string> colDataArray);
 
         /// <summary>
         /// Update this instance of row from the argument
@@ -68,13 +81,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary> 
         /// <returns></returns>
         string ToStringByPK(List<string> pkCols);
-
-        /// <summary>
-        /// Add data by indexed list
-        /// </summary>
-        /// <param name="dataList"></param>
-        void AddorUpdate(List<string> dataList);
-
+        
         /// <summary>
         /// Try to get the column data without throwing any exception.
         /// If not found then return null
@@ -82,5 +89,11 @@ namespace DynamicDatabase.Interfaces
         /// <param name="index"></param>
         /// <returns></returns>
         DbDataType TryGetValue(int index);
+
+        /// <summary>
+        /// Get the unique key representation of PK
+        /// </summary>
+        /// <returns></returns>
+        string ToStringByUK();
     }
 }

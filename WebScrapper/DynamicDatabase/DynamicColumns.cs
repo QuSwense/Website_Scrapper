@@ -1,8 +1,10 @@
-﻿using DynamicDatabase.Interfaces;
+﻿using DynamicDatabase.Config;
+using DynamicDatabase.Interfaces;
 using DynamicDatabase.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace DynamicDatabase
@@ -108,6 +110,27 @@ namespace DynamicDatabase
 
         #region Insert
 
+        protected void AddHelper(string colName, DbDataType dt)
+        {
+            if (ByNames == null) ByNames = new Dictionary<string, Types.DbDataType>();
+            if (ByIndices == null) ByIndices = new List<Types.DbDataType>();
+            
+            ByNames.Add(colName, dt);
+            ByIndices.Add(dt);
+        }
+
+        /// <summary>
+        /// Add a new row
+        /// </summary>
+        /// <param name="colMetadata"></param>
+        /// <param name="reader"></param>
+        public virtual void Add(IColumnMetadata colMetadata, DbDataReader reader)
+        {
+            DbDataType dtype = DbDataType.New(colMetadata.DataType);
+            dtype.Value = reader.GetValue(reader.GetOrdinal(colMetadata.ColumnName));
+            AddHelper(colMetadata.ColumnName, dtype);
+        }
+
         /// <summary>
         /// Add or update a column data in the Dictionary data set.
         /// That will automatically update the reference in the List dataset
@@ -115,7 +138,7 @@ namespace DynamicDatabase
         /// <param name="index"></param>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        public void AddorUpdate(string name, object data)
+        public void AddOrUpdate(string name, object data)
         {
             DbDataType dt;
 
@@ -137,19 +160,43 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="index"></param>
         /// <param name="data"></param>
-        public void AddorUpdate(int index, object data)
+        public void AddOrUpdate(int index, object data)
         {
             DbDataType dt;
 
-            if (ByIndices.Count >= index || ByIndices[index] == null)
-            {
-                dt = DbDataType.ParseDataType(data.GetType());
-                ByIndices.Insert(index, dt);
-                ByNames.Add(Row.Table.Headers[index].ColumnName, dt);
-            }
+            if (ByIndices.Count >= index || ByIndices[index] == null) dt = Add(index, data);
             else dt = ByIndices[index];
 
             dt.Value = data;
+        }
+
+        /// <summary>
+        /// Add or update a column data in the list dataset.
+        /// Thsi will automatically update the dictionary dataset
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="data"></param>
+        public DbDataType Add(int index, object data)
+        {
+            DbDataType dt = DbDataType.New(Row.Table.Headers[index].DataType);
+            ByIndices.Insert(index, dt);
+            ByNames.Add(Row.Table.Headers[index].ColumnName, dt);
+            return dt;
+        }
+
+        /// <summary>
+        /// Add or update a column data in the list dataset.
+        /// Thsi will automatically update the dictionary dataset
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="data"></param>
+        public DbDataType Add(string column, object data)
+        {
+            DbDataType dt = DbDataType.New(Row.Table.Headers[column].DataType);
+            dt.Value = data;
+            ByIndices.Insert(Row.Table.Headers.GetColumnIndex(column), dt);
+            ByNames.Add(column, dt);
+            return dt;
         }
 
         /// <summary>
@@ -169,22 +216,38 @@ namespace DynamicDatabase
         #region Utility
 
         /// <summary>
+        /// Get the unique key representation of PK
+        /// </summary>
+        /// <returns></returns>
+        public string ToStringUK()
+        {
+            List<string> ukList = Row.Table.GetUKColumnNames();
+            string pkString = "";
+
+            if (ukList != null && ukList.Count > 0 && ByNames != null)
+            {
+                List<string> pkvalues = ByNames.Where(p => ukList.Contains(p.Key)).Select(p => p.Value.Value.ToString()).ToList();
+                if (pkvalues.Count != ukList.Count) throw new Exception("Internal: Mismatch in the count of Primary keys");
+                pkString = DynamicDbHelper.GetPrimaryKeyString(pkvalues);
+            }
+
+            return pkString;
+        }
+
+        /// <summary>
         /// Create a unique string identifier for this Coloumn data using only the primary keys
         /// </summary>
         /// <returns></returns>
         public string ToStringPK()
         {
-            if (Row == null) throw new Exception("This class is not associated with any row");
-
-            List<string> pkList = Row.Table.GetPKNames();
+            List<string> pkList = Row.Table.GetPKColumnNames();
             string pkString = "";
 
             if(pkList != null && pkList.Count > 0 && ByNames != null)
             {
                 List<string> pkvalues = ByNames.Where(p => pkList.Contains(p.Key)).Select(p => p.Value.Value.ToString()).ToList();
-                if (pkvalues.Count <= 0) throw new Exception("Internal: No Primary Key Values found");
                 if (pkvalues.Count != pkList.Count) throw new Exception("Internal: Mismatch in the count of Primary keys");
-                pkString = string.Join(",", pkvalues);
+                pkString = DynamicDbHelper.GetPrimaryKeyString(pkvalues);
             }
 
             return pkString;

@@ -14,7 +14,11 @@ namespace WebCommon.Error
         {
             INIT_ARG_NULL,
             TABLE_NOT_FOUND,
-            DUPLICATE_ROW
+            DUPLICATE_ROW,
+            TABLE_LOADED,
+            COLUMN_NOT_FOUND,
+            COLUMN_INDEX_INVALID,
+            UKEY_NULL_EMPTY
         }
 
         /// <summary>
@@ -67,6 +71,14 @@ namespace WebCommon.Error
                     return "The argument passed to the Initialize method is null";
                 case EErrorType.DUPLICATE_ROW:
                     return string.Format("The table {0} has duplicate row for key {1}", dataList[0], dataList[1]);
+                case EErrorType.TABLE_LOADED:
+                    return string.Format("The table {0} is already loaded", dataList[0]);
+                case EErrorType.COLUMN_NOT_FOUND:
+                    return string.Format("The column {0} is not present", dataList[0]);
+                case EErrorType.COLUMN_INDEX_INVALID:
+                    return string.Format("The column index is invalid for column {0}", dataList[0]);
+                case EErrorType.UKEY_NULL_EMPTY:
+                    return string.Format("The unique key string cannot be null or empty for table {0}", dataList[0]);
                 default:
                     return "Unknwon database error";
             }

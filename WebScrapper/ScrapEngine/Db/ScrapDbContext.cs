@@ -6,6 +6,7 @@ using ScrapEngine.Interfaces;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using ScrapEngine.Model;
 
 namespace ScrapEngine.Db
 {
@@ -20,7 +21,7 @@ namespace ScrapEngine.Db
         /// The application name topic for which the web scrapper Database is to be generated
         /// </summary>
         public IScrapEngineContext ParentEngine { get; protected set; }
-
+        
         /// <summary>
         /// Read the Database configuration
         /// </summary>
@@ -36,7 +37,7 @@ namespace ScrapEngine.Db
         #region Constructor
 
         /// <summary>
-        /// Constructor
+        /// Default Constructor
         /// </summary>
         public ScrapDbContext() { }
 
@@ -48,8 +49,7 @@ namespace ScrapEngine.Db
             ParentEngine = parent;
 
             // Read aplication specific database config
-            MetaDbConfig = new DynamicAppDbConfig();
-            MetaDbConfig.Initialize(this);
+            MetaDbConfig = DynamicAppDbConfig.Init(this);
             MetaDbConfig.Read();
 
             // Create database context
@@ -103,6 +103,7 @@ namespace ScrapEngine.Db
             {
                 // Commit all the data in one go
                 WebScrapDb.Commit();
+                WebScrapDb.Clear();
                 WebScrapDb.Close();
             }
         }
@@ -174,30 +175,44 @@ namespace ScrapEngine.Db
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row)
+        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row, EWebDataConfigType scrapType)
         {
-            string colMetadatatableName = string.Format(
-                    DynamicGenericDbConfig.I.ColumnMetadataTableName, tableName);
-
-            List<string> ukeys = new List<string>();
-            Dictionary<string, string> dataList = new Dictionary<string, string>();
-
-            foreach (var col in row)
-            {
-                if (col.IsPk)
-                    ukeys.Add(col.Name);
-                else
-                    dataList.Add(col.Name, col.Value);
-            }
-
             // Add data
-            string pk = WebScrapDb.AddOrUpdate(tableName, ukeys, dataList);
+            string pk = WebScrapDb.AddOrUpdate(tableName, row.Select(p => p.Name).ToArray());   
 
             foreach (var colDataKv in row)
             {
+                string rowMetadatatableName = string.Format(
+                    DynamicGenericDbConfig.I.RowMetadataTableName, tableName, colDataKv.Name);
                 // Add metadata
-                WebScrapDb.AddOrUpdate(colMetadatatableName, new string[] { pk, null, null, colDataKv.Url, colDataKv.XPath });
+                WebScrapDb.AddOrUpdate(rowMetadatatableName, new string[] { pk, null, scrapType.ToString(), colDataKv.Url, colDataKv.XPath });
             }
+        }
+
+        /// <summary>
+        /// LOad table with partial columns
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        public void LoadPartial(WebDataConfigScrap webScrapConfigObj)
+        {
+            var columns = new Dictionary<string, ColumnLoadDataModel>();
+
+            foreach (var colObj in webScrapConfigObj.Columns)
+            {
+                ColumnLoadDataModel loadModelObj = new ColumnLoadDataModel();
+                loadModelObj.Name = colObj.Name;
+                loadModelObj.IsUnique = colObj.IsPk;
+                columns.Add(colObj.Name, loadModelObj);
+            }
+
+            string tableName = "";
+            while(string.IsNullOrEmpty(webScrapConfigObj.Name))
+            {
+                webScrapConfigObj = webScrapConfigObj.Parent;
+            }
+
+            tableName = webScrapConfigObj.Name;
+            WebScrapDb.LoadPartial(tableName, columns);
         }
 
         #endregion Create

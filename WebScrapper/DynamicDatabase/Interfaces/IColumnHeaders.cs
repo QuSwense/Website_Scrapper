@@ -61,6 +61,13 @@ namespace DynamicDatabase.Interfaces
         /// <param name="reader"></param>
         void Initialize(IDbTable tableParent, DbDataReader reader);
 
+        /// <summary>
+        /// Initialize from the metdata reader with partial columns
+        /// </summary>
+        /// <param name="reader"></param>
+        void Initialize(IDbTable tableParent, DbDataReader reader, 
+            Dictionary<string, ColumnLoadDataModel> columns);
+
         #endregion Constructor
 
         #region Utility
@@ -77,6 +84,12 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <returns></returns>
         List<IColumnMetadata> GetPKs();
+
+        /// <summary>
+        /// Get the list of UKs
+        /// </summary>
+        /// <returns></returns>
+        List<IColumnMetadata> GetUKs();
 
         #endregion Utility
     }

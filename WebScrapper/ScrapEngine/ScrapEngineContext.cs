@@ -28,19 +28,19 @@ namespace ScrapEngine
         public ApplicationConfig AppConfig { get; protected set; }
 
         /// <summary>
-        /// A generic database config
-        /// </summary>
-        public DynamicGenericDbConfig GenericDbConfig { get; protected set; }
-
-        /// <summary>
         /// The Database class layer
         /// </summary>
-        public ScrapDbContext WebDbContext { get; protected set; }
+        public IScrapDbContext WebDbContext { get; protected set; }
 
         /// <summary>
         /// Web scrapper html context
         /// </summary>
-        public WebScrapHtmlContext WebScrapHtml { get; protected set; }
+        public IScrapHtmlContext WebScrapHtml { get; protected set; }
+
+        /// <summary>
+        /// The Factory class object used to intiialzie all instances
+        /// </summary>
+        public ScrapFactory Factory { get; protected set; }
 
         #endregion Properties
 
@@ -49,7 +49,10 @@ namespace ScrapEngine
         /// <summary>
         /// Constructor
         /// </summary>
-        public ScrapEngineContext() { }
+        public ScrapEngineContext()
+        {
+            Factory = new ScrapFactory();
+        }
 
         /// <summary>
         /// Initialize the engine context
@@ -67,12 +70,10 @@ namespace ScrapEngine
             ReadApplicationConfig(appGenericConfig);
 
             // Initialize the database context
-            WebDbContext = new ScrapDbContext();
-            WebDbContext.Initialize(this);
+            WebDbContext = Factory.CreateDbContext(this);
 
             // Web scrap html context
-            WebScrapHtml = new WebScrapHtmlContext();
-            WebScrapHtml.Initialize(this);
+            WebScrapHtml = Factory.CreateHtmlContext(this);
         }
 
         /// <summary>
@@ -109,9 +110,7 @@ namespace ScrapEngine
             else if (appSpecificConfig == null)
                 AppConfig = appGenericConfig.Clone();
             else
-            {
                 AppConfig = appGenericConfig.Union(appSpecificConfig);
-            }
         }
 
         /// <summary>

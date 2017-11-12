@@ -1,9 +1,13 @@
-﻿using DynamicDatabase.Interfaces;
+﻿using DynamicDatabase.Config;
+using DynamicDatabase.Interfaces;
+using DynamicDatabase.Model;
 using DynamicDatabase.Sqlite;
 using DynamicDatabase.Types;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SQLite;
 using Unity;
+using WebScrapper.Db.Ctx.sqlite;
 
 namespace DynamicDatabase
 {
@@ -83,6 +87,7 @@ namespace DynamicDatabase
             container.RegisterType<IDataTypeContext, SqliteDataTypeContext>();
             container.RegisterType<IDynamicDbConnection, SqliteDbConnection>();
             container.RegisterType<IDbCommand, SqliteDbCommand>();
+            container.RegisterType<IColumnMetadata, SqliteColumnMetadata>();
         }
 
         /// <summary>
@@ -108,6 +113,68 @@ namespace DynamicDatabase
         public T Create<T>()
         {
             return container.Resolve<T>();
+        }
+
+        /// <summary>
+        /// Create and initialize a new Database table
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public IDbTable CreateDbTable(IDbContext dbContext, string tableName)
+        {
+            IDbTable dynTable = Create<IDbTable>();
+            dynTable.Initialize(dbContext, tableName);
+            return dynTable;
+        }
+
+        /// <summary>
+        /// Create and initialize a new Column metadata
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public IColumnMetadata CreateColumnMetadata(IDbTable table)
+        {
+            IColumnMetadata colMetadata = Create<IColumnMetadata>();
+            colMetadata.Initialize(table);
+            return colMetadata;
+        }
+
+        /// <summary>
+        /// Create and initialize a new Column metadata
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public IColumnHeaders CreateColumnHeaders(IDbTable tableParent, DbDataReader reader,
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            IColumnHeaders colHeaders = Create<IColumnHeaders>();
+            colHeaders.Initialize(tableParent, reader, columns);
+            return colHeaders;
+        }
+
+        /// <summary>
+        /// Create and initialize a new Column metadata
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public IColumnHeaders CreateColumnHeaders(IDbTable tableParent, DbColumnsDefinitionModel configCols)
+        {
+            IColumnHeaders colHeaders = Create<IColumnHeaders>();
+            colHeaders.Initialize(tableParent, configCols);
+            return colHeaders;
+        }
+
+        /// <summary>
+        /// Create and initialize a new Column metadata
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public IColumnHeaders CreateColumnHeaders(IDbTable table, DbDataReader reader)
+        {
+            IColumnHeaders colHeaders = Create<IColumnHeaders>();
+            colHeaders.Initialize(table, reader);
+            return colHeaders;
         }
 
         #endregion Create

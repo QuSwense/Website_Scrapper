@@ -18,16 +18,16 @@ namespace ScrapEngine.Interfaces
         /// Application config
         /// </summary>
         ApplicationConfig AppConfig { get; }
-        
+
         /// <summary>
         /// The Database class layer
         /// </summary>
-        ScrapDbContext WebDbContext { get; }
+        IScrapDbContext WebDbContext { get; }
 
         /// <summary>
         /// Web scrapper html context
         /// </summary>
-        WebScrapHtmlContext WebScrapHtml { get; }
+        IScrapHtmlContext WebScrapHtml { get; }
 
         #endregion Properties
 

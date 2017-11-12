@@ -6,7 +6,7 @@ namespace ScrapEngine.Bl
     /// <summary>
     /// The main web site scrapper context class
     /// </summary>
-    public class WebScrapHtmlContext
+    public class WebScrapHtmlContext : IScrapHtmlContext
     {
         /// <summary>
         /// Reference to the Scrapper Engine context class

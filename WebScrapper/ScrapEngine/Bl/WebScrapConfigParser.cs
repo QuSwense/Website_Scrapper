@@ -1,5 +1,6 @@
 ﻿using DynamicDatabase.Model;
 using HtmlAgilityPack;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System;
 using System.Collections.Generic;
@@ -14,13 +15,21 @@ namespace ScrapEngine.Bl
     /// The main class for parsing the scrap xml configuration file
     /// and do the scrapping
     /// </summary>
-    public class WebScrapConfigParser
+    public class WebScrapConfigParser : IScrapParser
     {
         /// <summary>
         /// Reference to the parent Web context object
         /// </summary>
-        public WebScrapHtmlContext WebContext { get; protected set; }
-        
+        public IScrapHtmlContext WebContext { get; protected set; }
+
+        /// <summary>
+        /// The web context
+        /// </summary>
+        public IScrapDbContext WebDbContext
+        {
+            get { return WebContext.EngineContext.WebDbContext; }
+        }
+
         /// <summary>
         /// A xml configuration reader
         /// </summary>
@@ -60,7 +69,11 @@ namespace ScrapEngine.Bl
 
             // Read the Scraps nodes which are the individual reader config nodes
             foreach (XmlNode rootScrapNode in xmlConfigReader.ReadNodes("//WebData/Scrap"))
+            {
                 ParseScrapElement(rootScrapNode);
+                WebDbContext.WebScrapDb.Commit();
+                WebDbContext.WebScrapDb.Clear();
+            }
         }
 
         /// <summary>
@@ -129,8 +142,6 @@ namespace ScrapEngine.Bl
 
                 nodeIndex++;
             }
-
-            WebContext.EngineContext.WebDbContext.WebScrapDb.Commit();
         }
 
         /// <summary>
@@ -175,6 +186,9 @@ namespace ScrapEngine.Bl
                             ParseColumnElement(nodeIndex, columnNode, webScrapConfigObj, webNodeNavigator));
                     }
                 }
+
+                // Load the table with partial columns in memory
+                WebDbContext.LoadPartial(webScrapConfigObj);
             }
 
             ColumnScrapIterator(nodeIndex, webScrapConfigObj, scrapNode, webNodeNavigator);
@@ -320,7 +334,7 @@ namespace ScrapEngine.Bl
                 tableDataColumn.XPath = manipulateHtml.XPath;
             }
 
-            WebContext.EngineContext.WebDbContext.AddOrUpdate(scrapConfig.Name, row);
+            WebContext.EngineContext.WebDbContext.AddOrUpdate(scrapConfig.Name, row, EWebDataConfigType.TABLE);
         }
 
         /// <summary>

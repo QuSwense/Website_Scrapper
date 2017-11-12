@@ -120,6 +120,15 @@ namespace DynamicDatabase.Interfaces
         #region Load
 
         /// <summary>
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        void LoadPartial(string tableName,
+            Dictionary<string, ColumnLoadDataModel> columns);
+
+        /// <summary>
         /// Use this method to load data
         /// Load the table data and metdata from the database
         /// </summary>
@@ -127,16 +136,16 @@ namespace DynamicDatabase.Interfaces
         void Load(string name);
         
         /// <summary>
-        /// Load the metadata of the table.
-        /// </summary>
-        /// <param name="name">The name of the table</param>
-        void LoadMetadata(string tablename);
-
-        /// <summary>
         /// Clear the table data that is loaded in memory
         /// </summary>
         /// <param name="name"></param>
         void Clear(string tablename);
+
+        /// <summary>
+        /// Clear all the tables in memory
+        /// generally after a commit call clear
+        /// </summary>
+        void Clear();
 
         #endregion Load
 
@@ -153,6 +162,16 @@ namespace DynamicDatabase.Interfaces
         void Commit(string tableName);
 
         /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
+        void CommitAndClear();
+
+        /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
+        void CommitAndClear(string tableName);
+
+        /// <summary>
         /// Add or update tables definition data to the table metdata
         /// </summary>
         /// <param name="name">The table name</param>
@@ -164,7 +183,7 @@ namespace DynamicDatabase.Interfaces
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="colIndexData"></param>
-        void AddOrUpdate(string tableName, string[] colIndexData);
+        string AddOrUpdate(string tableName, string[] colIndexData);
 
         /// <summary>
         /// Insert into the table.
@@ -173,7 +192,7 @@ namespace DynamicDatabase.Interfaces
         /// <param name="colIndexData"></param>
         /// <param name="dataList"></param>
         string AddOrUpdate(string tableName, List<string> ukeys, Dictionary<string, string> dataList);
-        
+
         #endregion Insert
     }
 }

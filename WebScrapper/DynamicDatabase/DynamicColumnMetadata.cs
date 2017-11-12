@@ -29,7 +29,7 @@ namespace DynamicDatabase
         /// <summary>
         /// Default contraint
         /// </summary>
-        public string Default { get; protected set; }
+        public object Default { get; protected set; }
 
         /// <summary>
         /// The Database data type
@@ -81,6 +81,28 @@ namespace DynamicDatabase
 
         #endregion Properties
 
+        #region Constructor
+
+        /// <summary>
+        /// Use this initializer
+        /// </summary>
+        /// <param name="dynTable"></param>
+        public void Initialize(IDbTable dynTable)
+        {
+            Table = dynTable;
+        }
+
+        /// <summary>
+        /// Update the current column metdata using the model object
+        /// </summary>
+        /// <param name="colLoadObj"></param>
+        public void Merge(ColumnLoadDataModel colLoadObj)
+        {
+            if (colLoadObj.IsUnique) Constraint |= EColumnConstraint.UNQIUE;
+        }
+
+        #endregion Constructor
+
         #region Load
 
         /// <summary>
@@ -101,13 +123,12 @@ namespace DynamicDatabase
         /// Column 2 - name
         /// Column 3 - Data Type
         /// Column Rest - Constraints
+        /// If not inherit a new class and override
         /// </summary>
         /// <param name="reader"></param>
         public virtual void Parse(DbDataReader reader)
         {
-            ColumnName = reader.GetString(1);
-            DataType = Table.DbContext.DbDataType.ParseDataType(reader.GetString(2));
-            Constraint = ParseConstraint(reader);
+            
         }
 
         /// <summary>

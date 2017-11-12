@@ -95,7 +95,7 @@ namespace DynamicDatabase.Sqlite
         /// </summary>
         /// <returns></returns>
         public override string InsertOrReplaceQueryString
-        { get { return "INSERT OR REPLACE INTO {TableName} VALUES ( {Values} )"; } }
+        { get { return "INSERT OR REPLACE INTO {TableName} ({ColumnList}) VALUES ( {Values} )"; } }
 
         #endregion Helper
 

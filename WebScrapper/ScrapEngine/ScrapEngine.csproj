@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonServiceLocator, Version=2.0.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.1.2\lib\net40\CommonServiceLocator.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
@@ -63,6 +66,18 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.1.2\lib\net40\Unity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.1.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.1.2\lib\net40\Unity.Container.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Interception, Version=5.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.1.2\lib\net40\Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ServiceLocation, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.1.2\lib\net40\Unity.ServiceLocation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
@@ -74,6 +89,9 @@
     <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
+    <Compile Include="Interfaces\IScrapHtmlContext.cs" />
+    <Compile Include="Interfaces\IScrapParser.cs" />
+    <Compile Include="Interfaces\IScrapperCommand.cs" />
     <Compile Include="Model\ApplicationConfig.cs" />
     <Compile Include="Model\ApplicationConfigKey.cs" />
     <Compile Include="Model\EWebDataConfigType.cs" />
@@ -89,6 +107,7 @@
     <Compile Include="Model\WebScrapStateModel.cs" />
     <Compile Include="ScrapEngineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScrapFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DynamicDatabase\DynamicDatabase.csproj">

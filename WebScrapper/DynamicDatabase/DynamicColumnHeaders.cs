@@ -5,6 +5,9 @@ using System.Reflection;
 using DynamicDatabase.Config;
 using System.Collections;
 using DynamicDatabase.Interfaces;
+using System.Linq;
+using WebCommon.Error;
+using System.Diagnostics;
 
 namespace DynamicDatabase
 {
@@ -31,6 +34,18 @@ namespace DynamicDatabase
 
         #endregion Properties
 
+        #region Properties Helper
+
+        /// <summary>
+        /// Get the Database factory
+        /// </summary>
+        protected IDbFactory DbFactory
+        {
+            get { return Table.DbContext.DbFactory; }
+        }
+
+        #endregion
+
         #region Indexer
 
         /// <summary>
@@ -42,12 +57,14 @@ namespace DynamicDatabase
         {
             get
             {
-                if (ByIndices == null || ByIndices.Count <= index) throw new IndexOutOfRangeException("Column Index out of range");
+                if (ByIndices == null || ByIndices.Count <= index)
+                    throw new IndexOutOfRangeException("Column Index out of range");
                 return ByIndices[index];
             }
             set
             {
-                if (ByIndices == null || ByIndices.Count <= index) throw new IndexOutOfRangeException("Column Index out of range");
+                if (ByIndices == null || ByIndices.Count <= index)
+                    throw new IndexOutOfRangeException("Column Index out of range");
                 ByIndices[index] = value;
             }
         }
@@ -61,12 +78,14 @@ namespace DynamicDatabase
         {
             get
             {
-                if (ByNames == null || !ByNames.ContainsKey(name)) throw new IndexOutOfRangeException("Column name do not exists");
+                if (ByNames == null || !ByNames.ContainsKey(name))
+                    throw new IndexOutOfRangeException("Column name do not exists");
                 return ByNames[name];
             }
             set
             {
-                if (ByNames == null || !ByNames.ContainsKey(name)) throw new IndexOutOfRangeException("Column name do not exists");
+                if (ByNames == null || !ByNames.ContainsKey(name))
+                    throw new IndexOutOfRangeException("Column name do not exists");
                 ByNames[name] = value;
             }
         }
@@ -82,13 +101,11 @@ namespace DynamicDatabase
         public void Initialize(IDbTable tableParent, Dictionary<string, ConfigDbColumn> configCols)
         {
             Table = tableParent;
-            int index = 0;
             foreach (var item in configCols)
             {
-                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
+                IColumnMetadata colMetadata = DbFactory.CreateColumnMetadata(Table);
                 colMetadata.Parse(item.Key, item.Value);
-                AddHeader(index, item.Key, colMetadata);
-                index++;
+                AddHeader(colMetadata);
             }
         }
 
@@ -99,13 +116,32 @@ namespace DynamicDatabase
         public void Initialize(IDbTable tableParent, DbDataReader reader)
         {
             Table = tableParent;
-            int index = 0;
             while (reader.Read())
             {
-                IColumnMetadata colMetadata = Table.DbContext.DbFactory.Create<IColumnMetadata>();
+                IColumnMetadata colMetadata = DbFactory.CreateColumnMetadata(Table);
                 colMetadata.Parse(reader);
-                AddHeader(index, colMetadata.ColumnName, colMetadata);
-                index++;
+                AddHeader(colMetadata);
+            }
+        }
+
+        /// <summary>
+        /// Initialize from the metdata reader with partial columns
+        /// </summary>
+        /// <param name="reader"></param>
+        public void Initialize(IDbTable tableParent, DbDataReader reader, 
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            Table = tableParent;
+            while (reader.Read())
+            {
+                IColumnMetadata colMetadata = DbFactory.CreateColumnMetadata(Table);
+                colMetadata.Parse(reader);
+                
+                if (columns.ContainsKey(colMetadata.ColumnName))
+                {
+                    colMetadata.Merge(columns[colMetadata.ColumnName]);
+                    AddHeader(colMetadata);
+                }
             }
         }
 
@@ -120,8 +156,11 @@ namespace DynamicDatabase
         /// <returns></returns>
         public int GetColumnIndex(string name)
         {
-            if (ByNames.ContainsKey(name)) throw new Exception(string.Format("Column name {0} not found.", name));
-            if (ByNames[name].Index < 0 || ByNames[name].Index > ByIndices.Count) throw new Exception(string.Format("Invalid Column Index of {0}", name));
+            Debug.Assert(!ByNames.ContainsKey(name));
+            Debug.Assert(ByNames[name].Index < 0 || ByNames[name].Index > ByIndices.Count);
+
+            if (!ByNames.ContainsKey(name) ||
+                ByNames[name].Index < 0 || ByNames[name].Index > ByIndices.Count) return -1;
             return ByNames[name].Index;
         }
 
@@ -129,22 +168,31 @@ namespace DynamicDatabase
         /// Get the list of PKs
         /// </summary>
         /// <returns></returns>
-        public List<IColumnMetadata> GetPKs()
-        {
-            List<IColumnMetadata> pkList = new List<IColumnMetadata>();
+        public List<IColumnMetadata> GetPKs() => ByIndices.Where(p => p.IsPK).ToList();
 
-            foreach (var item in ByIndices)
-            {
-                if ((item.Constraint & EColumnConstraint.PRIMARYKEY) > 0)
-                    pkList.Add(item);
-            }
-
-            return pkList;
-        }
+        /// <summary>
+        /// Get the list of PKs
+        /// </summary>
+        /// <returns></returns>
+        public List<IColumnMetadata> GetUKs() => ByIndices.Where(p => p.IsUnique).ToList();
 
         #endregion Utility
 
         #region Insert
+
+        /// <summary>
+        /// Add header to the table
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="dynCol"></param>
+        protected void AddHeader(IColumnMetadata dynCol)
+        {
+            if (ByNames == null) ByNames = new Dictionary<string, IColumnMetadata>();
+            ByNames.Add(dynCol.ColumnName, dynCol);
+
+            if (ByIndices == null) ByIndices = new List<IColumnMetadata>();
+            ByIndices.Add(dynCol);
+        }
 
         /// <summary>
         /// Add header to the table
@@ -222,18 +270,9 @@ namespace DynamicDatabase
                     // TODO: dispose managed state (managed objects).
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
                 disposedValue = true;
             }
         }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~DynamicColumnHeaders() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
 
         // This code added to correctly implement the disposable pattern.
         public void Dispose()

@@ -92,6 +92,8 @@ namespace DynamicDatabase
             insorUpdtIntoTableQueryObj.GenerateAllColumns(dbTable);
             SetSQL(insorUpdtIntoTableQueryObj.SQLs);
 
+            ExecuteDDL();
+
             for (int row = 0; row < dbTable.Rows.ByIndices.Count; row++) dbTable.Rows[row].IsDirty = false;
         }
 

@@ -76,6 +76,14 @@ namespace DynamicDatabase.Interfaces
         #region Load
 
         /// <summary>
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        void LoadMetadataPartial(DbDataReader reader, Dictionary<string, ColumnLoadDataModel> columns);
+        
+        /// <summary>
         /// Load table metadata. This is the metadata query result
         /// </summary>
         /// <param name="reader"></param>
@@ -106,7 +114,7 @@ namespace DynamicDatabase.Interfaces
         /// Insert into the table. Data is indexed by column
         /// </summary>
         /// <param name="colIndexData"></param>
-        void AddOrUpdate(string[] colIndexData);
+        string AddOrUpdate(string[] colIndexData);
 
         /// <summary>
         /// Insert into the table.
@@ -131,7 +139,13 @@ namespace DynamicDatabase.Interfaces
         /// Get the list of Primary keys by name
         /// </summary>
         /// <returns></returns>
-        List<string> GetPKNames();
+        List<string> GetPKColumnNames();
+
+        /// <summary>
+        /// Get the list of Primary keys by name
+        /// </summary>
+        /// <returns></returns>
+        List<string> GetUKColumnNames();
 
         /// <summary>
         /// The table is saved in the database.

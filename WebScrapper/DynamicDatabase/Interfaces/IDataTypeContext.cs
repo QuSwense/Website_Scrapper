@@ -7,6 +7,13 @@ namespace DynamicDatabase.Interfaces
     public interface IDataTypeContext
     {
         /// <summary>
+        /// Get a new data type instance
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
+        DbDataType New(DbDataType dataType);
+
+        /// <summary>
         /// Get the sqlitre data tyupe from the <see cref="Type"/>
         /// </summary>
         /// <param name="type"></param>
@@ -47,13 +54,7 @@ namespace DynamicDatabase.Interfaces
         /// <param name="dataType"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        string GetValue(DbDataType dataType, object value);
-
-        /// <summary>
-        /// Get the value from the data
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        string GetValue(DbDataType data);
+        string GetValue(DbDataType dataType, Func<string, string> fnNormalizeData);
+        
     }
 }

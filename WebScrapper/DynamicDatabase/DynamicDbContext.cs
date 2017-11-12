@@ -8,6 +8,7 @@ using DynamicDatabase.Model;
 using DynamicDatabase.Types;
 using log4net;
 using WebCommon.Error;
+using System.Diagnostics;
 
 namespace DynamicDatabase
 {
@@ -240,24 +241,87 @@ namespace DynamicDatabase
         #region Load
 
         /// <summary>
-        /// Use this method to load data
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        public virtual void LoadPartial(string tableName,
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("The name of the table is empty");
+
+            // If the table is already loaded then throw exceptions
+            if (Tables.ContainsKey(tableName))
+                throw new DynamicDbException(DynamicDbException.EErrorType.TABLE_LOADED,
+                    new string[] { tableName });
+
+            LoadMetadataPartial(tableName, columns);
+            LoadDataPartial(tableName, columns);
+        }
+
+        /// <summary>
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        protected virtual void LoadMetadataPartial(string tableName,
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            IDbTable dynTable = DbFactory.CreateDbTable(this, tableName);
+
+            // Add new metadata or update metadata inforrmation from database
+            dynTable.LoadMetadataPartial(DbCommand.LoadTableMetadata(tableName), columns);
+            Tables.Add(tableName, dynTable);
+        }
+
+        /// <summary>
+        /// Load the table partially into memory.
+        /// The table must be loaded with a primary key or unique key
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columns"></param>
+        protected virtual void LoadDataPartial(string tableName,
+            Dictionary<string, ColumnLoadDataModel> columns)
+        {
+            Debug.Assert(!Tables.ContainsKey(tableName));
+
+            Tables[tableName].LoadData(DbCommand.LoadData(tableName));
+        }
+
+        /// <summary>
+        /// Use this method to load data and metdata or update data from database to memory
         /// Load the table data and metdata from the database
         /// </summary>
-        /// <param name="name"></param>
-        public virtual void Load(string name)
+        /// <param name="tablename"></param>
+        public virtual void Load(string tablename)
         {
-            LoadMetadata(name);
-            LoadData(name);
+            if (string.IsNullOrEmpty(tablename))
+                throw new ArgumentNullException("The name of the table is empty");
+
+            // If the table is already loaded then throw exceptions
+            if (Tables.ContainsKey(tablename))
+                throw new DynamicDbException(DynamicDbException.EErrorType.TABLE_LOADED,
+                    new string[] { tablename });
+
+            LoadMetadata(tablename);
+            LoadData(tablename);
         }        
         
         /// <summary>
         /// Load the metadata of the table.
         /// </summary>
         /// <param name="name">The name of the table</param>
-        public virtual void LoadMetadata(string tablename)
-            => Load(tablename, (dynTable) => {
-                dynTable.LoadTableMetadata(DbCommand.LoadTableMetadata(tablename));
-            });
+        protected void LoadMetadata(string tablename)
+        {
+            IDbTable dynTable = DbFactory.CreateDbTable(this, tablename);
+
+            // Add new metadata or update metadata inforrmation from database
+            dynTable.LoadTableMetadata(DbCommand.LoadTableMetadata(tablename));
+            Tables.Add(tablename, dynTable);
+        }
 
         /// <summary>
         /// Load the table data. This method is not public. We should always use <see cref="Load(string)"/>
@@ -265,35 +329,37 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="name"></param>
         protected void LoadData(string tablename)
-            => Load(tablename, (dynTable) => {
-                dynTable.LoadData(DbCommand.LoadData(tablename));
-            });
-        
-        /// <summary>
-        /// Load data / metadata from the database and store in memory
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="fnTableLoad"></param>
-        private void Load(string tablename, Action<IDbTable> fnTableLoad)
         {
-            if (string.IsNullOrEmpty(tablename)) throw new Exception("The name of the table is empty");
-            IDbTable dynTable = null;
+            Debug.Assert(!Tables.ContainsKey(tablename));
 
-            if (Tables.ContainsKey(tablename))
-                dynTable = Tables[tablename];
-            else
-                dynTable = DbFactory.Create<IDbTable>();
-            
-            fnTableLoad(dynTable);
-
-            Tables.Add(tablename, dynTable);
+            Tables[tablename].LoadData(DbCommand.LoadData(tablename));
         }
-
+        
         /// <summary>
         /// Clear the table data that is loaded in memory
         /// </summary>
         /// <param name="name"></param>
-        public void Clear(string tablename) => GetTable(tablename).Clear();
+        public void Clear(string tablename)
+        {
+            Debug.Assert(string.IsNullOrEmpty(tablename));
+            Debug.Assert(Tables == null || Tables.Count <= 0);
+            Debug.Assert(!Tables.ContainsKey(tablename));
+
+            if (!Tables.ContainsKey(tablename)) return;
+            
+            Tables[tablename].Clear();
+            Tables.Remove(tablename);
+        }
+
+        /// <summary>
+        /// Clear all the tables in memory
+        /// generally after a commit call clear
+        /// </summary>
+        public void Clear()
+        {
+            foreach (var dynTable in Tables) dynTable.Value.Clear();
+            Tables.Clear();
+        }
 
         #endregion Load
 
@@ -324,6 +390,24 @@ namespace DynamicDatabase
         }
 
         /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
+        public void CommitAndClear()
+        {
+            Commit();
+            Clear();
+        }
+
+        /// <summary>
+        /// Commit the chnages to the database
+        /// </summary>
+        public void CommitAndClear(string tableName)
+        {
+            Commit(tableName);
+            Clear();
+        }
+
+        /// <summary>
         /// Add or update tables definition data to the table metdata
         /// </summary>
         /// <param name="name">The table name</param>
@@ -339,10 +423,10 @@ namespace DynamicDatabase
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="colIndexData"></param>
-        public void AddOrUpdate(string tableName, string[] colIndexData)
+        public string AddOrUpdate(string tableName, string[] colIndexData)
         {
             FindAndLoadTable(tableName);
-            Tables[tableName].AddOrUpdate(colIndexData);
+            return Tables[tableName].AddOrUpdate(colIndexData);
         }
 
         /// <summary>

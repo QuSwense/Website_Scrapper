@@ -10,6 +10,20 @@ namespace DynamicDatabase.Types
     public class DataTypeContext : IDataTypeContext
     {
         /// <summary>
+        /// Get a new data type instance
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
+        public DbDataType New(DbDataType dataType)
+        {
+            if (dataType is DbCharDataType) return new DbCharDataType();
+            if (dataType is DbDateTimeDataType) return new DbDateTimeDataType();
+            if (dataType is DbDoubleDataType) return new DbDoubleDataType();
+            if (dataType is DbIntDataType) return new DbIntDataType();
+            return new DbCharDataType();
+        }
+
+        /// <summary>
         /// Get the sqlitre data tyupe from the <see cref="Type"/>
         /// </summary>
         /// <param name="type"></param>
@@ -88,66 +102,34 @@ namespace DynamicDatabase.Types
         }
 
         /// <summary>
-        /// Get the value from the data type
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public string GetValue(DbDataType dataType, object value)
-        {
-            if (value == null) return "NULL";
-            if (dataType is DbCharDataType || dataType is DbDateTimeDataType)
-            {
-                return string.Format("'{0}'", value.ToString());
-            }
-            else if (dataType is DbDateTimeDataType)
-            {
-                return string.Format("'{0}'", value.ToString());
-            }
-            else if (dataType is DbDoubleDataType)
-            {
-                DbDoubleDataType doubleDt = dataType as DbDoubleDataType;
-                string format = null;
-                if (doubleDt.CountAfterDecimal >= 0) format = "{0:N" + doubleDt.CountAfterDecimal + "}";
-                else format = "{0}";
-                return string.Format(format, value.ToString());
-            }
-            else if (dataType is DbIntDataType)
-            {
-                return value.ToString();
-            }
-            else throw new Exception("Unknwon database dta type");
-        }
-
-        /// <summary>
         /// Get the value from the data
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public string GetValue(DbDataType data)
+        public string GetValue(DbDataType data, Func<string, string> fnNormalizeData)
         {
             if (data == null) return "NULL";
+            string dataObj = data.Value.ToString();
+            dataObj = fnNormalizeData(dataObj);
             if (data is DbCharDataType || data is DbDateTimeDataType)
-            {
-                return string.Format("'{0}'", data.Value.ToString());
-            }
+                dataObj = string.Format("'{0}'", dataObj);
             else if (data is DbDateTimeDataType)
-            {
-                return string.Format("'{0}'", data.Value.ToString());
-            }
+                dataObj = string.Format("'{0}'", dataObj);
             else if (data is DbDoubleDataType)
             {
                 DbDoubleDataType doubleDt = data as DbDoubleDataType;
                 string format = null;
                 if (doubleDt.CountAfterDecimal >= 0) format = "{0:N" + doubleDt.CountAfterDecimal + "}";
                 else format = "{0}";
-                return string.Format(format, data.Value.ToString());
+                dataObj = string.Format(format, dataObj);
             }
             else if (data is DbIntDataType)
             {
-                return data.Value.ToString();
+                dataObj = data.Value.ToString();
             }
             else throw new Exception("Unknwon database dta type");
+
+            return dataObj;
         }
     }
 }
