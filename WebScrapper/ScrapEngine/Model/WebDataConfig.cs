@@ -11,6 +11,6 @@ namespace ScrapEngine.Model
         public string Name { get; set; }
 
         [XmlElement("Scrap")]
-        public WebDataConfigScrap[] Scraps { get; set; }
+        public WebDataConfigScrapHtmlTable[] Scraps { get; set; }
     }
 }

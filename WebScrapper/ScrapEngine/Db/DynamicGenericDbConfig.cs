@@ -1,12 +1,10 @@
-﻿using ScrapEngine.Interfaces;
-using ScrapEngine.Model;
-using System.Collections;
+﻿using System.Collections;
 using WebCommon.Error;
 using WebCommon.PathHelp;
 using WebReader.Csv;
 using System.Linq;
-using DynamicDatabase.Model;
-using DynamicDatabase.Interfaces;
+using SqliteDatabase.Model;
+using SqliteDatabase.Interfaces;
 
 namespace ScrapEngine.Db
 {
@@ -106,12 +104,12 @@ namespace ScrapEngine.Db
         public void Read()
         {
             AppGenericConfigPathHelper.I.DbScriptsTableMdt.AssertExists();
-            AppGenericConfigPathHelper.I.DbScriptsTableColumnMdt.AssertExists();
-            AppGenericConfigPathHelper.I.DbScriptsTableColumnRowsMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.AssertExists();
 
             TableMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableMdt.FullPath);
-            TableColumnMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableColumnMdt.FullPath);
-            TableColumnRowMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableColumnRowsMdt.FullPath);
+            TableColumnMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.FullPath);
+            TableColumnRowMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.FullPath);
 
             AssertConfig(TableMetadataConfigs);
             AssertConfig(TableColumnMetadataConfigs);

@@ -1,5 +1,0 @@
-﻿{0}_{1}mdt,rid,Unique Row Id,number,,,,1,
-{0}_{1}mdt,dsc,Description,string,1000,,,,
-{0}_{1}mdt,typ,Web Data Type,number,,,,,
-{0}_{1}mdt,url,Url,string,512,,,,
-{0}_{1}mdt,xpath,XPath,string,512,,,,

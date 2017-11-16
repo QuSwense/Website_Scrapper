@@ -1,8 +1,5 @@
 ﻿using HtmlAgilityPack;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 
 namespace ScrapEngine.Model
@@ -21,7 +18,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// An instance of the webdata config xml parsed xml node
         /// </summary>
-        public WebDataConfigScrap ConfigScrapObj { get; set; }
+        public WebDataConfigScrapHtmlTable ConfigScrapObj { get; set; }
 
         /// <summary>
         /// The html nodes while parsing the webpage using the config xml data
@@ -34,7 +31,7 @@ namespace ScrapEngine.Model
         /// <param name="configXmlNode"></param>
         /// <param name="configScrapObj"></param>
         /// <param name="HtmlNodes"></param>
-        public WebScrapStateModel(XmlNode configXmlNode, WebDataConfigScrap configScrapObj, List<HtmlNodeNavigator> htmlNodes)
+        public WebScrapStateModel(XmlNode configXmlNode, WebDataConfigScrapHtmlTable configScrapObj, List<HtmlNodeNavigator> htmlNodes)
         {
             ConfigXmlNode = configXmlNode;
             ConfigScrapObj = configScrapObj;

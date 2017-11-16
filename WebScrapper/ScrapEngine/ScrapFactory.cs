@@ -1,10 +1,6 @@
 ﻿using ScrapEngine.Bl;
 using ScrapEngine.Db;
 using ScrapEngine.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Unity;
 
 namespace ScrapEngine

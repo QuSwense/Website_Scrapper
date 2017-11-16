@@ -3,10 +3,10 @@ using log4net;
 using ScrapEngine.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Xml.XPath;
 using WebCommon.Error;
 
@@ -48,8 +48,10 @@ namespace ScrapEngine.Bl
         {
             HttpWebRequest httpWebRequestObj = (HttpWebRequest)webRequestObj;
             httpWebRequestObj.Method = "GET";
-            httpWebRequestObj.Proxy.Credentials = CredentialCache.DefaultCredentials;
+            httpWebRequestObj.Proxy.Credentials = CredentialCache.DefaultNetworkCredentials;
             httpWebRequestObj.AuthenticationLevel = System.Net.Security.AuthenticationLevel.None;
+            httpWebRequestObj.ImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.None;
+            httpWebRequestObj.KeepAlive = true;
         }
 
         /// <summary>
@@ -62,6 +64,12 @@ namespace ScrapEngine.Bl
         private T Load<T>(string url, Func<Stream, T> fManipulateWebStream)
             where T: class
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.ServerCertificateValidationCallback +=
+                (sender, cert, chain, error) =>
+                {
+                    return true;
+                };
             WebRequest webRequestObj = WebRequest.Create(url);
 
             if (IsOnlineWebPage(url)) HttpWebRequestSettings(webRequestObj);
@@ -108,9 +116,10 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public StreamReader ManipulateWebStreamForFile(Stream stream)
+        public string ManipulateWebStreamForFile(Stream stream)
         {
-            return new StreamReader(stream);
+            using (StreamReader reader = new StreamReader(stream))
+                return reader.ReadToEnd();
         }
 
         /// <summary>
@@ -126,7 +135,7 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public StreamReader LoadFile(string url)
+        public string LoadFile(string url)
             => Load(url, ManipulateWebStreamForFile);
 
         #endregion Load

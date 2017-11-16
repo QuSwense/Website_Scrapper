@@ -44,8 +44,8 @@
             GlobalAppConfig = new PathGeneric("AppConfig.xml", ScrapperApps, true);
             GlobalConfig = new PathGeneric("Config", ScrapperApps);
             GlobalDbScripts = new PathGeneric("DbScripts", GlobalConfig);
-            DbScriptsTableColumnMdt = new PathGeneric("table_column_mdt.csv", GlobalDbScripts, true);
-            DbScriptsTableColumnRowsMdt = new PathGeneric("table_column_rows_mdt.csv", GlobalDbScripts, true);
+            DbScriptsTableScrapMdt = new PathGeneric("table_scrap_mdt.csv", GlobalDbScripts, true);
+            DbScriptsColumnScrapMdt = new PathGeneric("col_scrap_mdt.csv", GlobalDbScripts, true);
             DbScriptsTableMdt = new PathGeneric("table_mdt.csv", GlobalDbScripts, true);
         }
 
@@ -85,12 +85,12 @@
         /// <summary>
         /// The name of table column metdata file
         /// </summary>
-        public PathGeneric DbScriptsTableColumnMdt { get; protected set; }
+        public PathGeneric DbScriptsTableScrapMdt { get; protected set; }
 
         /// <summary>
         /// The name of table column rows metdata file
         /// </summary>
-        public PathGeneric DbScriptsTableColumnRowsMdt { get; protected set; }
+        public PathGeneric DbScriptsColumnScrapMdt { get; protected set; }
 
         /// <summary>
         /// The name of table metdata file

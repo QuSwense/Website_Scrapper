@@ -11,7 +11,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// Points to the parent scrap node
         /// </summary>
-        public WebDataConfigScrap Parent { get; set; }
+        public WebDataConfigScrapHtmlTable Parent { get; set; }
 
         /// <summary>
         /// The name of the column
@@ -22,8 +22,8 @@ namespace ScrapEngine.Model
         /// <summary>
         /// Whether this column is the unique key for insertion or updation
         /// </summary>
-        [DXmlAttribute("ispk")]
-        public bool IsPk { get; set; }
+        [DXmlAttribute("isunique")]
+        public bool IsUnique { get; set; }
 
         /// <summary>
         /// The index element in case of csv

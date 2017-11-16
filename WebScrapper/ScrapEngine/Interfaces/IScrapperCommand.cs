@@ -1,9 +1,6 @@
 ﻿using HtmlAgilityPack;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace ScrapEngine.Interfaces
 {
@@ -26,7 +23,7 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        StreamReader LoadFile(string url);
+        string LoadFile(string url);
 
         #endregion Load
 

@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
-    /// <summary>
-    /// The root element of the scrap xml config
-    /// </summary>
-    public class WebDataConfigScrap
+    public abstract class WebDataConfigScrap
     {
         /// <summary>
         /// The list of child Scrap element
@@ -16,50 +17,36 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The name of the node
         /// </summary>
-        [DXmlAttribute("name", IsMandatory =true)]
+        [DXmlAttribute("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// The url
         /// </summary>
-        [DXmlAttribute("url", IsMandatory = true)]
+        [DXmlAttribute("url")]
         public string Url { get; set; }
-
-        /// <summary>
-        /// The database table name where the web scrapped data is inserted / stored
-        /// </summary>
-        [DXmlAttribute("dbtbl")]
-        public string DbTable { get; set; }
-
-        /// <summary>
-        /// The Xpath
-        /// </summary>
-        [DXmlAttribute("xpath", IsMandatory =true)]
-        public string XPath { get; set; }
 
         /// <summary>
         /// The type of the scrap node
         /// </summary>
-        [DXmlAttribute("type", IsMandatory =true)]
-        public EWebDataConfigType Type { get; set; }
+        [DXmlAttribute("doupdateonly")]
+        public bool DoUpdateOnly { get; set; }
 
         /// <summary>
         /// The list of column nodes
         /// </summary>
         public List<WebDataConfigColumn> Columns { get; set; }
-        
+
         /// <summary>
         /// The parent node
         /// </summary>
         public WebDataConfigScrap Parent { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public WebDataConfigScrap()
         {
             Scraps = new List<WebDataConfigScrap>();
             Columns = new List<WebDataConfigColumn>();
+            DoUpdateOnly = false;
         }
     }
 }

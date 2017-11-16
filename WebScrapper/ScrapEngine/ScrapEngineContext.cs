@@ -1,6 +1,4 @@
-﻿using ScrapEngine.Bl;
-using ScrapEngine.Db;
-using ScrapEngine.Interfaces;
+﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using WebCommon.PathHelp;
 using WebReader.Xml;

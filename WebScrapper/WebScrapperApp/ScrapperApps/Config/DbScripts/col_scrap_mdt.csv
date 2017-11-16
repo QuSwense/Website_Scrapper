@@ -1,0 +1,4 @@
+﻿colscrpmdt,colm,The column name of the table,string,30,,,1,,
+colscrpmdt,xpath,XPath of the column,string,512,,,,,
+colscrpmdt,indx,Index of the column for file type,number,,,,,,
+colscrpmdt,uid,Unique Id refer tblscrpmdt,number,,,,1,,

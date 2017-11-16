@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScrapper", "WebScrapper\WebScrapper.csproj", "{7F93B8FA-BA3B-40C5-B817-C17B950AA7AC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicDatabase", "DynamicDatabase\DynamicDatabase.csproj", "{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebReader", "WebReader\WebReader.csproj", "{03EEFDE2-750C-47FD-A425-2DD80DA57FA9}"
 EndProject
@@ -14,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScrapperApp", "WebScrapperApp\WebScrapperApp.csproj", "{945E7A3E-4FB6-4E3A-87D9-29386FD80105}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrapEngine", "ScrapEngine\ScrapEngine.csproj", "{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqliteDatabase", "SqliteDatabase\SqliteDatabase.csproj", "{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +31,6 @@ Global
 		{7F93B8FA-BA3B-40C5-B817-C17B950AA7AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F93B8FA-BA3B-40C5-B817-C17B950AA7AC}.Release|x86.ActiveCfg = Release|x86
 		{7F93B8FA-BA3B-40C5-B817-C17B950AA7AC}.Release|x86.Build.0 = Release|x86
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Debug|x86.Build.0 = Debug|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Release|x86.ActiveCfg = Release|Any CPU
-		{A1B2EBAF-5797-4819-802F-4B4B20DEFABE}.Release|x86.Build.0 = Release|Any CPU
 		{03EEFDE2-750C-47FD-A425-2DD80DA57FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03EEFDE2-750C-47FD-A425-2DD80DA57FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03EEFDE2-750C-47FD-A425-2DD80DA57FA9}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -71,6 +63,14 @@ Global
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|x86.Build.0 = Release|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.Build.0 = Debug|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|x86.ActiveCfg = Release|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

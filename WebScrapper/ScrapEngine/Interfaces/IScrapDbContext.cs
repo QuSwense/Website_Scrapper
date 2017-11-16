@@ -1,7 +1,7 @@
-﻿using DynamicDatabase.Interfaces;
-using DynamicDatabase.Model;
-using ScrapEngine.Db;
+﻿using ScrapEngine.Db;
 using ScrapEngine.Model;
+using SqliteDatabase;
+using SqliteDatabase.Model;
 using System.Collections.Generic;
 
 namespace ScrapEngine.Interfaces
@@ -26,7 +26,7 @@ namespace ScrapEngine.Interfaces
         /// <summary>
         /// The configuration for web scrapping
         /// </summary>
-        IDbContext WebScrapDb { get; }
+        DatabaseContext WebScrapDb { get; }
 
         #endregion Properties
 
@@ -44,12 +44,12 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        void AddOrUpdate(string tableName, List<TableDataColumnModel> row, EWebDataConfigType scrapType);
+        void AddOrUpdate(WebDataConfigScrapHtmlTable scrapConfig, List<DynamicTableDataInsertModel> row);
 
         /// <summary>
         /// Load partial
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        void LoadPartial(WebDataConfigScrap webScrapConfigObj);
+        void AddMetadata(WebDataConfigScrap webScrapConfigObj);
     }
 }

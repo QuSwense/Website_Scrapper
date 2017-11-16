@@ -1,12 +1,8 @@
-﻿using DynamicDatabase;
-using DynamicDatabase.Config;
-using DynamicDatabase.Interfaces;
-using DynamicDatabase.Model;
-using ScrapEngine.Interfaces;
-using System.Linq;
-using System;
+﻿using ScrapEngine.Interfaces;
 using System.Collections.Generic;
 using ScrapEngine.Model;
+using SqliteDatabase;
+using SqliteDatabase.Model;
 
 namespace ScrapEngine.Db
 {
@@ -30,7 +26,7 @@ namespace ScrapEngine.Db
         /// <summary>
         /// The configuration for web scrapping
         /// </summary>
-        public IDbContext WebScrapDb { get; protected set; }
+        public DatabaseContext WebScrapDb { get; protected set; }
 
         #endregion Properties
 
@@ -61,14 +57,10 @@ namespace ScrapEngine.Db
         /// </summary>
         private void InitializeDbContext()
         {
-            WebScrapDb = new DynamicDbContext();
-
-            ArgsContextInitialize dbContextArgs = new ArgsContextInitialize();
-            dbContextArgs.DbFilePath = ParentEngine.AppTopicPath.AppTopicMain.FullPath;
-            dbContextArgs.Name = ParentEngine.AppTopicPath.AppTopic;
-            dbContextArgs.DbType = ParentEngine.AppConfig.Db();
-
-            WebScrapDb.Initialize(dbContextArgs);
+            WebScrapDb = new DatabaseContext();
+            
+            WebScrapDb.Initialize(ParentEngine.AppTopicPath.AppTopicMain.FullPath,
+                ParentEngine.AppTopicPath.AppTopic);
 
             if (ParentEngine.AppConfig.DoCreateDb())
                 WebScrapDb.CreateDatabase();
@@ -90,83 +82,13 @@ namespace ScrapEngine.Db
 
             try
             {
-                // Create metadata table
-                CreateTableMetadata();
-
-                // Create each table column metadata
-                CreateTableColumnMetadata();
-
-                // Create each table column rows metadata
-                CreateTableColumnRowsMetadata();
+                WebScrapDb.CreateMetadata();
+                WebScrapDb.AddTableMetadata(MetaDbConfig.TableMetadatas);
+                WebScrapDb.Create(MetaDbConfig.TableColumnConfigs);
             }
             finally
             {
-                // Commit all the data in one go
-                WebScrapDb.Commit();
-                WebScrapDb.Clear();
                 WebScrapDb.Close();
-            }
-        }
-
-        /// <summary>
-        /// Create table which contains metadata information about all tables
-        /// </summary>
-        private void CreateTableMetadata()
-        {
-            // Call the dynamic database context to create the table
-            WebScrapDb.CreateTable(DynamicGenericDbConfig.I.TableMetadataConfigs);
-
-            // Add data
-            WebScrapDb.AddOrUpdate(DynamicGenericDbConfig.I.MetadataTableName,
-                MetaDbConfig.TableMetadatas);
-
-            // Create all the data specific tables
-            WebScrapDb.CreateTable(MetaDbConfig.TableColumnConfigs);
-        }
-
-        /// <summary>
-        /// Create and update table column metadata
-        /// </summary>
-        private void CreateTableColumnMetadata()
-        {
-            // Create tables
-            foreach (var item in MetaDbConfig.TableColumnConfigs)
-            {
-                string tableName = string.Format(
-                    DynamicGenericDbConfig.I.ColumnMetadataTableName, item.Key);
-
-                WebScrapDb.CreateTable(tableName,
-                    DynamicGenericDbConfig.I.TableColumnMetadataConfigs.Values.First());
-            }
-
-            // Add column data that is available
-            foreach (var item in MetaDbConfig.TableColumnConfigs)
-            {
-                string tableName = string.Format(
-                    DynamicGenericDbConfig.I.ColumnMetadataTableName, item.Key);
-
-                foreach (var coldata in item.Value)
-                {
-                    WebScrapDb.AddOrUpdate(tableName, new string[] { coldata.Key, coldata.Value.Display });
-                }
-            }
-        }
-
-        /// <summary>
-        /// Create table rows metadata
-        /// </summary>
-        private void CreateTableColumnRowsMetadata()
-        {
-            foreach (var tableconfig in MetaDbConfig.TableColumnConfigs)
-            {
-                foreach (var tablecolconfig in tableconfig.Value)
-                {
-                    string tableName = string.Format(
-                        DynamicGenericDbConfig.I.RowMetadataTableName,
-                        tableconfig.Key, tablecolconfig.Key);
-
-                    WebScrapDb.CreateTable(tableName, DynamicGenericDbConfig.I.TableColumnRowMetadataConfigs.Values.First());
-                }
             }
         }
 
@@ -175,44 +97,75 @@ namespace ScrapEngine.Db
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        public void AddOrUpdate(string tableName, List<TableDataColumnModel> row, EWebDataConfigType scrapType)
+        public void AddOrUpdate(WebDataConfigScrapHtmlTable scrapConfig, List<DynamicTableDataInsertModel> row)
         {
             // Add data
-            string pk = WebScrapDb.AddOrUpdate(tableName, row.Select(p => p.Name).ToArray());   
-
-            foreach (var colDataKv in row)
-            {
-                string rowMetadatatableName = string.Format(
-                    DynamicGenericDbConfig.I.RowMetadataTableName, tableName, colDataKv.Name);
-                // Add metadata
-                WebScrapDb.AddOrUpdate(rowMetadatatableName, new string[] { pk, null, scrapType.ToString(), colDataKv.Url, colDataKv.XPath });
-            }
+            WebScrapDb.AddOrUpdate(scrapConfig.Name, row, scrapConfig.DoUpdateOnly);
         }
 
         /// <summary>
         /// LOad table with partial columns
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        public void LoadPartial(WebDataConfigScrap webScrapConfigObj)
+        public void AddMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj)
         {
-            var columns = new Dictionary<string, ColumnLoadDataModel>();
+            int uid = AddTableScrapMetadata(webScrapConfigObj);
+            AddColumnScrapMetadata(webScrapConfigObj, uid);
+        }
 
-            foreach (var colObj in webScrapConfigObj.Columns)
+        private void AddColumnScrapMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj, int uid)
+        {
+            List<ColumnScrapMetadataModel> colScrapMdtModels = new List<ColumnScrapMetadataModel>();
+
+            foreach(var colConfig in webScrapConfigObj.Columns)
             {
-                ColumnLoadDataModel loadModelObj = new ColumnLoadDataModel();
-                loadModelObj.Name = colObj.Name;
-                loadModelObj.IsUnique = colObj.IsPk;
-                columns.Add(colObj.Name, loadModelObj);
+                ColumnScrapMetadataModel colScrapMdtModel = new ColumnScrapMetadataModel();
+                colScrapMdtModel.ColumnName = colConfig.Name;
+                if(!string.IsNullOrEmpty(webScrapConfigObj.Name) &&
+                    !string.IsNullOrEmpty(colConfig.Name))
+                    colScrapMdtModel.DisplayName = MetaDbConfig.TableColumnConfigs[webScrapConfigObj.Name][colConfig.Name].Display;
+                colScrapMdtModel.Index = colConfig.Index;
+                colScrapMdtModel.Uid = uid;
+                colScrapMdtModel.XPath = colConfig.XPath;
+                colScrapMdtModels.Add(colScrapMdtModel);
             }
 
-            string tableName = "";
-            while(string.IsNullOrEmpty(webScrapConfigObj.Name))
+            WebScrapDb.Add(colScrapMdtModels);
+        }
+
+        private int AddTableScrapMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj)
+        {
+            TableScrapMetadataModel tblScrapMdtModel = new TableScrapMetadataModel();
+
+            // Add table metdata scrap info
+            List<string> Urls = new List<string>();
+            List<string> XPaths = new List<string>();
+            string name = "";
+
+            // Get to the topmost Scrap node
+            WebDataConfigScrapHtmlTable mainWebScrap = webScrapConfigObj;
+            while (mainWebScrap != null)
             {
-                webScrapConfigObj = webScrapConfigObj.Parent;
+                Urls.Add(mainWebScrap.Url);
+                XPaths.Add(mainWebScrap.XPath);
+                if (!string.IsNullOrEmpty(mainWebScrap.Name)) name = mainWebScrap.Name;
+                mainWebScrap = mainWebScrap.Parent;
             }
 
-            tableName = webScrapConfigObj.Name;
-            WebScrapDb.LoadPartial(tableName, columns);
+            Urls.Reverse();
+            XPaths.Reverse();
+
+            tblScrapMdtModel.Name = name;
+            if (Urls.Count > 0) tblScrapMdtModel.Url1 = Urls[0];
+            if (Urls.Count > 1) tblScrapMdtModel.Url2 = Urls[1];
+            if (Urls.Count > 2) tblScrapMdtModel.Url3 = Urls[2];
+            if (Urls.Count > 3) tblScrapMdtModel.Url4 = Urls[3];
+            if (XPaths.Count > 0) tblScrapMdtModel.XPath1 = XPaths[0];
+            if (XPaths.Count > 1) tblScrapMdtModel.XPath2 = XPaths[1];
+            if (XPaths.Count > 2) tblScrapMdtModel.XPath3 = XPaths[2];
+            if (XPaths.Count > 3) tblScrapMdtModel.XPath4 = XPaths[3];
+
+            return WebScrapDb.Add(tblScrapMdtModel);
         }
 
         #endregion Create
