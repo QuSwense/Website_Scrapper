@@ -44,7 +44,7 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        void AddOrUpdate(WebDataConfigScrapHtmlTable scrapConfig, List<DynamicTableDataInsertModel> row);
+        void AddOrUpdate(WebDataConfigScrap scrapConfig, List<DynamicTableDataInsertModel> row);
 
         /// <summary>
         /// Load partial

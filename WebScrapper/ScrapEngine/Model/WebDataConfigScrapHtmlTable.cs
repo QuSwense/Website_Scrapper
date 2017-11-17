@@ -9,6 +9,11 @@ namespace ScrapEngine.Model
     public class WebDataConfigScrapHtmlTable : WebDataConfigScrap
     {
         /// <summary>
+        /// The name of the Element tag
+        /// </summary>
+        public static string TagName = "ScrapHtmlTable";
+
+        /// <summary>
         /// The Xpath
         /// </summary>
         [DXmlAttribute("xpath")]

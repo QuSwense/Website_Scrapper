@@ -2,4 +2,5 @@
 <AppConfig>
   <Key name="db" value="sqlite" />
   <Key name="dodbcreate" value="false" />
+  <Key name="ScrapMaxLevel" value="4" />
 </AppConfig>

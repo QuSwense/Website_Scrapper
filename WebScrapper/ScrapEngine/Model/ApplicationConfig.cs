@@ -46,6 +46,17 @@ namespace ScrapEngine.Model
         public bool DoCreateDb() => Convert.ToBoolean(Key("dodbcreate"));
 
         /// <summary>
+        /// Maximum Scrap level
+        /// </summary>
+        /// <returns></returns>
+        public int ScrapMaxLevel()
+        {
+            string keyValue = Key("ScrapMaxLevel");
+            if (string.IsNullOrEmpty(keyValue)) return 0;
+            else return Convert.ToInt32(keyValue);
+        }
+
+        /// <summary>
         /// Method to clone this object and return a new object
         /// </summary>
         /// <returns></returns>

@@ -10,6 +10,11 @@ namespace ScrapEngine.Model
     public class WebDataConfigScrapCsv : WebDataConfigScrap
     {
         /// <summary>
+        /// The name of the Element tag
+        /// </summary>
+        public static string TagName = "ScrapCsv";
+
+        /// <summary>
         /// The Xpath
         /// </summary>
         [DXmlAttribute("delimiter")]

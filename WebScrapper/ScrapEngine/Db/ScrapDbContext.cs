@@ -97,7 +97,7 @@ namespace ScrapEngine.Db
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        public void AddOrUpdate(WebDataConfigScrapHtmlTable scrapConfig, List<DynamicTableDataInsertModel> row)
+        public void AddOrUpdate(WebDataConfigScrap scrapConfig, List<DynamicTableDataInsertModel> row)
         {
             // Add data
             WebScrapDb.AddOrUpdate(scrapConfig.Name, row, scrapConfig.DoUpdateOnly);
@@ -107,13 +107,13 @@ namespace ScrapEngine.Db
         /// LOad table with partial columns
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        public void AddMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj)
+        public void AddMetadata(WebDataConfigScrap webScrapConfigObj)
         {
             int uid = AddTableScrapMetadata(webScrapConfigObj);
             AddColumnScrapMetadata(webScrapConfigObj, uid);
         }
 
-        private void AddColumnScrapMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj, int uid)
+        private void AddColumnScrapMetadata(WebDataConfigScrap webScrapConfigObj, int uid)
         {
             List<ColumnScrapMetadataModel> colScrapMdtModels = new List<ColumnScrapMetadataModel>();
 
@@ -133,7 +133,7 @@ namespace ScrapEngine.Db
             WebScrapDb.Add(colScrapMdtModels);
         }
 
-        private int AddTableScrapMetadata(WebDataConfigScrapHtmlTable webScrapConfigObj)
+        private int AddTableScrapMetadata(WebDataConfigScrap webScrapConfigObj)
         {
             TableScrapMetadataModel tblScrapMdtModel = new TableScrapMetadataModel();
 
@@ -143,7 +143,7 @@ namespace ScrapEngine.Db
             string name = "";
 
             // Get to the topmost Scrap node
-            WebDataConfigScrapHtmlTable mainWebScrap = webScrapConfigObj;
+            WebDataConfigScrap mainWebScrap = webScrapConfigObj;
             while (mainWebScrap != null)
             {
                 Urls.Add(mainWebScrap.Url);

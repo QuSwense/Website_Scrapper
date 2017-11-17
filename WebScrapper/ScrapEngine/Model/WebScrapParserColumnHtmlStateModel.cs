@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScrapEngine.Model
 {
-    public class WebScrapParserColumnStateModel
+    public class WebScrapParserColumnHtmlStateModel
     {
         public int NodeIndex { get; set; }
         public WebScrapParserStateModel ScrapState { get; set; }

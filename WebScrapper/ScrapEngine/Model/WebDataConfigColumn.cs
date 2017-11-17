@@ -11,7 +11,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// Points to the parent scrap node
         /// </summary>
-        public WebDataConfigScrapHtmlTable Parent { get; set; }
+        public WebDataConfigScrap Parent { get; set; }
 
         /// <summary>
         /// The name of the column
@@ -41,12 +41,7 @@ namespace ScrapEngine.Model
         /// The manipulate tag
         /// </summary>
         public List<WebDataConfigManipulate> Manipulations { get; set; }
-
-        /// <summary>
-        /// Saves the current state of the column node while scrapping the piece of data from webpage
-        /// </summary>
-        public WebPageHtmlState State { get; set; }
-
+        
         /// <summary>
         /// Constructor
         /// </summary>

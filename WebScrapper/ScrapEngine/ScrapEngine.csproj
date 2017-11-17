@@ -81,10 +81,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bl\AppTopicConfigParser.cs" />
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
     <Compile Include="Bl\ScrapColumnConfigParser.cs" />
     <Compile Include="Bl\ScrapConfigParser.cs" />
+    <Compile Include="Bl\ScrapCsvConfigParser.cs" />
     <Compile Include="Bl\ScrapHtmlTableConfigParser.cs" />
+    <Compile Include="Bl\ScrapManipulateConfigParser.cs" />
     <Compile Include="Bl\WebScrapConfigParser.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />
     <Compile Include="Db\DynamicAppDbConfig.cs" />
@@ -112,8 +115,8 @@
     <Compile Include="Model\WebDataConfigScrapHtmlTable.cs" />
     <Compile Include="Model\WebDataConfigSplit.cs" />
     <Compile Include="Model\WebDataConfigTrim.cs" />
-    <Compile Include="Model\WebPageHtmlState.cs" />
-    <Compile Include="Model\WebScrapParserColumnStateModel.cs" />
+    <Compile Include="Model\WebScrapParserColumnCsvStateModel.cs" />
+    <Compile Include="Model\WebScrapParserColumnHtmlStateModel.cs" />
     <Compile Include="Model\WebScrapParserStateModel.cs" />
     <Compile Include="Model\WebScrapStateModel.cs" />
     <Compile Include="ScrapEngineContext.cs" />
