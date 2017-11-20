@@ -18,6 +18,8 @@ namespace WebReader.Csv
     /// </summary>
     public class CSVReader : DynamicReader
     {
+        protected Regex regex = new Regex("(?<=^|,)(\"(?:[^\"]|\"\")*\"|[^,]*)");
+
         /// <summary>
         /// Constructor default
         /// </summary>
@@ -38,11 +40,8 @@ namespace WebReader.Csv
             int keyIndx = 0;
             List<string> splits = new List<string>();
 
-            var regex = new Regex("(?<=^|,)(\"(?:[^\"]|\"\")*\"|[^,]*)");
             foreach (Match m in regex.Matches(line))
-            {
                 splits.Add(m.Value);
-            }
 
             SetValues(Store, splits, keyIndx);
         }
@@ -57,13 +56,9 @@ namespace WebReader.Csv
         {
             // If the current object is Dictionary
             if (store is IDictionary)
-            {
                 SetValueToDictionary(store as IDictionary, splits, keyIndx);
-            }
             else
-            {
                 SetValueToClass(store, splits, keyIndx);
-            }
         }
 
         /// <summary>
@@ -79,14 +74,10 @@ namespace WebReader.Csv
             {
                 SplitIndexAttribute splitIndex = propOfObjValue.GetCustomAttribute<SplitIndexAttribute>();
                 if (propOfObjValue.PropertyType == typeof(IDictionary))
-                {
                     SetValues(propOfObjValue.PropertyType, splits, splitIndex.Index);
-                }
                 else
-                {
                     propOfObjValue.SetValue(objStore,
                         propOfObjValue.PropertyType.ChangeType(splits[splitIndex.Index]));
-                }
             }
         }
 
@@ -149,7 +140,7 @@ namespace WebReader.Csv
         public static T Read<T>(string path) where T: new()
         {
             T fileObj = new T();
-            using (CSVReader reader = new CSVReader(path, fileObj)) reader.Read();
+            new CSVReader(path, fileObj).Read();
             return fileObj;
         }
     }

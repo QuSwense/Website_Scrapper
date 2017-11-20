@@ -6,7 +6,7 @@ namespace ScrapEngine.Model
     /// <summary>
     /// The root element of the scrap xml config
     /// </summary>
-    public class WebDataConfigScrapHtmlTable : WebDataConfigScrap
+    public class ScrapHtmlTableElement : ScrapElement
     {
         /// <summary>
         /// The name of the Element tag
@@ -22,8 +22,6 @@ namespace ScrapEngine.Model
         /// <summary>
         /// Constructor
         /// </summary>
-        public WebDataConfigScrapHtmlTable()
-        {
-        }
+        public ScrapHtmlTableElement() { }
     }
 }

@@ -97,7 +97,7 @@ namespace ScrapEngine.Db
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        public void AddOrUpdate(WebDataConfigScrap scrapConfig, List<DynamicTableDataInsertModel> row)
+        public void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row)
         {
             // Add data
             WebScrapDb.AddOrUpdate(scrapConfig.Name, row, scrapConfig.DoUpdateOnly);
@@ -107,13 +107,13 @@ namespace ScrapEngine.Db
         /// LOad table with partial columns
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        public void AddMetadata(WebDataConfigScrap webScrapConfigObj)
+        public void AddMetadata(ScrapElement webScrapConfigObj)
         {
             int uid = AddTableScrapMetadata(webScrapConfigObj);
             AddColumnScrapMetadata(webScrapConfigObj, uid);
         }
 
-        private void AddColumnScrapMetadata(WebDataConfigScrap webScrapConfigObj, int uid)
+        private void AddColumnScrapMetadata(ScrapElement webScrapConfigObj, int uid)
         {
             List<ColumnScrapMetadataModel> colScrapMdtModels = new List<ColumnScrapMetadataModel>();
 
@@ -133,7 +133,7 @@ namespace ScrapEngine.Db
             WebScrapDb.Add(colScrapMdtModels);
         }
 
-        private int AddTableScrapMetadata(WebDataConfigScrap webScrapConfigObj)
+        private int AddTableScrapMetadata(ScrapElement webScrapConfigObj)
         {
             TableScrapMetadataModel tblScrapMdtModel = new TableScrapMetadataModel();
 
@@ -143,11 +143,13 @@ namespace ScrapEngine.Db
             string name = "";
 
             // Get to the topmost Scrap node
-            WebDataConfigScrap mainWebScrap = webScrapConfigObj;
+            ScrapElement mainWebScrap = webScrapConfigObj;
             while (mainWebScrap != null)
             {
                 Urls.Add(mainWebScrap.Url);
-                XPaths.Add(mainWebScrap.XPath);
+
+                if(mainWebScrap is ScrapHtmlTableElement)
+                    XPaths.Add(((ScrapHtmlTableElement)mainWebScrap).XPath);
                 if (!string.IsNullOrEmpty(mainWebScrap.Name)) name = mainWebScrap.Name;
                 mainWebScrap = mainWebScrap.Parent;
             }

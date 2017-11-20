@@ -112,7 +112,7 @@ namespace ScrapEngine
         }
 
         /// <summary>
-        /// Execute
+        /// Execute the main method for generating App Topic specific data
         /// </summary>
         public void Run()
         {

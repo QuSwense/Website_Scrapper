@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScrapper", "WebScrapper\WebScrapper.csproj", "{7F93B8FA-BA3B-40C5-B817-C17B950AA7AC}"
 EndProject
@@ -49,8 +49,8 @@ Global
 		{59422652-B685-4205-B494-B7A40E66220B}.Release|x86.Build.0 = Release|Any CPU
 		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|x86.Build.0 = Debug|Any CPU
+		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|x86.ActiveCfg = Debug|x86
+		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Debug|x86.Build.0 = Debug|x86
 		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Release|Any CPU.Build.0 = Release|Any CPU
 		{945E7A3E-4FB6-4E3A-87D9-29386FD80105}.Release|x86.ActiveCfg = Release|Any CPU
@@ -65,8 +65,8 @@ Global
 		{2D25C05D-63D5-4644-8A7B-DAA9D73744D4}.Release|x86.Build.0 = Release|Any CPU
 		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.Build.0 = Debug|Any CPU
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.ActiveCfg = Debug|x86
+		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Debug|x86.Build.0 = Debug|x86
 		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7342FDA2-9D9E-45B7-9986-D61A6CF92C22}.Release|x86.ActiveCfg = Release|Any CPU

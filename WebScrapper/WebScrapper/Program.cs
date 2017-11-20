@@ -12,7 +12,7 @@ namespace WebScrapper
     {
         /// <summary>
         /// Pass argument for generating application data
-        /// 1: The name of the application, or "*" for all
+        /// 1: The name of the application topic, or "*" for all
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args)

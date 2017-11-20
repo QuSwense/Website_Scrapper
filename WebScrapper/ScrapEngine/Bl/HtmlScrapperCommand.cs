@@ -14,6 +14,8 @@ namespace ScrapEngine.Bl
 {
     /// <summary>
     /// The class which helps in Website queries / commands like loading, querying xpath
+    /// When using .NET 4.0 version of <see cref="System.Net"/> library, there was an issue of 
+    /// downloading text file from an Url directly. Hence the Project was changed to use .NET 4.5.
     /// </summary>
     public class HtmlScrapperCommand : IScrapperCommand
     {

@@ -8,7 +8,7 @@ namespace WebReader.Xml
     /// <summary>
     /// A Xml file serialization reader
     /// </summary>
-    public class DXmlSerializeReader : IDisposable
+    public class DXmlSerializeReader
     {
         /// <summary>
         /// The private logger
@@ -23,6 +23,8 @@ namespace WebReader.Xml
         /// <returns></returns>
         public T Read<T>(string fileName)
         {
+            logger.DebugFormat("Try to parse and read the xml file {0} into {1} object", fileName, typeof(T));
+
             XmlSerializer configXmlSerializer = new XmlSerializer(typeof(T));
             using (XmlReader reader = XmlReader.Create(fileName))
             {
@@ -87,44 +89,6 @@ namespace WebReader.Xml
         /// <param name="fullFilePath"></param>
         /// <returns></returns>
         public static T Load<T>(string fullFilePath)
-        {
-            using (DXmlSerializeReader dXmlSerializeReader = new DXmlSerializeReader())
-                return dXmlSerializeReader.Read<T>(fullFilePath);
-        }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~DXmlReader() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
+            => new DXmlSerializeReader().Read<T>(fullFilePath);
     }
 }

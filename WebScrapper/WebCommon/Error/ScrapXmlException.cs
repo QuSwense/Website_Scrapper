@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace WebCommon.Error
 {
-    public class ScrapParserException : Exception
+    public class ScrapXmlException : Exception
     {
         /// <summary>
         /// The type of path error
         /// </summary>
         public enum EErrorType
         {
-            SCRAP_LEVEL_INVALID,
-            SCRAP_NAME_MULTIPLE,
-            SCRAP_NAME_EMPTY,
-            UNKNOWN_MANIPULATE_CHILD_TYPE
+            INVALID_MANIPULATE_CHILD_ITEM
         }
 
         /// <summary>
@@ -30,14 +29,14 @@ namespace WebCommon.Error
         /// <summary>
         /// Default
         /// </summary>
-        public ScrapParserException() : base() { }
+        public ScrapXmlException() : base() { }
 
         /// <summary>
         /// Constructor with path value
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public ScrapParserException(EErrorType type) : base(Initialize(null, type))
+        public ScrapXmlException(EErrorType type) : base(Initialize(null, type))
         {
             ErrorType = type;
         }
@@ -47,7 +46,7 @@ namespace WebCommon.Error
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public ScrapParserException(EErrorType type, params string[] dataList) 
+        public ScrapXmlException(EErrorType type, params string[] dataList) 
             : base(Initialize(dataList.ToList(), type))
         {
             DataList = dataList.ToList();
@@ -61,14 +60,8 @@ namespace WebCommon.Error
         {
             switch (type)
             {
-                case EErrorType.SCRAP_LEVEL_INVALID:
-                    return string.Format("The level {0} of Scrap tag is invalid", dataList[0]);
-                case EErrorType.SCRAP_NAME_MULTIPLE:
-                    return string.Format("The Scrap child tags may contain multiple name attribute which is not allowed");
-                case EErrorType.SCRAP_NAME_EMPTY:
-                    return string.Format("The Scrap name attribute cannot be empty. It must be present at in one of the childs");
-                case EErrorType.UNKNOWN_MANIPULATE_CHILD_TYPE:
-                    return string.Format("Unknown manipulate child element {0}", dataList[0]);
+                case EErrorType.INVALID_MANIPULATE_CHILD_ITEM:
+                    return string.Format("The element tag {0} is invalid Manipulate child item tag", dataList[0]);
                 default:
                     return "Unknwon Web Scrap Parser error";
             }

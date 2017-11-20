@@ -4,6 +4,7 @@ using System.Xml;
 using WebReader.Model;
 using WebCommon.Extn;
 using WebCommon.Error;
+using log4net;
 
 namespace WebReader.Xml
 {
@@ -13,6 +14,11 @@ namespace WebReader.Xml
     public class DXmlDocReader
     {
         #region Properties
+
+        /// <summary>
+        /// The private logger
+        /// </summary>
+        private ILog logger = LogManager.GetLogger(typeof(DXmlSerializeReader));
 
         /// <summary>
         /// The file path
@@ -38,6 +44,8 @@ namespace WebReader.Xml
         /// </summary>
         public void Initialize(string filePath)
         {
+            logger.DebugFormat("Initialize an instance of DXmlDocReader with file path '{0}'", filePath);
+
             FilePath = filePath;
             xmlDocument = new XmlDocument();
             xmlDocument.Load(filePath);
@@ -65,6 +73,8 @@ namespace WebReader.Xml
         /// <param name="xpath"></param>
         public XmlNodeList ReadNodes(string xpath, XmlNode currentElement = null)
         {
+            logger.DebugFormat("Read the next set of nodes using XPath '{0}'", xpath);
+
             if (currentElement == null)
                 return xmlDocument.DocumentElement.SelectNodes(xpath);
             return currentElement.SelectNodes(xpath);
@@ -77,6 +87,9 @@ namespace WebReader.Xml
         /// <returns></returns>
         public T ReadElement<T>(XmlNode currentElement) where T: new()
         {
+            logger.DebugFormat("Read the current Xml node element tag <{0}> and its attributes into type '{1}'",
+                currentElement.LocalName, typeof(T));
+
             T obj = new T();
             Type objType = typeof(T);
 

@@ -7,6 +7,6 @@ namespace ScrapEngine.Model
     public class WebDataConfigMetadata
     {
         [XmlElement("Split")]
-        public WebDataConfigSplit[] Splits { get; set; }
+        public SplitElement[] Splits { get; set; }
     }
 }

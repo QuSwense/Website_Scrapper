@@ -8,15 +8,12 @@ namespace ScrapEngine.Bl
     /// </summary>
     public class WebScrapHtmlContext : IScrapHtmlContext
     {
+        #region Properties
+
         /// <summary>
         /// Reference to the Scrapper Engine context class
         /// </summary>
         public IScrapEngineContext EngineContext { get; protected set; }
-
-        /// <summary>
-        /// The web data rules configuration
-        /// </summary>
-        public WebDataConfig ScrapperRulesConfig { get; protected set; }
 
         /// <summary>
         /// The Html helper command class
@@ -27,6 +24,28 @@ namespace ScrapEngine.Bl
         /// The main parser
         /// </summary>
         private WebScrapConfigParser WebScrapParser;
+
+        #endregion Properties
+
+        #region Properties Helper
+
+        /// <summary>
+        /// The main web database conetxt for website scrapping
+        /// </summary>
+        public IScrapDbContext WebDbContext
+        {
+            get { return EngineContext.WebDbContext; }
+        }
+
+        /// <summary>
+        /// The core database context
+        /// </summary>
+        public SqliteDatabase.DatabaseContext WebScrapDb
+        {
+            get { return WebDbContext.WebScrapDb; }
+        }
+
+        #endregion Properties Helper
 
         /// <summary>
         /// Constructor
@@ -52,7 +71,7 @@ namespace ScrapEngine.Bl
         /// </summary>
         public void Run()
         {
-            EngineContext.WebDbContext.WebScrapDb.Open();
+            WebScrapDb.Open();
 
             try
             {
@@ -61,7 +80,7 @@ namespace ScrapEngine.Bl
             }
             finally
             {
-                EngineContext.WebDbContext.WebScrapDb.Close();
+                WebScrapDb.Close();
             }
         }
     }

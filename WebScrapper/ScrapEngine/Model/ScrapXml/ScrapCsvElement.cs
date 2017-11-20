@@ -7,7 +7,7 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
-    public class WebDataConfigScrapCsv : WebDataConfigScrap
+    public class WebDataConfigScrapCsv : ScrapElement
     {
         /// <summary>
         /// The name of the Element tag

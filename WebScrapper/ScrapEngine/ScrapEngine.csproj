@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonServiceLocator, Version=2.0.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.5.2.1\lib\net40\CommonServiceLocator.dll</HintPath>
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\CommonServiceLocator.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -52,7 +52,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -64,30 +65,48 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Unity.Abstractions, Version=2.2.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.5.2.1\lib\net40\Unity.Abstractions.dll</HintPath>
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Configuration, Version=5.0.6.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.Configuration.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Unity.Container, Version=5.2.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.5.2.1\lib\net40\Unity.Container.dll</HintPath>
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.Container.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Unity.Interception, Version=5.0.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.5.2.1\lib\net40\Unity.Interception.dll</HintPath>
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.Interception.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Interception.Configuration, Version=5.0.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.Interception.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.RegistrationByConvention, Version=2.1.0.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Unity.ServiceLocation, Version=2.0.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.5.2.1\lib\net40\Unity.ServiceLocation.dll</HintPath>
+      <HintPath>..\packages\Unity.5.2.1\lib\net45\Unity.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bl\AppTopicConfigParser.cs" />
+    <Compile Include="Bl\Parser\AppTopicConfigParser.cs" />
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
-    <Compile Include="Bl\ScrapColumnConfigParser.cs" />
-    <Compile Include="Bl\ScrapConfigParser.cs" />
-    <Compile Include="Bl\ScrapCsvConfigParser.cs" />
-    <Compile Include="Bl\ScrapHtmlTableConfigParser.cs" />
-    <Compile Include="Bl\ScrapManipulateConfigParser.cs" />
+    <Compile Include="Bl\Parser\ManipulateChildFactory.cs" />
+    <Compile Include="Bl\Parser\ScrapColumnConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapCsvConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapHtmlTableConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapManipulateChildConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapManipulateConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapRegexConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapReplaceConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapSplitConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapTrimConfigParser.cs" />
     <Compile Include="Bl\WebScrapConfigParser.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />
     <Compile Include="Db\DynamicAppDbConfig.cs" />
@@ -95,6 +114,7 @@
     <Compile Include="Db\ScrapDbContext.cs" />
     <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Interfaces\IInnerBaseParser.cs" />
+    <Compile Include="Model\ScrapXml\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
     <Compile Include="Interfaces\IScrapHtmlContext.cs" />
@@ -104,21 +124,22 @@
     <Compile Include="Model\ApplicationConfigKey.cs" />
     <Compile Include="Model\EWebDataConfigType.cs" />
     <Compile Include="Model\ManipulateHtmlData.cs" />
-    <Compile Include="Model\WebDataConfig.cs" />
-    <Compile Include="Model\WebDataConfigColumn.cs" />
-    <Compile Include="Model\WebDataConfigManipulate.cs" />
-    <Compile Include="Model\WebDataConfigMetadata.cs" />
-    <Compile Include="Model\WebDataConfigRegex.cs" />
-    <Compile Include="Model\WebDataConfigReplace.cs" />
-    <Compile Include="Model\WebDataConfigScrap.cs" />
-    <Compile Include="Model\WebDataConfigScrapCsv.cs" />
-    <Compile Include="Model\WebDataConfigScrapHtmlTable.cs" />
-    <Compile Include="Model\WebDataConfigSplit.cs" />
-    <Compile Include="Model\WebDataConfigTrim.cs" />
+    <Compile Include="Model\Parser\ColumnScrapIteratorArgs.cs" />
+    <Compile Include="Model\Parser\ColumnScrapIteratorFileArgs.cs" />
+    <Compile Include="Model\Parser\ColumnScrapIteratorHtmlArgs.cs" />
+    <Compile Include="Model\ScrapXml\ColumnElement.cs" />
+    <Compile Include="Model\ScrapXml\ManipulateElement.cs" />
+    <Compile Include="Model\ScrapXml\MetadataElement.cs" />
+    <Compile Include="Model\ScrapXml\RegexElement.cs" />
+    <Compile Include="Model\ScrapXml\ReplaceElement.cs" />
+    <Compile Include="Model\ScrapXml\ScrapElement.cs" />
+    <Compile Include="Model\ScrapXml\ScrapCsvElement.cs" />
+    <Compile Include="Model\ScrapXml\ScrapHtmlTableElement.cs" />
+    <Compile Include="Model\ScrapXml\SplitElement.cs" />
+    <Compile Include="Model\ScrapXml\TrimElement.cs" />
     <Compile Include="Model\WebScrapParserColumnCsvStateModel.cs" />
     <Compile Include="Model\WebScrapParserColumnHtmlStateModel.cs" />
     <Compile Include="Model\WebScrapParserStateModel.cs" />
-    <Compile Include="Model\WebScrapStateModel.cs" />
     <Compile Include="ScrapEngineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScrapFactory.cs" />
@@ -141,5 +162,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

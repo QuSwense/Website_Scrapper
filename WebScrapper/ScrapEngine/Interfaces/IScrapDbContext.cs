@@ -44,12 +44,12 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="row"></param>
-        void AddOrUpdate(WebDataConfigScrap scrapConfig, List<DynamicTableDataInsertModel> row);
+        void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row);
 
         /// <summary>
         /// Load partial
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        void AddMetadata(WebDataConfigScrap webScrapConfigObj);
+        void AddMetadata(ScrapElement webScrapConfigObj);
     }
 }

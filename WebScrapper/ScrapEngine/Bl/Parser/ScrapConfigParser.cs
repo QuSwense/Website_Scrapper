@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using WebCommon.Error;
 
-namespace ScrapEngine.Bl
+namespace ScrapEngine.Bl.Parser
 {
     public class ScrapConfigParser : AppTopicConfigParser
     {
@@ -25,9 +25,9 @@ namespace ScrapEngine.Bl
         /// Check the maximum level of Scrap nodes allowed is 4
         /// </summary>
         /// <param name="webScrapConfigObj">The last child Scrap node</param>
-        protected void AssertLevelConstraint(WebDataConfigScrap webScrapConfigObj)
+        protected void AssertLevelConstraint(ScrapElement webScrapConfigObj)
         {
-            WebDataConfigScrap tmpObj = webScrapConfigObj;
+            ScrapElement tmpObj = webScrapConfigObj;
             int level = 0;
             for (; tmpObj != null && level <= configParser.AppConfig.ScrapMaxLevel(); level++, tmpObj = tmpObj.Parent) ;
 
@@ -41,11 +41,11 @@ namespace ScrapEngine.Bl
         /// attribute
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        protected void AssertScrapNameAttribute(WebDataConfigScrap webScrapConfigObj)
+        protected void AssertScrapNameAttribute(ScrapElement webScrapConfigObj)
         {
             bool isTableNameFound = false;
             string NameValue = null;
-            WebDataConfigScrap tmpObj = webScrapConfigObj;
+            ScrapElement tmpObj = webScrapConfigObj;
 
             while (tmpObj != null)
             {
@@ -71,8 +71,8 @@ namespace ScrapEngine.Bl
         /// <param name="parentScrapConfigObj"></param>
         /// <returns></returns>
         protected T ParseScrapElementAttributes<T>(XmlNode scrapNode,
-            WebDataConfigScrap parentConfigScrap, HtmlNodeNavigator htmlNode)
-            where T : WebDataConfigScrap, new()
+            ScrapElement parentConfigScrap, HtmlNodeNavigator htmlNode)
+            where T : ScrapElement, new()
         {
             var webScrapConfigObj =
                 configParser.XmlConfigReader.ReadElement<T>(scrapNode);
@@ -87,7 +87,7 @@ namespace ScrapEngine.Bl
         /// <param name="urlValue"></param>
         /// <param name="scrapNode"></param>
         /// <returns></returns>
-        protected string ParseUrlValue(WebDataConfigScrap configScrap, HtmlNodeNavigator htmlNode)
+        protected string ParseUrlValue(ScrapElement configScrap, HtmlNodeNavigator htmlNode)
         {
             Debug.Assert(!(configScrap == null));
 

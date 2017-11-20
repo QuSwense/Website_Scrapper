@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScrapEngine.Bl
+namespace ScrapEngine.Bl.Parser
 {
     /// <summary>
     /// The base class for the scrap xml app topic engine
@@ -24,6 +24,11 @@ namespace ScrapEngine.Bl
         public AppTopicConfigParser(WebScrapConfigParser configParser)
         {
             this.configParser = configParser;
+        }
+
+        protected string Normalize(string htmlValue)
+        {
+            return htmlValue.Replace("\\n", "\n").Replace("\\t", "\t");
         }
     }
 }

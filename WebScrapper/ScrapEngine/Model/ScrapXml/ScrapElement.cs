@@ -7,12 +7,12 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
-    public abstract class WebDataConfigScrap
+    public abstract class ScrapElement
     {
         /// <summary>
         /// The list of child Scrap element
         /// </summary>
-        public List<WebDataConfigScrap> Scraps { get; set; }
+        public List<ScrapElement> Scraps { get; set; }
 
         /// <summary>
         /// The name of the node
@@ -35,17 +35,17 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The list of column nodes
         /// </summary>
-        public List<WebDataConfigColumn> Columns { get; set; }
+        public List<ColumnElement> Columns { get; set; }
 
         /// <summary>
         /// The parent node
         /// </summary>
-        public WebDataConfigScrap Parent { get; set; }
+        public ScrapElement Parent { get; set; }
 
-        public WebDataConfigScrap()
+        public ScrapElement()
         {
-            Scraps = new List<WebDataConfigScrap>();
-            Columns = new List<WebDataConfigColumn>();
+            Scraps = new List<ScrapElement>();
+            Columns = new List<ColumnElement>();
             DoUpdateOnly = false;
         }
     }

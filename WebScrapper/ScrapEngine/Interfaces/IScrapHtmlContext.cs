@@ -8,12 +8,7 @@ namespace ScrapEngine.Interfaces
         /// Reference to the Scrapper Engine context class
         /// </summary>
         IScrapEngineContext EngineContext { get; }
-
-        /// <summary>
-        /// The web data rules configuration
-        /// </summary>
-        WebDataConfig ScrapperRulesConfig { get; }
-
+        
         /// <summary>
         /// Constructor initializes with parent engine
         /// </summary>

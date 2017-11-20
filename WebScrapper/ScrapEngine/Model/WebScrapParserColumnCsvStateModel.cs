@@ -11,7 +11,7 @@ namespace ScrapEngine.Model
     {
         public int NodeIndex { get; set; }
 
-        public WebDataConfigScrap ConfigScrap { get; set; }
+        public ScrapElement ConfigScrap { get; set; }
 
         public XmlNode CurrentXmlNode { get; set; }
 

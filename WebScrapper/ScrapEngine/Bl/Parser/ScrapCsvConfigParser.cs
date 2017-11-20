@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace ScrapEngine.Bl
+namespace ScrapEngine.Bl.Parser
 {
     /// <summary>
     /// The main business logic to parse the Xml config file and alongside extract the 
@@ -18,16 +18,25 @@ namespace ScrapEngine.Bl
     public class ScrapCsvConfigParser : ScrapConfigParser
     {
         /// <summary>
+        /// Scrap column config parser
+        /// </summary>
+        private ScrapColumnConfigParser scrapColumnConfigParser;
+
+        /// <summary>
         /// Constructor (no default constructor)
         /// </summary>
         /// <param name="configParser"></param>
         /// <param name="startState"></param>
-        public ScrapCsvConfigParser(WebScrapConfigParser configParser) : base(configParser) { }
+        public ScrapCsvConfigParser(WebScrapConfigParser configParser)
+            : base(configParser)
+        {
+            scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
+        }
 
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public void Process(XmlNode scrapNode, WebDataConfigScrap parentConfig, HtmlNodeNavigator htmlNode)
+        public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
         {
             var webScrapConfigObj = 
                 ParseScrapElementAttributes<WebDataConfigScrapCsv>(scrapNode, parentConfig, htmlNode);
@@ -50,8 +59,8 @@ namespace ScrapEngine.Bl
                     AssertScrapNameAttribute(webScrapConfigObj);
 
                     // Read the Column nodes which are the individual reader config nodes
-                    new ScrapColumnConfigParser(configParser).Process(nodeIndex, 
-                        scrapNode, parentConfig, webNodeNavigator, fileLine);
+                    scrapColumnConfigParser.Process(nodeIndex, 
+                        scrapNode, parentConfig, htmlNode, fileLine);
                 }
             }
         }

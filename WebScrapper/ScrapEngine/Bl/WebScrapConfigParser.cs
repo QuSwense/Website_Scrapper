@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
+using ScrapEngine.Bl.Parser;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
-using ScrapEngine.Model.State;
 using SqliteDatabase.Model;
 using System;
 using System.Collections.Generic;
@@ -40,6 +40,16 @@ namespace ScrapEngine.Bl
         /// </summary>
         public HtmlScrapperCommand ScrapperCommand { get; protected set; }
 
+        /// <summary>
+        /// The scrap html table config parser
+        /// </summary>
+        private ScrapHtmlTableConfigParser scrapHtmlTableConfigParser;
+
+        /// <summary>
+        /// Scrap csv config parser
+        /// </summary>
+        private ScrapCsvConfigParser scrapCsvConfigParser;
+
         #endregion Properties
 
         #region Helper Properties
@@ -73,7 +83,11 @@ namespace ScrapEngine.Bl
         /// <summary>
         /// Constructor
         /// </summary>
-        public WebScrapConfigParser() { }
+        public WebScrapConfigParser()
+        {
+            scrapHtmlTableConfigParser = new ScrapHtmlTableConfigParser(this);
+            scrapCsvConfigParser = new ScrapCsvConfigParser(this);
+        }
 
         /// <summary>
         /// Constructor parameterized
@@ -99,25 +113,21 @@ namespace ScrapEngine.Bl
 
             // Read the Webdata node which is the start node of any app topic
             foreach (XmlNode rootWebdataNode in XmlConfigReader.ReadNodes("//WebData"))
-            {
                 ParseChildScrapNodes(rootWebdataNode, null, null);
-            }
         }
 
         /// <summary>
         /// This is the parse method to parse the "Webdata" element tag
         /// </summary>
         /// <param name="rootScrapNode"></param>
-        public void ParseChildScrapNodes(XmlNode xmlNode, WebDataConfigScrap parentConfig,
+        public void ParseChildScrapNodes(XmlNode xmlNode, ScrapElement parentConfig,
             HtmlNodeNavigator webNodeNavigator)
         {
             if (xmlNode == null || xmlNode.ChildNodes == null) return;
 
             // Read the child nodes of Scrap type nodes
             foreach (XmlNode scrapNode in xmlNode.ChildNodes)
-            {
                 ConfigScrapElementFactory(scrapNode, parentConfig, webNodeNavigator);
-            }
         }
 
         /// <summary>
@@ -126,14 +136,14 @@ namespace ScrapEngine.Bl
         /// and save into table
         /// </summary>
         /// <param name="scrapTypeNode"></param>
-        private void ConfigScrapElementFactory(XmlNode xmlNode, WebDataConfigScrap parentConfig,
+        private void ConfigScrapElementFactory(XmlNode xmlNode, ScrapElement parentConfig,
             HtmlNodeNavigator scrapNode)
         {
             if (scrapNode == null) return;
-            if (scrapNode.LocalName == WebDataConfigScrapHtmlTable.TagName)
-                new ScrapHtmlTableConfigParser(this).Process(xmlNode, parentConfig, scrapNode);
+            if (scrapNode.LocalName == ScrapHtmlTableElement.TagName)
+                scrapHtmlTableConfigParser.Process(xmlNode, parentConfig, scrapNode);
             else if (scrapNode.LocalName == WebDataConfigScrapCsv.TagName)
-                new ScrapCsvConfigParser(this).Process(xmlNode, parentConfig, scrapNode);
+                scrapCsvConfigParser.Process(xmlNode, parentConfig, scrapNode);
         }
     }
 }

@@ -6,12 +6,17 @@ namespace ScrapEngine.Model
     /// <summary>
     /// REafs to a column of the table to store the data scrapped
     /// </summary>
-    public class WebDataConfigColumn
+    public class ColumnElement
     {
+        /// <summary>
+        /// The name of the Element tag
+        /// </summary>
+        public static string TagName = "Column";
+
         /// <summary>
         /// Points to the parent scrap node
         /// </summary>
-        public WebDataConfigScrap Parent { get; set; }
+        public ScrapElement Parent { get; set; }
 
         /// <summary>
         /// The name of the column
@@ -40,14 +45,14 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The manipulate tag
         /// </summary>
-        public List<WebDataConfigManipulate> Manipulations { get; set; }
+        public List<ManipulateElement> Manipulations { get; set; }
         
         /// <summary>
         /// Constructor
         /// </summary>
-        public WebDataConfigColumn()
+        public ColumnElement()
         {
-            Manipulations = new List<WebDataConfigManipulate>();
+            Manipulations = new List<ManipulateElement>();
         }
     }
 }

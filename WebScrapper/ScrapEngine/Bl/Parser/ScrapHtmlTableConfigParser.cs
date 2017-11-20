@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace ScrapEngine.Bl
+namespace ScrapEngine.Bl.Parser
 {
     /// <summary>
     /// The main business logic to parse the Xml config file and alongside extract the 
@@ -19,20 +19,28 @@ namespace ScrapEngine.Bl
     public class ScrapHtmlTableConfigParser : ScrapConfigParser
     {
         /// <summary>
+        /// Scrap column config parser
+        /// </summary>
+        private ScrapColumnConfigParser scrapColumnConfigParser;
+
+        /// <summary>
         /// Constructor (no default constructor)
         /// </summary>
         /// <param name="configParser"></param>
         /// <param name="startState"></param>
         public ScrapHtmlTableConfigParser(WebScrapConfigParser configParser)
-            : base(configParser) { }
+            : base(configParser)
+        {
+            scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
+        }
 
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public void Process(XmlNode scrapNode, WebDataConfigScrap parentConfig, HtmlNodeNavigator htmlNode)
+        public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
         {
             var webScrapConfigObj = 
-                ParseScrapElementAttributes<WebDataConfigScrapHtmlTable>(scrapNode, parentConfig, htmlNode);
+                ParseScrapElementAttributes<ScrapHtmlTableElement>(scrapNode, parentConfig, htmlNode);
 
             // This finally scraps the html webpage data
             var webNodeNavigatorList = FetchHtmlTable(webScrapConfigObj);
@@ -52,7 +60,7 @@ namespace ScrapEngine.Bl
                 AssertScrapNameAttribute(webScrapConfigObj);
 
                 // Read the Column nodes which are the individual reader config nodes
-                new ScrapColumnConfigParser(configParser).Process(nodeIndex, scrapNode, parentConfig, webNodeNavigator);
+                scrapColumnConfigParser.Process(nodeIndex, scrapNode, parentConfig, webNodeNavigator);
 
                 nodeIndex++;
             }
@@ -63,7 +71,7 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
         /// <returns></returns>
-        private List<HtmlNodeNavigator> FetchHtmlTable(WebDataConfigScrapHtmlTable webScrapConfigObj)
+        private List<HtmlNodeNavigator> FetchHtmlTable(ScrapHtmlTableElement webScrapConfigObj)
         {
             HtmlNode htmlDoc = configParser.ScrapperCommand.Load(webScrapConfigObj.Url);
             return configParser.ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
