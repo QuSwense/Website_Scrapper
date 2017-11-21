@@ -1,66 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
-  <ScrapHtmlTable name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="(//table[@id='GeoGroupsENG']/tr)[position() > 1]" >
-    <Column name="m49" xpath="./@data-tt-id" isunique="1"></Column>
-    <Column name="nm" xpath="td[1]"></Column>
-    <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
-    <Column name="iso31661a3" xpath="td[3]"></Column>
-  </ScrapHtmlTable>
-  <ScrapHtmlTable name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="(//ul[@id='GetAppendix_D']/li//tr)[position() = 1]" doupdateonly="true">
-    <Column name="nm" xpath="td[1]/a" isunique="1">
-      <Manipulate>
-        <Trim data="\n"></Trim>
-        <Trim data="\t"></Trim>
-        <Trim data="-"></Trim>
-      </Manipulate>
-    </Column>
-    <Column name="genc_2a" xpath="td[2]"></Column>
-    <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]">
-      <Manipulate>
-        <Trim data="-"></Trim>
-      </Manipulate>
-    </Column>
-    <Column name="iso3166_no" xpath="td[3]/table//tr[1]/td[3]">
-      <Manipulate>
-        <Trim data="-"></Trim>
-      </Manipulate>
-    </Column>
-    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]">
-      <Manipulate>
-        <Trim data="-"></Trim>
-      </Manipulate>
-    </Column>
-    <Column name="stanag" xpath="td[4]">
-      <Manipulate>
-        <Trim data="-"></Trim>
-      </Manipulate>
-    </Column>
-    <Column name="tld" xpath="td[5]">
-      <Manipulate>
-        <Trim data="-"></Trim>
-        <Split data="." index="1"></Split>
-      </Manipulate>
-    </Column>
-  </ScrapHtmlTable>
-  <ScrapHtmlTable name="rgn" url="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" xpath="(//div[@class='mw-parser-output']/table[3]//tr)[position()>1]" doupdateonly="true">
-    <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
-    <Column name="iso31661a2yrentr" xpath="td[3]"></Column>
-  </ScrapHtmlTable>
-  <ScrapCsv name="rgn" url="https://evs.nci.nih.gov/ftp1/FDA/GENC/NCIt-GENC_Terminology.txt" doupdateonly="true" delimiter="\t" skipfirst="1">
-    <Column name="genc_2a" index="3" isunique="1"></Column>
-    <Column name="genc_3a" index="4"></Column>
-    <Column name="genc_no" index="5"></Column>
-  </ScrapCsv>
-  <ScrapHtmlTable name="rgn" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position() > 1]" doupdateonly="true">
-    <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
-    <Column name="iso3166_no" xpath="td[3]"></Column>
-    <Column name="fips" xpath="td[4]"></Column>
-    <Column name="ttlareakm2_geonm" xpath="td[7]">
-      <Manipulate>
-        <Replace in="," out=""></Replace>
-      </Manipulate>
-    </Column>
-  </ScrapHtmlTable>
   <ScrapHtmlTable name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" xpath="(//body/p[4]/table//table//tr)[position() > 1]">
     <Column name="iso6391" xpath="td[1]"></Column>
     <Column name="nm" xpath="td[2]"></Column>
@@ -70,16 +9,20 @@
       <Column name="iso31661a2" xpath=".//tr[2]/td[2]">
         <Manipulate>
           <Split data="," index="0"></Split>
+          <Trim />
         </Manipulate>
       </Column>
-      <Column name="iso6391" xpath=".//tr[8]/td[2]">
+      <Column name="iso6391" xpath=".//tr[8]/td[2]" cardinal="*">
         <Manipulate>
-          <Regex pattern="(?&lt;=\()(.*?)(?=\))"/>
+          <Regex pattern="(?&lt;=\()(.*?)(?=\))" index="*">
+          </Regex>
+          <Split data="-" index="0" />
         </Manipulate>
+        <Validate table="lang" col="iso6391" />
       </Column>
     </ScrapHtmlTable>
   </ScrapHtmlTable>
-  <ScrapHtmlTable name="cntrylang" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
+  <ScrapHtmlTable name="crncy" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
     <Column name="iso4217" xpath="td[1]"></Column>
     <Column name="nm" xpath="td[2]"></Column>
   </ScrapHtmlTable>

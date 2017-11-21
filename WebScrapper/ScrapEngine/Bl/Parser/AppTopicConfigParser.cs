@@ -28,6 +28,7 @@ namespace ScrapEngine.Bl.Parser
 
         protected string Normalize(string htmlValue)
         {
+            if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
             return htmlValue.Replace("\\n", "\n").Replace("\\t", "\t");
         }
     }

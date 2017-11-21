@@ -81,7 +81,7 @@ namespace ScrapEngine.Bl.Parser
             }
 
             result.XPath = columnConfig.XPath;
-            result.Value = HtmlEntity.DeEntitize(result.Value);
+            result.OriginalValue = HtmlEntity.DeEntitize(result.OriginalValue);
         }
 
         /// <summary>

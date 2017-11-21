@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using log4net;
 using ScrapEngine.Model;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapCsvConfigParser : ScrapConfigParser
     {
+        public static ILog logger = LogManager.GetLogger(typeof(ScrapCsvConfigParser));
+
         /// <summary>
         /// Scrap column config parser
         /// </summary>
@@ -38,8 +41,11 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
         {
+            logger.Info("Parsing Config ScrapCsv node");
+
             var webScrapConfigObj = 
                 ParseScrapElementAttributes<WebDataConfigScrapCsv>(scrapNode, parentConfig, htmlNode);
+            webScrapConfigObj.Delimiter = Normalize(webScrapConfigObj.Delimiter);
 
             // This finally scraps the html webpage data
             using (StringReader reader = FetchFileReader(webScrapConfigObj))
@@ -50,7 +56,10 @@ namespace ScrapEngine.Bl.Parser
                 {
                     nodeIndex++;
                     if (webScrapConfigObj.SkipFirstLines > nodeIndex) continue;
-                    
+
+                    logger.DebugFormat("Parsing Config ScrapCsv {0}th node with data '{1}'",
+                        nodeIndex, fileLine);
+
                     // Check the constraints on the Scrap nodes
                     // 1. Only maximum 4 levels is allowed
                     // 2. Only one "name" tag should be present from the top level to bottom Scrap
@@ -60,7 +69,7 @@ namespace ScrapEngine.Bl.Parser
 
                     // Read the Column nodes which are the individual reader config nodes
                     scrapColumnConfigParser.Process(nodeIndex, 
-                        scrapNode, parentConfig, htmlNode, fileLine);
+                        scrapNode, webScrapConfigObj, htmlNode, fileLine);
                 }
             }
         }
@@ -72,6 +81,8 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private StringReader FetchFileReader(WebDataConfigScrapCsv webScrapConfigObj)
         {
+            logger.DebugFormat("Fetch File from Url '{0}'", webScrapConfigObj.Url);
+
             return new StringReader(configParser.ScrapperCommand.LoadFile(webScrapConfigObj.Url));
         }
     }

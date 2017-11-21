@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using log4net;
 using ScrapEngine.Bl.Parser;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
@@ -24,6 +25,8 @@ namespace ScrapEngine.Bl
     public class WebScrapConfigParser : IScrapParser
     {
         #region Properties
+
+        public static ILog logger = LogManager.GetLogger(typeof(WebScrapConfigParser));
 
         /// <summary>
         /// Reference to the parent Web context object
@@ -113,7 +116,11 @@ namespace ScrapEngine.Bl
 
             // Read the Webdata node which is the start node of any app topic
             foreach (XmlNode rootWebdataNode in XmlConfigReader.ReadNodes("//WebData"))
+            {
+                logger.InfoFormat("Parsing WebData xml node from {0} Xml config {1}", 
+                    AppTopicPath.AppTopic, AppTopicPath.AppTopicScrap.FullPath);
                 ParseChildScrapNodes(rootWebdataNode, null, null);
+            }
         }
 
         /// <summary>
@@ -127,7 +134,7 @@ namespace ScrapEngine.Bl
 
             // Read the child nodes of Scrap type nodes
             foreach (XmlNode scrapNode in xmlNode.ChildNodes)
-                ConfigScrapElementFactory(scrapNode, parentConfig, webNodeNavigator);
+                if (!ConfigScrapElementFactory(scrapNode, parentConfig, webNodeNavigator)) return;
         }
 
         /// <summary>
@@ -136,14 +143,21 @@ namespace ScrapEngine.Bl
         /// and save into table
         /// </summary>
         /// <param name="scrapTypeNode"></param>
-        private void ConfigScrapElementFactory(XmlNode xmlNode, ScrapElement parentConfig,
+        private bool ConfigScrapElementFactory(XmlNode xmlNode, ScrapElement parentConfig,
             HtmlNodeNavigator scrapNode)
         {
-            if (scrapNode == null) return;
-            if (scrapNode.LocalName == ScrapHtmlTableElement.TagName)
+            bool bProcessed = true;
+            if (xmlNode == null) bProcessed = false;
+
+            logger.InfoFormat("Parsing Config scrap node {0}", xmlNode.LocalName);
+
+            if (xmlNode.LocalName == ScrapHtmlTableElement.TagName)
                 scrapHtmlTableConfigParser.Process(xmlNode, parentConfig, scrapNode);
-            else if (scrapNode.LocalName == WebDataConfigScrapCsv.TagName)
+            else if (xmlNode.LocalName == WebDataConfigScrapCsv.TagName)
                 scrapCsvConfigParser.Process(xmlNode, parentConfig, scrapNode);
+            else bProcessed = false;
+
+            return bProcessed;
         }
     }
 }

@@ -47,6 +47,13 @@ namespace ScrapEngine.Interfaces
         void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row);
 
         /// <summary>
+        /// To Add all combination of column values
+        /// </summary>
+        /// <param name="scrapConfig"></param>
+        /// <param name="rows"></param>
+        void AddOrUpdate(ScrapElement scrapConfig, List<List<DynamicTableDataInsertModel>> rows);
+
+        /// <summary>
         /// Load partial
         /// </summary>
         /// <param name="webScrapConfigObj"></param>

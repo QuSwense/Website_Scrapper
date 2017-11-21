@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using log4net;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
@@ -20,6 +21,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapColumnConfigParser : AppTopicConfigParser
     {
+        public static ILog logger = LogManager.GetLogger(typeof(ScrapColumnConfigParser));
+
         /// <summary>
         /// The Manipulate Config tag object parser
         /// </summary>
@@ -44,6 +47,7 @@ namespace ScrapEngine.Bl.Parser
         public void Process(int nodeIndex, XmlNode scrapNode, 
             ScrapElement configScrap, HtmlNodeNavigator htmlNode)
         {
+            logger.DebugFormat("Scrapping data from website for a Single Row.");
             ParseColumnsConfig(scrapNode, configScrap);
             ColumnScrapIterator(new ColumnScrapIteratorHtmlArgs()
             {
@@ -65,6 +69,7 @@ namespace ScrapEngine.Bl.Parser
         public void Process(int nodeIndex, XmlNode scrapNode, ScrapElement configScrap,
             HtmlNodeNavigator htmlNode, string fileLine)
         {
+            logger.DebugFormat("Scrapping data from online text file");
             ParseColumnsConfig(scrapNode, configScrap);
             ColumnScrapIterator(new ColumnScrapIteratorFileArgs()
             {
@@ -94,10 +99,11 @@ namespace ScrapEngine.Bl.Parser
                             ParseColumnElement(columnNode, configScrap));
                     }
                 }
+            }
 
+            if(configScrap.Columns.Count > 0)
                 // Load the table with partial columns in memory
                 configParser.WebDbContext.AddMetadata(configScrap);
-            }
         }
 
         /// <summary>
@@ -143,35 +149,44 @@ namespace ScrapEngine.Bl.Parser
         private void ColumnScrapIterator<T>(T scrapArgs)
             where T : ColumnScrapIteratorArgs
         {
-            List<DynamicTableDataInsertModel> row = new List<DynamicTableDataInsertModel>();
-            bool doSkipUpdate = false;
+            List<List<DynamicTableDataInsertModel>> rows = new List<List<DynamicTableDataInsertModel>>();
+            bool doSkipDbAddUpdate = false;
             scrapArgs.PreProcess();
             for (int indx = 0; indx < scrapArgs.ScrapConfig.Columns.Count; ++indx)
             {
+                // A list to store multiple column values for >1 cardinal values
+                List<DynamicTableDataInsertModel> colValues = new List<DynamicTableDataInsertModel>();
+
                 ColumnElement columnConfig = scrapArgs.ScrapConfig.Columns[indx];
                 ManipulateHtmlData manipulateHtml = null;
                 
                 manipulateHtml = Manipulate(columnConfig, scrapArgs.GetDataIterator(columnConfig));
 
-                DynamicTableDataInsertModel tableDataColumn = new DynamicTableDataInsertModel();
-
-                if (columnConfig.IsUnique && string.IsNullOrEmpty(manipulateHtml.Value))
+                if (columnConfig.IsUnique && 
+                    (manipulateHtml.Results.Count <= 0 || manipulateHtml.Results.Contains(null)
+                    || manipulateHtml.Results.Contains(string.Empty)))
                 {
-                    doSkipUpdate = true;
+                    doSkipDbAddUpdate = true;
                     break;
                 }
 
-                row.Add(tableDataColumn);
+                foreach (var result in manipulateHtml.Results)
+                {
+                    DynamicTableDataInsertModel tableDataColumn = new DynamicTableDataInsertModel();
+                    colValues.Add(tableDataColumn);
 
-                tableDataColumn.Name = columnConfig.Name;
-                tableDataColumn.IsPk = columnConfig.IsUnique;
-                tableDataColumn.Value = manipulateHtml.Value;
-                tableDataColumn.DataType =
-                    configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.ScrapConfig.Name][columnConfig.Name].DataType;
+                    tableDataColumn.Name = columnConfig.Name;
+                    tableDataColumn.IsPk = columnConfig.IsUnique;
+                    tableDataColumn.Value = manipulateHtml.OriginalValue;
+                    tableDataColumn.DataType =
+                        configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.ScrapConfig.TableName][columnConfig.Name].DataType;
+                }
+
+                rows.Add(colValues);
             }
 
-            if (!doSkipUpdate)
-                configParser.WebDbContext.AddOrUpdate(scrapArgs.ScrapConfig, row);
+            if (!doSkipDbAddUpdate && scrapArgs.ScrapConfig.Columns.Count > 0)
+                configParser.WebDbContext.AddOrUpdate(scrapArgs.ScrapConfig, rows);
         }
 
         /// <summary>
@@ -183,10 +198,19 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private ManipulateHtmlData Manipulate(ColumnElement columnConfig, string scrappedData)
         {
-            ManipulateHtmlData result = new ManipulateHtmlData();
-            result.Value = scrappedData;
+            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", columnConfig.Name, scrappedData);
 
+            ManipulateHtmlData result = new ManipulateHtmlData();
+            result.OriginalValue = scrappedData;
+            result.Results.Add(scrappedData);
+            result.Cardinality = columnConfig.Cardinal;
+
+            // Even if Scrapped data is null send to manipulation tag. As there can be a default
+            // manipulation defined
             scrapManipulateConfigParser.Process(columnConfig, result);
+
+            logger.DebugFormat("For Column '{0}' Final manipulated data '{1}'", columnConfig.Name, result.OriginalValue);
+
             return result;
         }   
     }

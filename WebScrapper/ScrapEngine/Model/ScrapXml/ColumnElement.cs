@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
@@ -43,6 +44,25 @@ namespace ScrapEngine.Model
         public string XPath { get; set; }
 
         /// <summary>
+        /// Defines the cardinality of a relationship with other columns
+        /// If a column is defined to be greater than 1 then it can have multiple values for combinations with other columns
+        /// e.g, (col, col21), (col1, col22), etc. for col2.Cardinality = 2
+        /// To represent 'n' cardinality use '*' in xml and as value we will use '-1'
+        /// </summary>
+        [DXmlAttribute("cardinal")]
+        public string CardinalString { get; set; }
+
+        public int Cardinal
+        {
+            get
+            {
+                if (CardinalString == "*") return -1;
+                else if(string.IsNullOrEmpty(CardinalString)) return 0;
+                return Convert.ToInt32(CardinalString);
+            }
+        }
+
+        /// <summary>
         /// The manipulate tag
         /// </summary>
         public List<ManipulateElement> Manipulations { get; set; }
@@ -53,6 +73,7 @@ namespace ScrapEngine.Model
         public ColumnElement()
         {
             Manipulations = new List<ManipulateElement>();
+            CardinalString = "1";
         }
     }
 }

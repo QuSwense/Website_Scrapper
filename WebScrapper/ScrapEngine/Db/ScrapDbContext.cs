@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ScrapEngine.Model;
 using SqliteDatabase;
 using SqliteDatabase.Model;
+using WebCommon.Combinatorics;
 
 namespace ScrapEngine.Db
 {
@@ -100,7 +101,24 @@ namespace ScrapEngine.Db
         public void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row)
         {
             // Add data
-            WebScrapDb.AddOrUpdate(scrapConfig.Name, row, scrapConfig.DoUpdateOnly);
+            WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
+        }
+
+        /// <summary>
+        /// To Add all combination of column values
+        /// </summary>
+        /// <param name="scrapConfig"></param>
+        /// <param name="rows"></param>
+        public void AddOrUpdate(ScrapElement scrapConfig, List<List<DynamicTableDataInsertModel>> rows)
+        {
+            // Create Combinations of data list
+            Combinations<List<DynamicTableDataInsertModel>> rowCombinations =
+                new Combinations<List<DynamicTableDataInsertModel>>(rows, rows.Count);
+
+            foreach (var row in rowCombinations)
+            {
+                WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
+            }
         }
 
         /// <summary>
@@ -121,9 +139,9 @@ namespace ScrapEngine.Db
             {
                 ColumnScrapMetadataModel colScrapMdtModel = new ColumnScrapMetadataModel();
                 colScrapMdtModel.ColumnName = colConfig.Name;
-                if(!string.IsNullOrEmpty(webScrapConfigObj.Name) &&
+                if(!string.IsNullOrEmpty(webScrapConfigObj.TableName) &&
                     !string.IsNullOrEmpty(colConfig.Name))
-                    colScrapMdtModel.DisplayName = MetaDbConfig.TableColumnConfigs[webScrapConfigObj.Name][colConfig.Name].Display;
+                    colScrapMdtModel.DisplayName = MetaDbConfig.TableColumnConfigs[webScrapConfigObj.TableName][colConfig.Name].Display;
                 colScrapMdtModel.Index = colConfig.Index;
                 colScrapMdtModel.Uid = uid;
                 colScrapMdtModel.XPath = colConfig.XPath;
@@ -150,7 +168,7 @@ namespace ScrapEngine.Db
 
                 if(mainWebScrap is ScrapHtmlTableElement)
                     XPaths.Add(((ScrapHtmlTableElement)mainWebScrap).XPath);
-                if (!string.IsNullOrEmpty(mainWebScrap.Name)) name = mainWebScrap.Name;
+                if (!string.IsNullOrEmpty(mainWebScrap.TableName)) name = mainWebScrap.TableName;
                 mainWebScrap = mainWebScrap.Parent;
             }
 

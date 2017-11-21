@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
@@ -14,6 +15,8 @@ namespace ScrapEngine.Model
     [XmlRoot("AppConfig")]
     public class ApplicationConfig
     {
+        public static ILog logger = LogManager.GetLogger(typeof(ApplicationConfig));
+
         /// <summary>
         /// The list of application keys
         /// </summary>
@@ -79,6 +82,8 @@ namespace ScrapEngine.Model
         /// <returns></returns>
         public ApplicationConfig Union(ApplicationConfig configToOverwrite)
         {
+            logger.Info("Merge the application config files");
+
             ApplicationConfig result = new ApplicationConfig();
 
             if (Keys != null && configToOverwrite.Keys == null)

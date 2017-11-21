@@ -1,4 +1,5 @@
-﻿using ScrapEngine.Interfaces;
+﻿using log4net;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using WebCommon.PathHelp;
 using WebReader.Xml;
@@ -14,6 +15,8 @@ namespace ScrapEngine
     public class ScrapEngineContext : IScrapEngineContext
     {
         #region Properties
+
+        public static ILog logger = LogManager.GetLogger(typeof(ScrapEngineContext));
 
         /// <summary>
         /// The application name topic for which the web scrapper Database is to be generated
@@ -72,6 +75,9 @@ namespace ScrapEngine
 
             // Web scrap html context
             WebScrapHtml = Factory.CreateHtmlContext(this);
+
+            logger.InfoFormat("Web scrap Engine context object which is the starting" +
+                "object for a application topic scrapper is successfull initialized for '{0}'", AppTopicPath.AppTopic);
         }
 
         /// <summary>

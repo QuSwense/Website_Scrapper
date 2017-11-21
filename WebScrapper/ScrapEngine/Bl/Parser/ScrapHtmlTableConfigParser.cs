@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using log4net;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System;
@@ -18,6 +19,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapHtmlTableConfigParser : ScrapConfigParser
     {
+        public static ILog logger = LogManager.GetLogger(typeof(ScrapHtmlTableConfigParser));
+
         /// <summary>
         /// Scrap column config parser
         /// </summary>
@@ -39,30 +42,40 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
         {
+            logger.Info("Parsing Config ScrapHtmlTable node");
+
             var webScrapConfigObj = 
                 ParseScrapElementAttributes<ScrapHtmlTableElement>(scrapNode, parentConfig, htmlNode);
 
             // This finally scraps the html webpage data
             var webNodeNavigatorList = FetchHtmlTable(webScrapConfigObj);
 
-            // Process
-            int nodeIndex = 0;
-            foreach (var webNodeNavigator in webNodeNavigatorList)
+            if (webNodeNavigatorList != null && webNodeNavigatorList.Count > 0)
             {
-                // Read the child Scraps nodes which are the individual reader config nodes
-                configParser.ParseChildScrapNodes(scrapNode, parentConfig, webNodeNavigator);
+                logger.DebugFormat("{0} html Nodes found which will be parsed in loop.", webNodeNavigatorList.Count);
 
-                // Check the constraints on the Scrap nodes
-                // 1. Only maximum 4 levels is allowed
-                // 2. Only one "name" tag should be present from the top level to bottom Scrap
-                //    If multiple "name" tag is present throw error
-                AssertLevelConstraint(webScrapConfigObj);
-                AssertScrapNameAttribute(webScrapConfigObj);
+                // Process
+                int nodeIndex = 0;
+                foreach (var webNodeNavigator in webNodeNavigatorList)
+                {
+                    logger.DebugFormat("Parsing Config ScrapHtmlTable {0}th node with data '{1}'", 
+                        nodeIndex, webNodeNavigator.Value);
 
-                // Read the Column nodes which are the individual reader config nodes
-                scrapColumnConfigParser.Process(nodeIndex, scrapNode, parentConfig, webNodeNavigator);
+                    // Read the child Scraps nodes which are the individual reader config nodes
+                    configParser.ParseChildScrapNodes(scrapNode, webScrapConfigObj, webNodeNavigator);
 
-                nodeIndex++;
+                    // Check the constraints on the Scrap nodes
+                    // 1. Only maximum 4 levels is allowed
+                    // 2. Only one "name" tag should be present from the top level to bottom Scrap
+                    //    If multiple "name" tag is present throw error
+                    AssertLevelConstraint(webScrapConfigObj);
+                    AssertScrapNameAttribute(webScrapConfigObj);
+
+                    // Read the Column nodes which are the individual reader config nodes
+                    scrapColumnConfigParser.Process(nodeIndex, scrapNode, webScrapConfigObj, webNodeNavigator);
+
+                    nodeIndex++;
+                }
             }
         }
 
@@ -73,6 +86,8 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private List<HtmlNodeNavigator> FetchHtmlTable(ScrapHtmlTableElement webScrapConfigObj)
         {
+            logger.DebugFormat("Fetch '{0}' from Url '{1}'", webScrapConfigObj.XPath, webScrapConfigObj.Url);
+
             HtmlNode htmlDoc = configParser.ScrapperCommand.Load(webScrapConfigObj.Url);
             return configParser.ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
         }

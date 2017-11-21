@@ -130,6 +130,7 @@
     <Compile Include="Model\ScrapXml\ColumnElement.cs" />
     <Compile Include="Model\ScrapXml\ManipulateElement.cs" />
     <Compile Include="Model\ScrapXml\MetadataElement.cs" />
+    <Compile Include="Model\ScrapXml\PickElement.cs" />
     <Compile Include="Model\ScrapXml\RegexElement.cs" />
     <Compile Include="Model\ScrapXml\ReplaceElement.cs" />
     <Compile Include="Model\ScrapXml\ScrapElement.cs" />

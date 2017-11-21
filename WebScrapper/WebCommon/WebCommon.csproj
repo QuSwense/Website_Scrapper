@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Combinatorics\GroupCombinations.cs" />
     <Compile Include="Error\AppTopicConfigException.cs" />
     <Compile Include="Error\AppTopicDbConfigException.cs" />
     <Compile Include="Error\CommandLineException.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Error\ScrapParserException.cs" />
     <Compile Include="Error\ScrapXmlException.cs" />
     <Compile Include="Error\XmlDocReaderException.cs" />
+    <Compile Include="Extn\ListClassExtension.cs" />
     <Compile Include="Extn\StringInjectExtension.cs" />
     <Compile Include="PathHelp\AppTopicConfigPathHelper.cs" />
     <Compile Include="PathHelp\ConfigHelper.cs" />

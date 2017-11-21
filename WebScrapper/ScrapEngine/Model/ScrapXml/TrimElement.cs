@@ -12,7 +12,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data
         /// </summary>
-        [DXmlAttribute("data", IsMandatory = true)]
+        [DXmlAttribute("data")]
         public string Data { get; set; }
 
         /// <summary>

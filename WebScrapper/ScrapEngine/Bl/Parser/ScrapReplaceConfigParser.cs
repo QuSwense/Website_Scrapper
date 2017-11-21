@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -16,17 +17,31 @@ namespace ScrapEngine.Bl.Parser
 
         public override ManipulateChildElement Process(XmlNode replaceNode, ManipulateElement webConfigObj)
         {
-            ReplaceElement configTrimObj = configParser.XmlConfigReader.ReadElement<ReplaceElement>(replaceNode);
-            configTrimObj.InString = Normalize(configTrimObj.InString);
-            configTrimObj.OutString = Normalize(configTrimObj.OutString);
+            ReplaceElement configReplaceObj = configParser.XmlConfigReader.ReadElement<ReplaceElement>(replaceNode);
+            configReplaceObj.InString = Normalize(configReplaceObj.InString);
+            configReplaceObj.OutString = Normalize(configReplaceObj.OutString);
+            Assert(configReplaceObj);
 
-            return configTrimObj;
+            return configReplaceObj;
         }
         
         public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
         {
+            if (string.IsNullOrEmpty(result.OriginalValue)) return;
+
             ReplaceElement replaceConfig = (ReplaceElement)manipulateChild;
-            result.Value = result.Value.Replace(replaceConfig.InString, replaceConfig.OutString);
+
+            List<string> finalResults = new List<string>();
+            for (int i = 0; i < result.Results.Count; ++i)
+                finalResults.Add(result.Results[i].Replace(replaceConfig.InString, replaceConfig.OutString));
+
+            result.Results = new List<string>(finalResults);
+        }
+
+        private void Assert(ReplaceElement replaceElement)
+        {
+            if (string.IsNullOrEmpty(replaceElement.InString))
+                throw new ScrapParserException(ScrapParserException.EErrorType.MANIPULATE_REPLACE_INSTRING_EMPTY);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using System.Collections.Generic;
 
 namespace WebScrapper
 {
@@ -19,5 +20,18 @@ namespace WebScrapper
         /// </summary>
         [Option("a", DefaultValue = "*", HelpText = "Scrapper Application Topic")]
         public string AppTopic { get; set; }
+
+        /// <summary>
+        /// Get the list of Key = value pairs
+        /// </summary>
+        /// <returns></returns>
+        public string[] PrintParsed()
+        {
+            return new string[]
+            {
+                string.Format("ScrapperFolderPath = {0}", ScrapperFolderPath),
+                string.Format("AppTopic = {0}", AppTopic)
+            };
+        }
     }
 }

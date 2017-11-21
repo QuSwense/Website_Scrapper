@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using ScrapEngine.Model.ScrapXml;
+using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -18,14 +19,32 @@ namespace ScrapEngine.Bl.Parser
         {
             TrimElement configTrimObj = configParser.XmlConfigReader.ReadElement<TrimElement>(trimNode);
             configTrimObj.Data = Normalize(configTrimObj.Data);
+            Assert(configTrimObj);
             return configTrimObj;
         }
 
         public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
         {
+            if (string.IsNullOrEmpty(result.OriginalValue)) return;
+
             TrimElement trimElement = (TrimElement)manipulateChild;
-            
-            result.Value = result.Value.Trim(trimElement.Data.ToCharArray());
+
+            List<string> finalResults = new List<string>();
+            for (int i = 0; i < result.Results.Count; ++i)
+            {
+                if (!string.IsNullOrEmpty(trimElement.Data))
+                    finalResults.Add(result.Results[i].Trim(trimElement.Data.ToCharArray()));
+                else
+                    finalResults.Add(result.Results[i].Trim());
+            }
+            result.Results = new List<string>(finalResults);
+        }
+
+        private void Assert(TrimElement configTrimObj)
+        {
+            if (string.IsNullOrEmpty(configTrimObj.Data))
+                return;
+            // For empty Trim consider default string.Trim() method
         }
     }
 }

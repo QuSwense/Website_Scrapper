@@ -16,7 +16,7 @@ namespace ScrapEngine.Model.Parser
         public override void PreProcess()
         {
             WebDataConfigScrapCsv ScrapConfigCsv = ScrapConfig as WebDataConfigScrapCsv;
-            if (ScrapConfigCsv == null)
+            if (ScrapConfigCsv != null)
             {
                 splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });
             }

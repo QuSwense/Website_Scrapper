@@ -48,5 +48,28 @@ namespace ScrapEngine.Model
             Columns = new List<ColumnElement>();
             DoUpdateOnly = false;
         }
+
+        /// <summary>
+        /// The name of the table
+        /// </summary>
+        public string TableName
+        {
+            get
+            {
+                ScrapElement tmpObj = this;
+
+                while (tmpObj != null)
+                {
+                    if (!string.IsNullOrEmpty(tmpObj.Name))
+                    {
+                        return tmpObj.Name;
+                    }
+
+                    tmpObj = tmpObj.Parent;
+                }
+
+                return string.Empty;
+            }
+        }
     }
 }

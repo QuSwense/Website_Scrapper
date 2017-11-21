@@ -21,14 +21,27 @@ namespace ScrapEngine.Model
         /// The data node
         /// </summary>
         [DXmlAttribute("index")]
-        public int Index { get; set; }
+        public string IndexString { get; set; }
+
+        /// <summary>
+        /// The index of the regex matched groups. '*'(-1) for all of them 
+        /// </summary>
+        public int Index
+        {
+            get
+            {
+                if (IndexString == "*") return -1;
+                else if (string.IsNullOrEmpty(IndexString)) return 0;
+                return Convert.ToInt32(IndexString);
+            }
+        }
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public RegexElement()
         {
-            Index = 0;
+            IndexString = "0";
             manipulateType = EManipulateType.Regex;
         }
     }
