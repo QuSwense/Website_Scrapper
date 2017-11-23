@@ -112,10 +112,12 @@ namespace ScrapEngine.Db
         public void AddOrUpdate(ScrapElement scrapConfig, List<List<DynamicTableDataInsertModel>> rows)
         {
             // Create Combinations of data list
-            Combinations<List<DynamicTableDataInsertModel>> rowCombinations =
-                new Combinations<List<DynamicTableDataInsertModel>>(rows, rows.Count);
+            GroupCombinations<DynamicTableDataInsertModel> rowCombinations =
+                new GroupCombinations<DynamicTableDataInsertModel>(rows, rows.Count);
 
-            foreach (var row in rowCombinations)
+            rowCombinations.GenerateNonRepetive();
+
+            foreach (var row in rowCombinations.ResultSets)
             {
                 WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
             }

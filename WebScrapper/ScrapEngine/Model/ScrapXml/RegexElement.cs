@@ -25,12 +25,14 @@ namespace ScrapEngine.Model
 
         /// <summary>
         /// The index of the regex matched groups. '*'(-1) for all of them 
+        /// The index of the last elelment is represented by -2.
         /// </summary>
         public int Index
         {
             get
             {
                 if (IndexString == "*") return -1;
+                else if (IndexString == "last") return -2;
                 else if (string.IsNullOrEmpty(IndexString)) return 0;
                 return Convert.ToInt32(IndexString);
             }

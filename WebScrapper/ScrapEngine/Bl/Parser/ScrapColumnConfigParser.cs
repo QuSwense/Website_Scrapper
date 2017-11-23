@@ -162,9 +162,7 @@ namespace ScrapEngine.Bl.Parser
                 
                 manipulateHtml = Manipulate(columnConfig, scrapArgs.GetDataIterator(columnConfig));
 
-                if (columnConfig.IsUnique && 
-                    (manipulateHtml.Results.Count <= 0 || manipulateHtml.Results.Contains(null)
-                    || manipulateHtml.Results.Contains(string.Empty)))
+                if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0))
                 {
                     doSkipDbAddUpdate = true;
                     break;
@@ -173,20 +171,29 @@ namespace ScrapEngine.Bl.Parser
                 foreach (var result in manipulateHtml.Results)
                 {
                     DynamicTableDataInsertModel tableDataColumn = new DynamicTableDataInsertModel();
-                    colValues.Add(tableDataColumn);
 
                     tableDataColumn.Name = columnConfig.Name;
                     tableDataColumn.IsPk = columnConfig.IsUnique;
-                    tableDataColumn.Value = manipulateHtml.OriginalValue;
+                    tableDataColumn.Value = result;
                     tableDataColumn.DataType =
                         configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.ScrapConfig.TableName][columnConfig.Name].DataType;
+
+                    if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
+                        continue;
+                    colValues.Add(tableDataColumn);
                 }
 
                 rows.Add(colValues);
             }
 
             if (!doSkipDbAddUpdate && scrapArgs.ScrapConfig.Columns.Count > 0)
+            {
+                configParser.Performance.NewDbUpdate(scrapArgs.NodeIndex.ToString());
+
                 configParser.WebDbContext.AddOrUpdate(scrapArgs.ScrapConfig, rows);
+
+                configParser.Performance.FinalDbUpdate(scrapArgs.NodeIndex.ToString());
+            }
         }
 
         /// <summary>

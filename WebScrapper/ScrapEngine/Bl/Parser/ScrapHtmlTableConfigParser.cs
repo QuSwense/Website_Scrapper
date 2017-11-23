@@ -86,10 +86,17 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private List<HtmlNodeNavigator> FetchHtmlTable(ScrapHtmlTableElement webScrapConfigObj)
         {
+            configParser.Performance.NewHtmlLoad(webScrapConfigObj.Url);
+
             logger.DebugFormat("Fetch '{0}' from Url '{1}'", webScrapConfigObj.XPath, webScrapConfigObj.Url);
 
             HtmlNode htmlDoc = configParser.ScrapperCommand.Load(webScrapConfigObj.Url);
-            return configParser.ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
+            List<HtmlNodeNavigator> navigators =
+                configParser.ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
+
+            configParser.Performance.FinalHtmlLoad(webScrapConfigObj.Url);
+
+            return navigators;
         }
     }
 }

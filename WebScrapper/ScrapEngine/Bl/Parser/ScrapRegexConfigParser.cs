@@ -53,13 +53,15 @@ namespace ScrapEngine.Bl.Parser
 
             for(int i = 0; i < result.Results.Count; ++i)
             {
-                Match output = regexPattern.Match(result.Results[i]);
+                MatchCollection matchlist = regexPattern.Matches(result.Results[i]);
 
-                if (regexConfig.Index >= 0 && output.Groups.Count > regexConfig.Index)
-                        finalResults.Add(output.Groups[regexConfig.Index].Value);
-                else if (regexConfig.Index < 0)
-                    foreach (Group group in output.Groups)
-                        finalResults.Add(group.Value);
+                if (regexConfig.Index >= 0 && matchlist.Count > regexConfig.Index)
+                        finalResults.Add(matchlist[regexConfig.Index].Value);
+                else if (regexConfig.Index == -1)
+                    foreach (Match match in matchlist)
+                        finalResults.Add(match.Value);
+                else if (regexConfig.Index == -2 && matchlist.Count > 0) // Add last
+                    finalResults.Add(matchlist[matchlist.Count - 1].Value);
                 else finalResults.Add(result.Results[i]);
             }
 

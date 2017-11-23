@@ -42,6 +42,25 @@ namespace ScrapEngine.Model
         /// </summary>
         public ScrapElement Parent { get; set; }
 
+        /// <summary>
+        /// Get the level with respect to the parent Scrap node
+        /// </summary>
+        public int Level
+        {
+            get
+            {
+                int level = 0;
+                ScrapElement tmpObj = this;
+                while (tmpObj.Parent != null)
+                {
+                    tmpObj = tmpObj.Parent;
+                    ++level;
+                }
+
+                return level;
+            }
+        }
+
         public ScrapElement()
         {
             Scraps = new List<ScrapElement>();

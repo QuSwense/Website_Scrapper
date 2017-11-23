@@ -6,6 +6,7 @@ using ScrapEngine.Model;
 using SqliteDatabase.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -53,6 +54,11 @@ namespace ScrapEngine.Bl
         /// </summary>
         private ScrapCsvConfigParser scrapCsvConfigParser;
 
+        /// <summary>
+        /// Performance measurement for debug
+        /// </summary>
+        public PerformanceMeasure Performance { get; set; }
+
         #endregion Properties
 
         #region Helper Properties
@@ -90,6 +96,7 @@ namespace ScrapEngine.Bl
         {
             scrapHtmlTableConfigParser = new ScrapHtmlTableConfigParser(this);
             scrapCsvConfigParser = new ScrapCsvConfigParser(this);
+            Performance = new PerformanceMeasure();
         }
 
         /// <summary>
@@ -132,6 +139,8 @@ namespace ScrapEngine.Bl
         {
             if (xmlNode == null || xmlNode.ChildNodes == null) return;
 
+            CalculateRootWebDataNodePerformance(xmlNode);
+
             // Read the child nodes of Scrap type nodes
             foreach (XmlNode scrapNode in xmlNode.ChildNodes)
                 if (!ConfigScrapElementFactory(scrapNode, parentConfig, webNodeNavigator)) return;
@@ -158,6 +167,21 @@ namespace ScrapEngine.Bl
             else bProcessed = false;
 
             return bProcessed;
+        }
+
+        /// <summary>
+        /// Calculate processing of Root Webdata single node
+        /// </summary>
+        /// <param name="xmlNode"></param>
+        private void CalculateRootWebDataNodePerformance(XmlNode xmlNode)
+        {
+            if (xmlNode == null || xmlNode.Attributes == null ||
+                xmlNode.ParentNode == null) return;
+
+            if(xmlNode.ParentNode.Name == "WebData")
+            {
+                Performance.NewChildNode(xmlNode.Attributes["name"].Value);
+            }
         }
     }
 }

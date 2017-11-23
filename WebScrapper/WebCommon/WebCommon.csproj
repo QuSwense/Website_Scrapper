@@ -81,6 +81,7 @@
     <Compile Include="Combinatorics\GroupCombinations.cs" />
     <Compile Include="Error\AppTopicConfigException.cs" />
     <Compile Include="Error\AppTopicDbConfigException.cs" />
+    <Compile Include="Error\CombinatoricsException.cs" />
     <Compile Include="Error\CommandLineException.cs" />
     <Compile Include="Error\ConfigException.cs" />
     <Compile Include="Error\DynamicDbException.cs" />

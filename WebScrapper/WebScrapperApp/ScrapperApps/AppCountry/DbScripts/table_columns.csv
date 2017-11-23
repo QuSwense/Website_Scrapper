@@ -73,5 +73,5 @@ crncycntry,iso4217,ISO 4217,string,2,,,
 crncycntry,iso31661a2,ISO 3166-1 A 2,string,3,,,
 lang,iso6391,ISO 639-1 Code,string,2,,,1
 lang,nm,English Name of Language,string,2,,,1
-cntrylang,iso31661a2,ISO 3166-1 Alpha 2,string,2,,1,
+cntrylang,iso31661a2,ISO 3166-1 Alpha 2,string,2,,,1
 cntrylang,iso6391,ISO 4217 Code,string,2,,,1

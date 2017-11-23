@@ -47,14 +47,18 @@ namespace ScrapEngine.Bl.Parser
             List<string> finalResults = new List<string>();
             for (int i = 0; i < result.Results.Count; ++i)
             {
-                if (!string.IsNullOrEmpty(result.OriginalValue))
+                if (!string.IsNullOrEmpty(result.Results[i]))
                 {
                     string[] split = result.Results[i].Split(splitElement.Data.ToArray());
 
                     if (splitElement.Index >= 0 && splitElement.Index < split.Length)
                         finalResults.Add(split[splitElement.Index]);
-                    else if(splitElement.Index < 0)
+                    else if (splitElement.Index == -1) // Add all
                         foreach (var item in split) finalResults.Add(item);
+                    else if (splitElement.Index == -2) // Add last
+                        finalResults.Add(split.LastOrDefault());
+                    else
+                        throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_INDEX_INVALID);
                 }
                 else
                     finalResults.Add(result.Results[i]);
@@ -70,7 +74,7 @@ namespace ScrapEngine.Bl.Parser
         {
             if (string.IsNullOrEmpty(splitElement.Data))
                 throw new ScrapParserException(ScrapParserException.EErrorType.MANIPULATE_SPLIT_DATA_EMPTY);
-            else if (splitElement.Index < 0)
+            else if (!(splitElement.Index == -1 || splitElement.Index == -2 || splitElement.Index >= 0))
                 throw new ScrapParserException(ScrapParserException.EErrorType.MANIPULATE_SPLIT_INDEX_INVALID,
                     new string[] { splitElement.Index.ToString() });
         }
