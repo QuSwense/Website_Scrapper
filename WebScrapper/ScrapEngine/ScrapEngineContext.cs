@@ -16,6 +16,9 @@ namespace ScrapEngine
     {
         #region Properties
 
+        /// <summary>
+        /// The logger
+        /// </summary>
         public static ILog logger = LogManager.GetLogger(typeof(ScrapEngineContext));
 
         /// <summary>
@@ -93,6 +96,23 @@ namespace ScrapEngine
             ScrapEngineContext appEngine = new ScrapEngineContext();
             appEngine.Initialize(appTopicPath, appGenericConfig);
             return appEngine;
+        }
+
+        /// <summary>
+        /// A static initializer to construct and initialize the app topic specific scrap context
+        /// </summary>
+        /// <param name="appTopicPath"></param>
+        /// <param name="appGenericConfig"></param>
+        /// <param name="genericDbConfig"></param>
+        /// <returns></returns>
+        public static void Execute(AppTopicConfigPathHelper appTopicPath,
+            ApplicationConfig appGenericConfig)
+        {
+            logger.InfoFormat("Generate Application Web Scrapped data for {0}", appTopicPath);
+
+            ScrapEngineContext engineContext = ScrapEngineContext.Init(appTopicPath,
+                        appGenericConfig);
+            engineContext.Run();
         }
 
         #endregion Constructor

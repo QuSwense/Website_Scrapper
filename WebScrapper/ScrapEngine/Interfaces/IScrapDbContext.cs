@@ -3,6 +3,7 @@ using ScrapEngine.Model;
 using SqliteDatabase;
 using SqliteDatabase.Model;
 using System.Collections.Generic;
+using ScrapEngine.Bl;
 
 namespace ScrapEngine.Interfaces
 {
@@ -58,5 +59,13 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
         void AddMetadata(ScrapElement webScrapConfigObj);
+
+        /// <summary>
+        /// Add performance metadata
+        /// </summary>
+        /// <param name="performance"></param>
+        //void Add(PerformanceMeasure performance);
+
+        void AddMetadata(string id, PerformanceMeasure performanceMeasure);
     }
 }

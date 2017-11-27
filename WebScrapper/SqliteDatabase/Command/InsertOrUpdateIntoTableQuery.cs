@@ -149,6 +149,59 @@ namespace SqliteDatabase.Command
                     string.Join(",", colValues));
         }
 
+        public void Generate(string key, Dictionary<string, TimeSpan> elapsedDataList, string type)
+        {
+            List<string> colValues = new List<string>();
+
+            foreach (var elapsed in elapsedDataList)
+            {
+                List<string> singleValue = new List<string>
+                {
+                    DataTypeContextHelper.GetQueryFormat(key, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(elapsed.Key, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(type, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(
+                    elapsed.Value.ToString(@"hh\:mm\:ss\.fff"), EConfigDbDataType.STRING)
+                };
+
+                colValues.Add(string.Join(",", singleValue));
+            }
+
+            SQL = string.Format(InsertQueryString, "tblperfmdt", string.Join(") , (", colValues));
+        }
+
+        public void Generate(string key, TimeSpan totalElapsed)
+        {
+            SQL = string.Format(InsertQueryString, 
+                string.Format("{0}, null, {1}, {2}",
+                    DataTypeContextHelper.GetQueryFormat(key, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat("ScrapNode", EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(
+                        totalElapsed.ToString(@"hh\:mm\:ss\.fff"), EConfigDbDataType.STRING)));
+        }
+
+        internal void Generate(string key, List<TimeSpan> totalElapsedList, string type)
+        {
+            List<string> colValues = new List<string>();
+
+            for (int i = 0; i < totalElapsedList.Count; ++i)
+            {
+                var elapsed = totalElapsedList[i];
+                List<string> singleValue = new List<string>
+                {
+                    DataTypeContextHelper.GetQueryFormat(key, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(i.ToString(), EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(type, EConfigDbDataType.STRING),
+                    DataTypeContextHelper.GetQueryFormat(
+                    elapsed.ToString(@"hh\:mm\:ss\.fff"), EConfigDbDataType.STRING)
+                };
+
+                colValues.Add(string.Join(",", singleValue));
+            }
+
+            SQL = string.Format(InsertQueryString, "tblperfmdt", string.Join(") , (", colValues));
+        }
+
         #endregion Generate
     }
 }

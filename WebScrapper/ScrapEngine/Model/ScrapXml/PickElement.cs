@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ScrapEngine.Model.ScrapXml
+﻿namespace ScrapEngine.Model.ScrapXml
 {
     /// <summary>
     /// This class is used to pick mulitple values in case of multiple cardinality

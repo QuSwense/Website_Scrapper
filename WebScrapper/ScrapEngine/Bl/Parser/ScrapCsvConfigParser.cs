@@ -1,12 +1,7 @@
-﻿using HtmlAgilityPack;
-using log4net;
+﻿using log4net;
 using ScrapEngine.Model;
-using System;
-using System.Collections.Generic;
+using ScrapEngine.Model.Parser;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace ScrapEngine.Bl.Parser
@@ -18,12 +13,15 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapCsvConfigParser : ScrapConfigParser
     {
+        /// <summary>
+        /// The logging context
+        /// </summary>
         public static ILog logger = LogManager.GetLogger(typeof(ScrapCsvConfigParser));
 
         /// <summary>
-        /// Scrap column config parser
+        /// Current Csv iterator scrap
         /// </summary>
-        private ScrapColumnConfigParser scrapColumnConfigParser;
+        private ScrapIteratorCsvArgs currentScrapIteratorCsv;
 
         /// <summary>
         /// Constructor (no default constructor)
@@ -31,20 +29,17 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configParser"></param>
         /// <param name="startState"></param>
         public ScrapCsvConfigParser(WebScrapConfigParser configParser)
-            : base(configParser)
-        {
-            scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
-        }
+            : base(configParser) { }
 
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
+        public override void Process(ScrapIteratorArgs args)
         {
             logger.Info("Parsing Config ScrapCsv node");
 
             var webScrapConfigObj = 
-                ParseScrapElementAttributes<WebDataConfigScrapCsv>(scrapNode, parentConfig, htmlNode);
+                ParseScrapElementAttributes<ScrapCsvElement>(args);
             webScrapConfigObj.Delimiter = Normalize(webScrapConfigObj.Delimiter);
 
             // This finally scraps the html webpage data
@@ -60,16 +55,22 @@ namespace ScrapEngine.Bl.Parser
                     logger.DebugFormat("Parsing Config ScrapCsv {0}th node with data '{1}'",
                         nodeIndex, fileLine);
 
-                    // Check the constraints on the Scrap nodes
-                    // 1. Only maximum 4 levels is allowed
-                    // 2. Only one "name" tag should be present from the top level to bottom Scrap
-                    //    If multiple "name" tag is present throw error
-                    AssertLevelConstraint(webScrapConfigObj);
-                    AssertScrapNameAttribute(webScrapConfigObj);
+                    // Set current state
+                    SetCurrentState(args, new ScrapIteratorCsvArgs()
+                    {
+                        ScrapConfigNode = args.ScrapConfigNode,
+                        ScrapConfigObj = webScrapConfigObj,
+                        WebHtmlNode = args.WebHtmlNode
+                    }, ref currentScrapIteratorCsv);
 
-                    // Read the Column nodes which are the individual reader config nodes
-                    scrapColumnConfigParser.Process(nodeIndex, 
-                        scrapNode, webScrapConfigObj, htmlNode, fileLine);
+                    // Process column values
+                    ProcessColumnParser(new ColumnScrapIteratorFileArgs()
+                    {
+                        FileLine = fileLine,
+                        NodeIndex = nodeIndex,
+                        ScrapConfig = currentScrapIteratorCsv.ScrapConfigObj,
+                        ScrapNode = args.ScrapConfigNode
+                    });
                 }
             }
         }
@@ -79,11 +80,32 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
         /// <returns></returns>
-        private StringReader FetchFileReader(WebDataConfigScrapCsv webScrapConfigObj)
+        private StringReader FetchFileReader(ScrapCsvElement webScrapConfigObj)
         {
+            configParser.Performance.NewHtmlLoad(webScrapConfigObj);
+
             logger.DebugFormat("Fetch File from Url '{0}'", webScrapConfigObj.Url);
 
-            return new StringReader(configParser.ScrapperCommand.LoadFile(webScrapConfigObj.Url));
+            StringReader stringReader = new StringReader(configParser.ScrapperCommand.LoadFile(webScrapConfigObj.Url));
+
+            configParser.Performance.FinalHtmlLoad(webScrapConfigObj.Url);
+
+            return stringReader;
+        }
+
+        /// <summary>
+        /// Create new args to pass to Process method
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public override ScrapIteratorArgs CreateArgs(ScrapIteratorArgs args, XmlNode nextChildNode)
+        {
+            return new ScrapIteratorCsvArgs()
+            {
+                ScrapConfigNode = nextChildNode,
+                ScrapConfigObj = args.ScrapConfigObj,
+                WebHtmlNode = args.WebHtmlNode
+            };
         }
     }
 }

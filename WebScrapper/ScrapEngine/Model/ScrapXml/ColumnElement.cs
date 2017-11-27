@@ -52,6 +52,12 @@ namespace ScrapEngine.Model
         [DXmlAttribute("cardinal")]
         public string CardinalString { get; set; }
 
+        /// <summary>
+        /// The xpath
+        /// </summary>
+        [DXmlAttribute("level")]
+        public int Level { get; set; }
+
         public int Cardinal
         {
             get
@@ -74,6 +80,7 @@ namespace ScrapEngine.Model
         {
             Manipulations = new List<ManipulateElement>();
             CardinalString = "1";
+            Level = Int32.MinValue;
         }
     }
 }

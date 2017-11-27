@@ -1,9 +1,4 @@
-﻿using ScrapEngine.Interfaces;
-using ScrapEngine.Model.ScrapXml;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using ScrapEngine.Model.ScrapXml;
 using WebReader.Model;
 
 namespace ScrapEngine.Model

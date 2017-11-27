@@ -1,17 +1,9 @@
-﻿using HtmlAgilityPack;
-using log4net;
-using ScrapEngine.Interfaces;
+﻿using log4net;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using SqliteDatabase.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.XPath;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -39,26 +31,6 @@ namespace ScrapEngine.Bl.Parser
         }
 
         /// <summary>
-        /// Process Column element tag for scrapping data from Html Table
-        /// </summary>
-        /// <param name="scrapNode"></param>
-        /// <param name="configScrap"></param>
-        /// <param name="htmlNode"></param>
-        public void Process(int nodeIndex, XmlNode scrapNode, 
-            ScrapElement configScrap, HtmlNodeNavigator htmlNode)
-        {
-            logger.DebugFormat("Scrapping data from website for a Single Row.");
-            ParseColumnsConfig(scrapNode, configScrap);
-            ColumnScrapIterator(new ColumnScrapIteratorHtmlArgs()
-            {
-                NodeIndex = nodeIndex,
-                ScrapConfig = configScrap,
-                ScrapNode = scrapNode,
-                WebHtmlNode = htmlNode
-            });
-        }
-
-        /// <summary>
         /// Process Column element tag for scrapping data from csv file
         /// </summary>
         /// <param name="nodeIndex"></param>
@@ -66,18 +38,12 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configScrap"></param>
         /// <param name="htmlNode"></param>
         /// <param name="fileLine"></param>
-        public void Process(int nodeIndex, XmlNode scrapNode, ScrapElement configScrap,
-            HtmlNodeNavigator htmlNode, string fileLine)
+        public void Process<T>(T args)
+            where T : ColumnScrapIteratorArgs
         {
             logger.DebugFormat("Scrapping data from online text file");
-            ParseColumnsConfig(scrapNode, configScrap);
-            ColumnScrapIterator(new ColumnScrapIteratorFileArgs()
-            {
-                NodeIndex = nodeIndex,
-                ScrapConfig = configScrap,
-                ScrapNode = scrapNode,
-                FileLine = fileLine
-            });
+            ParseColumnsConfig(args.ScrapNode, args.ScrapConfig);
+            ColumnScrapIterator(args);
         }
 
         /// <summary>
@@ -188,11 +154,11 @@ namespace ScrapEngine.Bl.Parser
 
             if (!doSkipDbAddUpdate && scrapArgs.ScrapConfig.Columns.Count > 0)
             {
-                configParser.Performance.NewDbUpdate(scrapArgs.NodeIndex.ToString());
+                configParser.Performance.NewDbUpdate(rows, scrapArgs);
 
                 configParser.WebDbContext.AddOrUpdate(scrapArgs.ScrapConfig, rows);
 
-                configParser.Performance.FinalDbUpdate(scrapArgs.NodeIndex.ToString());
+                configParser.Performance.FinalDbUpdate(rows, scrapArgs);
             }
         }
 

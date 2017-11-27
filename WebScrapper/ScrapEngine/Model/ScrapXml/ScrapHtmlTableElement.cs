@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WebReader.Model;
+﻿using WebReader.Model;
 
 namespace ScrapEngine.Model
 {

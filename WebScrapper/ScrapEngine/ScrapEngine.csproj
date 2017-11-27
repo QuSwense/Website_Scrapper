@@ -115,6 +115,9 @@
     <Compile Include="Db\ScrapDbContext.cs" />
     <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Interfaces\IInnerBaseParser.cs" />
+    <Compile Include="Model\Parser\ScrapIteratorArgs.cs" />
+    <Compile Include="Model\Parser\ScrapIteratorCsvArgs.cs" />
+    <Compile Include="Model\Parser\ScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\PerformanceState.cs" />
     <Compile Include="Model\ScrapXml\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />

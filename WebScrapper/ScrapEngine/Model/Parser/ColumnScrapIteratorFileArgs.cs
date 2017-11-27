@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ScrapEngine.Model.Parser
+﻿namespace ScrapEngine.Model.Parser
 {
     public class ColumnScrapIteratorFileArgs : ColumnScrapIteratorArgs
     {
@@ -15,7 +8,7 @@ namespace ScrapEngine.Model.Parser
 
         public override void PreProcess()
         {
-            WebDataConfigScrapCsv ScrapConfigCsv = ScrapConfig as WebDataConfigScrapCsv;
+            ScrapCsvElement ScrapConfigCsv = ScrapConfig as ScrapCsvElement;
             if (ScrapConfigCsv != null)
             {
                 splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });

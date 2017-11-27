@@ -1,5 +1,4 @@
 ﻿using ScrapEngine.Interfaces;
-using ScrapEngine.Model;
 
 namespace ScrapEngine.Bl
 {

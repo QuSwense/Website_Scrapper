@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using System.Collections.Generic;
-using System.IO;
 
 namespace ScrapEngine.Interfaces
 {

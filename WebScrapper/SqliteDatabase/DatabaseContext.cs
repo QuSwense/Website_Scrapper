@@ -124,6 +124,17 @@ namespace SqliteDatabase
             ExecuteDDL(SQL.ToString());
         }
 
+        protected void CreateTablePerformanceMetdata()
+        {
+            StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS tblperfmdt (");
+            SQL.Append("nm TEXT,");
+            SQL.Append("pkey TEXT,");
+            SQL.Append("typ TEXT,");
+            SQL.Append("timespan TEXT)");
+
+            ExecuteDDL(SQL.ToString());
+        }
+
         public void AddOrUpdate(string name, List<DynamicTableDataInsertModel> row, bool doUpdateOnly = false)
         {
             SelectTableQuery selectUniqueRowObj = new SelectTableQuery();
@@ -175,6 +186,20 @@ namespace SqliteDatabase
                 ExecuteDDL(commandQuery.SQL);
         }
 
+        public void AddPerformance(string key, Dictionary<string, TimeSpan> elapsedDataList, string type)
+        {
+            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
+            commandQuery.Generate(key, elapsedDataList, type);
+            ExecuteDDL(commandQuery.SQL);
+        }
+
+        public void AddPerformance(string key, List<TimeSpan> totalElapsedList, string type)
+        {
+            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
+            commandQuery.Generate(key, totalElapsedList, type);
+            ExecuteDDL(commandQuery.SQL);
+        }
+
         public void AddTableMetadata(DbTablesMetdataDefinitionModel tableMetadatas)
         {
             InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
@@ -201,6 +226,7 @@ namespace SqliteDatabase
             CreateTableMetadata();
             CreateTableScrapMetadata();
             CreateColumnScrapMetadata();
+            CreateTablePerformanceMetdata();
         }
 
         /// <summary>

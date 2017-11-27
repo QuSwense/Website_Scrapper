@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebReader.Model;
+﻿using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
-    public class WebDataConfigScrapCsv : ScrapElement
+    public class ScrapCsvElement : ScrapElement
     {
         /// <summary>
         /// The name of the Element tag
@@ -26,7 +21,7 @@ namespace ScrapEngine.Model
         [DXmlAttribute("skipfirst")]
         public int SkipFirstLines { get; set; }
 
-        public WebDataConfigScrapCsv()
+        public ScrapCsvElement()
         {
             SkipFirstLines = 0;
             Delimiter = "\\t";

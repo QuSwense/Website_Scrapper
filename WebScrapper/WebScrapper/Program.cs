@@ -15,7 +15,7 @@ namespace WebScrapper
         public static ILog logger = LogManager.GetLogger(typeof(Program));
 
         /// <summary>
-        /// Pass argument for generating application data
+        /// Pass command line argument for scrapping and saving application data
         /// 1: The name of the application topic, or "*" for all
         /// </summary>
         /// <param name="args"></param>
@@ -60,23 +60,10 @@ namespace WebScrapper
 
                 // Get a list of all application scrap folders and generate application scrapper context
                 foreach (var appTopicPath in AppTopicConfigPathHelper.GetAppTopics())
-                {
-                    logger.InfoFormat("Generate Application Web Scrapped data for {0}", appTopicPath);
-
-                    ScrapEngineContext engineContext = ScrapEngineContext.Init(appTopicPath, 
-                        appGenericConfig);
-                    engineContext.Run();
-                }
+                    ScrapEngineContext.Execute(appTopicPath, appGenericConfig);
             }
             else
-            {
-                logger.InfoFormat("Generate Application Web Scrapped data for {0}", options.AppTopic);
-
-                // For specific application topic value
-                ScrapEngineContext engineContext = ScrapEngineContext.Init(new AppTopicConfigPathHelper(options.AppTopic), 
-                    appGenericConfig);
-                engineContext.Run();
-            }
+                ScrapEngineContext.Execute(new AppTopicConfigPathHelper(options.AppTopic), appGenericConfig);
 
             logger.Info("End of the Application Data Scrapper");
         }

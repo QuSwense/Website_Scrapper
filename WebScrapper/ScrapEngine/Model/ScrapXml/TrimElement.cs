@@ -1,5 +1,4 @@
-﻿using ScrapEngine.Interfaces;
-using ScrapEngine.Model.ScrapXml;
+﻿using ScrapEngine.Model.ScrapXml;
 using WebReader.Model;
 
 namespace ScrapEngine.Model

@@ -1,13 +1,8 @@
 ﻿using HtmlAgilityPack;
 using log4net;
-using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
-using System;
+using ScrapEngine.Model.Parser;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace ScrapEngine.Bl.Parser
@@ -20,11 +15,12 @@ namespace ScrapEngine.Bl.Parser
     public class ScrapHtmlTableConfigParser : ScrapConfigParser
     {
         public static ILog logger = LogManager.GetLogger(typeof(ScrapHtmlTableConfigParser));
-
+        
         /// <summary>
-        /// Scrap column config parser
+        /// Stores the current state which is getting processed. Save the State before
+        /// sending to process child node
         /// </summary>
-        private ScrapColumnConfigParser scrapColumnConfigParser;
+        private ScrapIteratorHtmlArgs currentScrapIteratorHtml;
 
         /// <summary>
         /// Constructor (no default constructor)
@@ -32,20 +28,17 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configParser"></param>
         /// <param name="startState"></param>
         public ScrapHtmlTableConfigParser(WebScrapConfigParser configParser)
-            : base(configParser)
-        {
-            scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
-        }
+            : base(configParser) { }
 
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public void Process(XmlNode scrapNode, ScrapElement parentConfig, HtmlNodeNavigator htmlNode)
+        public override void Process(ScrapIteratorArgs args)
         {
             logger.Info("Parsing Config ScrapHtmlTable node");
 
             var webScrapConfigObj = 
-                ParseScrapElementAttributes<ScrapHtmlTableElement>(scrapNode, parentConfig, htmlNode);
+                ParseScrapElementAttributes<ScrapHtmlTableElement>(args);
 
             // This finally scraps the html webpage data
             var webNodeNavigatorList = FetchHtmlTable(webScrapConfigObj);
@@ -58,21 +51,28 @@ namespace ScrapEngine.Bl.Parser
                 int nodeIndex = 0;
                 foreach (var webNodeNavigator in webNodeNavigatorList)
                 {
-                    logger.DebugFormat("Parsing Config ScrapHtmlTable {0}th node with data '{1}'", 
-                        nodeIndex, webNodeNavigator.Value);
+                    logger.DebugFormat("Parsing Config ScrapHtmlTable {0}th node with data", 
+                        nodeIndex);
+
+                    // Set current state
+                    SetCurrentState(args, new ScrapIteratorHtmlArgs()
+                    {
+                        ScrapConfigNode = args.ScrapConfigNode,
+                        ScrapConfigObj = webScrapConfigObj,
+                        WebHtmlNode = webNodeNavigator
+                    }, ref currentScrapIteratorHtml);
 
                     // Read the child Scraps nodes which are the individual reader config nodes
-                    configParser.ParseChildScrapNodes(scrapNode, webScrapConfigObj, webNodeNavigator);
+                    configParser.ParseChildScrapNodes(currentScrapIteratorHtml);
 
-                    // Check the constraints on the Scrap nodes
-                    // 1. Only maximum 4 levels is allowed
-                    // 2. Only one "name" tag should be present from the top level to bottom Scrap
-                    //    If multiple "name" tag is present throw error
-                    AssertLevelConstraint(webScrapConfigObj);
-                    AssertScrapNameAttribute(webScrapConfigObj);
-
-                    // Read the Column nodes which are the individual reader config nodes
-                    scrapColumnConfigParser.Process(nodeIndex, scrapNode, webScrapConfigObj, webNodeNavigator);
+                    // Process column values
+                    ProcessColumnParser(new ColumnScrapIteratorHtmlArgs()
+                    {
+                        NodeIndex = nodeIndex,
+                        ScrapNode = currentScrapIteratorHtml.ScrapConfigNode,
+                        ScrapConfig = currentScrapIteratorHtml.ScrapConfigObj,
+                        WebHtmlNode = currentScrapIteratorHtml.WebHtmlNode
+                    });
 
                     nodeIndex++;
                 }
@@ -86,7 +86,7 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private List<HtmlNodeNavigator> FetchHtmlTable(ScrapHtmlTableElement webScrapConfigObj)
         {
-            configParser.Performance.NewHtmlLoad(webScrapConfigObj.Url);
+            configParser.Performance.NewHtmlLoad(webScrapConfigObj);
 
             logger.DebugFormat("Fetch '{0}' from Url '{1}'", webScrapConfigObj.XPath, webScrapConfigObj.Url);
 
@@ -97,6 +97,21 @@ namespace ScrapEngine.Bl.Parser
             configParser.Performance.FinalHtmlLoad(webScrapConfigObj.Url);
 
             return navigators;
+        }
+
+        /// <summary>
+        /// Create new args to pass to Process method
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public override ScrapIteratorArgs CreateArgs(ScrapIteratorArgs args, XmlNode nextChildNode)
+        {
+            return new ScrapIteratorHtmlArgs()
+            {
+                ScrapConfigNode = nextChildNode,
+                ScrapConfigObj = args.ScrapConfigObj,
+                WebHtmlNode = args.WebHtmlNode
+            };
         }
     }
 }

@@ -1,10 +1,5 @@
 ﻿using SqliteDatabase.Model;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using WebCommon.Extn;
 
 namespace SqliteDatabase.Command
 {
@@ -66,9 +61,11 @@ namespace SqliteDatabase.Command
                 List<string> pkCols = new List<string>();
                 foreach (var colKv in tableKv.Value)
                 {
-                    List<string> tmpColAttributes = new List<string>();
-                    tmpColAttributes.Add(colKv.Key);
-                    tmpColAttributes.Add(DataTypeContextHelper.GetSqliteType(colKv.Value.DataType));
+                    List<string> tmpColAttributes = new List<string>
+                    {
+                        colKv.Key,
+                        DataTypeContextHelper.GetSqliteType(colKv.Value.DataType)
+                    };
                     if (colKv.Value.IsPrimaryKey)
                         pkCols.Add(colKv.Key);
                     colLists.Add(string.Join(" ", tmpColAttributes));

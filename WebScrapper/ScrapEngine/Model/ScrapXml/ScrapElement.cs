@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
@@ -13,6 +9,12 @@ namespace ScrapEngine.Model
         /// The list of child Scrap element
         /// </summary>
         public List<ScrapElement> Scraps { get; set; }
+
+        /// <summary>
+        /// The id of the node
+        /// </summary>
+        [DXmlAttribute("id")]
+        public string IdString { get; set; }
 
         /// <summary>
         /// The name of the node
@@ -82,6 +84,29 @@ namespace ScrapEngine.Model
                     if (!string.IsNullOrEmpty(tmpObj.Name))
                     {
                         return tmpObj.Name;
+                    }
+
+                    tmpObj = tmpObj.Parent;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// The id of the node
+        /// </summary>
+        public string Id
+        {
+            get
+            {
+                ScrapElement tmpObj = this;
+
+                while (tmpObj != null)
+                {
+                    if (!string.IsNullOrEmpty(tmpObj.IdString))
+                    {
+                        return tmpObj.IdString;
                     }
 
                     tmpObj = tmpObj.Parent;

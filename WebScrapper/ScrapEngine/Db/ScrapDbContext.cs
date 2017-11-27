@@ -4,6 +4,7 @@ using ScrapEngine.Model;
 using SqliteDatabase;
 using SqliteDatabase.Model;
 using WebCommon.Combinatorics;
+using ScrapEngine.Bl;
 
 namespace ScrapEngine.Db
 {
@@ -121,6 +122,35 @@ namespace ScrapEngine.Db
             {
                 WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
             }
+        }
+
+        /// <summary>
+        /// Add performance metadata
+        /// </summary>
+        /// <param name="performance"></param>
+        public void Add(PerformanceMeasure performanceMeasure)
+        {
+            foreach (var performance in performanceMeasure.StorePerformances)
+            {
+                //TODO: WebScrapDb.AddPerformance(performance.Key, performance.Value.ScrapElapsedList, "TotalColumnsUpdate");
+                WebScrapDb.AddPerformance(performance.Key, performance.Value.ElapsedHtmlLoads, "WebPageLoad");
+                WebScrapDb.AddPerformance(performance.Key, performance.Value.ElapsedDbUpdates, "DbUpdate");
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="performanceMeasure"></param>
+        public void AddMetadata(string id, PerformanceMeasure performanceMeasure)
+        {
+            WebScrapDb.AddPerformance(id,
+                performanceMeasure.StorePerformances[id].ScrapElapsedList, "TotalColumnsUpdate");
+            WebScrapDb.AddPerformance(id, 
+                performanceMeasure.StorePerformances[id].ElapsedHtmlLoads, "WebPageLoad");
+            WebScrapDb.AddPerformance(id, 
+                performanceMeasure.StorePerformances[id].ElapsedDbUpdates, "DbUpdate");
         }
 
         /// <summary>

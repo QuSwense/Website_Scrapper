@@ -1,5 +1,4 @@
-﻿using ScrapEngine.Interfaces;
-using ScrapEngine.Model.ScrapXml;
+﻿using ScrapEngine.Model.ScrapXml;
 using System.Collections.Generic;
 
 namespace ScrapEngine.Model

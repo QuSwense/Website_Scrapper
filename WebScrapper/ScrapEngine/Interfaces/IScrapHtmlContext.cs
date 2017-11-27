@@ -1,6 +1,4 @@
-﻿using ScrapEngine.Model;
-
-namespace ScrapEngine.Interfaces
+﻿namespace ScrapEngine.Interfaces
 {
     public interface IScrapHtmlContext
     {

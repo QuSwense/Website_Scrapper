@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WebCommon.Error;
 
 namespace WebCommon.Combinatorics
@@ -73,8 +69,10 @@ namespace WebCommon.Combinatorics
                 resultSet = new List<List<T>>();
                 for(int i = 0; i < OriginalGroupSets[rowindex].Count; ++i)
                 {
-                    List<T> newList = new List<T>();
-                    newList.Add(OriginalGroupSets[rowindex][i]);
+                    List<T> newList = new List<T>
+                    {
+                        OriginalGroupSets[rowindex][i]
+                    };
                     resultSet.Add(newList);
                 }
             }

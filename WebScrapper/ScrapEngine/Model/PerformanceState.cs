@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScrapEngine.Model
 {
@@ -13,9 +9,9 @@ namespace ScrapEngine.Model
     public class PerformanceState
     {
         /// <summary>
-        /// Calculate total elapsed time for a WebData child node
+        /// Calculate total elapsed time for a single loop WebData child node
         /// </summary>
-        public TimeSpan TotalElapsed { get; set; }
+        public List<TimeSpan> ScrapElapsedList { get; set; }
 
         /// <summary>
         /// Elapsed time span for loading the Html page
@@ -32,6 +28,7 @@ namespace ScrapEngine.Model
         /// </summary>
         public PerformanceState()
         {
+            ScrapElapsedList = new List<TimeSpan>();
             ElapsedHtmlLoads = new Dictionary<string, TimeSpan>();
             ElapsedDbUpdates = new Dictionary<string, TimeSpan>();
         }

@@ -49,6 +49,12 @@ namespace ScrapEngine.Model
         public bool DoCreateDb() => Convert.ToBoolean(Key("dodbcreate"));
 
         /// <summary>
+        /// Get the check if the data is actually to be parsed and processed or to be mocked.
+        /// </summary>
+        /// <returns></returns>
+        public bool Mock() => Convert.ToBoolean(Key("mock"));
+
+        /// <summary>
         /// Maximum Scrap level
         /// </summary>
         /// <returns></returns>

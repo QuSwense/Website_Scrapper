@@ -1,11 +1,10 @@
 ﻿using ScrapEngine.Model;
+using ScrapEngine.Model.Parser;
+using SqliteDatabase.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace ScrapEngine.Bl
 {
@@ -24,19 +23,19 @@ namespace ScrapEngine.Bl
         /// <summary>
         /// Store the list of performances by unique names
         /// </summary>
-        private Dictionary<string, PerformanceState> storePerformances;
+        public Dictionary<string, PerformanceState> StorePerformances { get; set; }
 
         /// <summary>
         /// The name of the current scrap node
         /// </summary>
-        private string CurrentScrapNodeName;
+        public string CurrentScrapNodeName { get; set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public PerformanceMeasure()
         {
-            storePerformances = new Dictionary<string, PerformanceState>();
+            StorePerformances = new Dictionary<string, PerformanceState>();
         }
 
         /// <summary>
@@ -45,21 +44,25 @@ namespace ScrapEngine.Bl
         /// <param name="xmlNode"></param>
         public void NewChildNode(string name)
         {
-            if(!storePerformances.ContainsKey(name))
+            if (!StorePerformances.ContainsKey(name))
             {
-                if(stopwatchScrapElementProcessing != null)
-                {
-                    stopwatchScrapElementProcessing.Stop();
-                    storePerformances[CurrentScrapNodeName].TotalElapsed =
-                        stopwatchScrapElementProcessing.Elapsed;
-                }
-
                 PerformanceState performanceState = new PerformanceState();
-                storePerformances.Add(name, performanceState);
-                stopwatchScrapElementProcessing = new Stopwatch();
-                stopwatchScrapElementProcessing.Start();
+                StorePerformances.Add(name, performanceState);
 
                 CurrentScrapNodeName = name;
+            }
+
+            stopwatchScrapElementProcessing = new Stopwatch();
+            stopwatchScrapElementProcessing.Start();
+        }
+
+        public void FinalChildNode()
+        {
+            if (stopwatchScrapElementProcessing != null)
+            {
+                stopwatchScrapElementProcessing.Stop();
+                StorePerformances[CurrentScrapNodeName].ScrapElapsedList.Add(
+                    stopwatchScrapElementProcessing.Elapsed);
             }
         }
 
@@ -67,12 +70,17 @@ namespace ScrapEngine.Bl
         /// Add a new url load
         /// </summary>
         /// <param name="url"></param>
-        public void NewHtmlLoad(string url)
+        public void NewHtmlLoad(ScrapElement scrapElement)
         {
             stopwatchTemp = new Stopwatch();
             stopwatchTemp.Start();
 
-            storePerformances[CurrentScrapNodeName].ElapsedHtmlLoads.Add(url, TimeSpan.MinValue);
+            if (string.IsNullOrEmpty(CurrentScrapNodeName))
+                CurrentScrapNodeName = scrapElement.Id;
+
+            if (!StorePerformances.ContainsKey(CurrentScrapNodeName))
+                StorePerformances.Add(CurrentScrapNodeName, new PerformanceState());
+            StorePerformances[CurrentScrapNodeName].ElapsedHtmlLoads.Add(scrapElement.Url, TimeSpan.MinValue);
         }
 
         /// <summary>
@@ -82,7 +90,7 @@ namespace ScrapEngine.Bl
         public void FinalHtmlLoad(string url)
         {
             stopwatchTemp.Stop();
-            storePerformances[CurrentScrapNodeName].ElapsedHtmlLoads[url] = 
+            StorePerformances[CurrentScrapNodeName].ElapsedHtmlLoads[url] = 
                 stopwatchTemp.Elapsed;
         }
 
@@ -90,23 +98,41 @@ namespace ScrapEngine.Bl
         /// Add a new url load
         /// </summary>
         /// <param name="url"></param>
-        public void NewDbUpdate(string keyIndex)
+        public void NewDbUpdate<T>(List<List<DynamicTableDataInsertModel>> colValues, T scrapArgs)
+            where T : ColumnScrapIteratorArgs
         {
             stopwatchTemp = new Stopwatch();
             stopwatchTemp.Start();
 
-            storePerformances[CurrentScrapNodeName].ElapsedHtmlLoads.Add(keyIndex, TimeSpan.MinValue);
+            string id = scrapArgs.ScrapConfig.Id;
+
+            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates
+                .Add(scrapArgs.NodeIndex.ToString(), TimeSpan.MinValue);
         }
 
         /// <summary>
         /// Time the load of url
         /// </summary>
         /// <param name="url"></param>
-        public void FinalDbUpdate(string keyIndex)
+        public void FinalDbUpdate<T>(List<List<DynamicTableDataInsertModel>> colValues, T scrapArgs)
+            where T : ColumnScrapIteratorArgs
         {
             stopwatchTemp.Stop();
-            storePerformances[CurrentScrapNodeName].ElapsedHtmlLoads[keyIndex] =
+            //string key = GetColumnKey(colValues, keyIndex);
+
+            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates[scrapArgs.NodeIndex.ToString()] =
                 stopwatchTemp.Elapsed;
+        }
+
+        /// <summary>
+        /// Get unique key to store performance data for a table
+        /// </summary>
+        /// <param name="colValues"></param>
+        /// <param name="keyIndex"></param>
+        /// <returns></returns>
+        private string GetColumnKey(List<List<DynamicTableDataInsertModel>> colValues, string keyIndex)
+        {
+            return string.Join(",", colValues[0].Select(p => p.Name)) + keyIndex;
         }
     }
 }
