@@ -1,4 +1,5 @@
-﻿using ScrapEngine.Model.ScrapXml;
+﻿using ScrapEngine.Common;
+using ScrapEngine.Model.ScrapXml;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
@@ -8,21 +9,18 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data node
         /// </summary>
-        [DXmlAttribute("in", IsMandatory = true)]
+        [DXmlAttribute(ScrapXmlConsts.InAttributeName, IsMandatory = true)]
         public string InString { get; set; }
 
         /// <summary>
         /// The data node
         /// </summary>
-        [DXmlAttribute("out", IsMandatory = true)]
+        [DXmlAttribute(ScrapXmlConsts.OutAttributeName, IsMandatory = true)]
         public string OutString { get; set; }
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public ReplaceElement()
-        {
-            manipulateType = EManipulateType.Replace;
-        }
+        public ReplaceElement() { }
     }
 }

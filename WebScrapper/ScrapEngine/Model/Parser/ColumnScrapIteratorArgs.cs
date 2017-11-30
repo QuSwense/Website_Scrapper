@@ -3,11 +3,20 @@ using System.Xml;
 
 namespace ScrapEngine.Model.Parser
 {
-    public class ColumnScrapIteratorArgs
+    /// <summary>
+    /// The class to iterate columns
+    /// </summary>
+    public class ColumnScrapIteratorArgs : ParserIteratorArgs
     {
-        public int NodeIndex { get; set; }
-        public ScrapElement ScrapConfig { get; set; }
-        public XmlNode ScrapNode { get; set; }
+        /// <summary>
+        /// The unique id for each columns scrapped in a loop
+        /// </summary>
+        public string NodeIndexId { get; set; }
+
+        /// <summary>
+        /// The parent Scrap node
+        /// </summary>
+        public ScrapElement Parent { get; set; }
 
         public virtual void PreProcess() { }
         public virtual string GetDataIterator(ColumnElement columnConfig) { return null;  }

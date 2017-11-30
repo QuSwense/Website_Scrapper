@@ -1,4 +1,5 @@
-﻿using ScrapEngine.Model.ScrapXml;
+﻿using ScrapEngine.Common;
+using ScrapEngine.Model.ScrapXml;
 using System;
 using WebReader.Model;
 
@@ -9,13 +10,13 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data node
         /// </summary>
-        [DXmlAttribute("pattern", IsMandatory = true)]
+        [DXmlAttribute(ScrapXmlConsts.PatternAttributeName, IsMandatory = true)]
         public string Pattern { get; set; }
 
         /// <summary>
         /// The data node
         /// </summary>
-        [DXmlAttribute("index")]
+        [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
         public string IndexString { get; set; }
 
         /// <summary>
@@ -26,8 +27,8 @@ namespace ScrapEngine.Model
         {
             get
             {
-                if (IndexString == "*") return -1;
-                else if (IndexString == "last") return -2;
+                if (IndexString == ScrapXmlConsts.AllValue) return -1;
+                else if (IndexString == ScrapXmlConsts.LastIndexValue) return -2;
                 else if (string.IsNullOrEmpty(IndexString)) return 0;
                 return Convert.ToInt32(IndexString);
             }
@@ -39,7 +40,6 @@ namespace ScrapEngine.Model
         public RegexElement()
         {
             IndexString = "0";
-            manipulateType = EManipulateType.Regex;
         }
     }
 }

@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Xml;
 using WebCommon.PathHelp;
 using WebReader.Xml;
+using System;
+using ScrapEngine.Common;
+using WebCommon.Error;
 
 namespace ScrapEngine.Bl
 {
@@ -42,16 +45,13 @@ namespace ScrapEngine.Bl
         /// Register the Scrap parsers
         /// </summary>
         private Dictionary<string, ScrapConfigParser> scrapParsers;
-        
+
+        public ScrapIteratorStateModel StateModel { get; set; }
+
         /// <summary>
         /// Performance measurement for debug
         /// </summary>
         public PerformanceMeasure Performance { get; set; }
-
-        /// <summary>
-        /// Stores all the states for the scrap nodes
-        /// </summary>
-        public Dictionary<string, List<ScrapIteratorArgs>> WebScrapStates { get; set; }
 
         #endregion Properties
 
@@ -81,6 +81,11 @@ namespace ScrapEngine.Bl
             get { return WebContext.EngineContext.AppConfig; }
         }
 
+        public List<ScrapElement> RootScrapNodes
+        {
+            get { return WebContext.RootScrapNodes; }
+        }
+
         #endregion Helper Properties
 
         /// <summary>
@@ -89,7 +94,8 @@ namespace ScrapEngine.Bl
         public WebScrapConfigParser()
         {
             Performance = new PerformanceMeasure();
-            WebScrapStates = new Dictionary<string, List<ScrapIteratorArgs>>();
+            //WebScrapStates = new Dictionary<string, List<ScrapIteratorArgs>>();
+            StateModel = new ScrapIteratorStateModel();
 
             RegisterParsers();
         }
@@ -101,8 +107,8 @@ namespace ScrapEngine.Bl
         {
             scrapParsers = new Dictionary<string, ScrapConfigParser>
             {
-                { ScrapHtmlTableElement.TagName, new ScrapHtmlTableConfigParser(this) },
-                { ScrapCsvElement.TagName, new ScrapCsvConfigParser(this) }
+                { ScrapXmlConsts.ScrapHtmlTableNodeName, new ScrapHtmlTableConfigParser(this) },
+                { ScrapXmlConsts.ScrapCsvNodeName, new ScrapCsvConfigParser(this) }
             };
         }
 
@@ -124,19 +130,20 @@ namespace ScrapEngine.Bl
         /// </summary>
         public void Run()
         {
-            // Load the scrap xml config
-            AppTopicPath.AppTopicScrap.AssertExists();
-            XmlConfigReader = DXmlDocReader.Create(AppTopicPath.AppTopicScrap.FullPath);
-
             // Read the Webdata node which is the start node of any app topic
-            foreach (XmlNode rootWebdataNode in XmlConfigReader.ReadNodes("//WebData"))
+            foreach (ScrapElement rootScrapObj in RootScrapNodes)
             {
                 logger.InfoFormat("Parsing WebData xml node from {0} Xml config {1}",
                     AppTopicPath.AppTopic, AppTopicPath.AppTopicScrap.FullPath);
-                ParseChildScrapNodes(new ScrapIteratorArgs()
+                CalculateRootWebDataNodePerformance(rootScrapObj);
+                ResetIfNew(rootScrapObj);
+
+                StateModel.AddRootScrapArgsState(new ScrapIteratorArgs()
                 {
-                    ScrapConfigNode = rootWebdataNode
+                    ScrapConfigObj = rootScrapObj
                 });
+
+                if (!ConfigScrapElementFactory(StateModel.WebScrapArgs[rootScrapObj.IdString])) return;
             }
         }
 
@@ -144,15 +151,22 @@ namespace ScrapEngine.Bl
         /// This is the parse method to parse the "Webdata" element tag
         /// </summary>
         /// <param name="rootScrapNode"></param>
-        public void ParseChildScrapNodes(ScrapIteratorArgs args)
+        public void ParseChildScrapNodes(ScrapIteratorArgs scrapIteratorArgs)
         {
-            if (args.ScrapConfigNode == null || args.ScrapConfigNode.ChildNodes == null) return;
-
-            // Read the child nodes of Scrap type nodes
-            foreach (XmlNode scrapNode in args.ScrapConfigNode.ChildNodes)
+            // Check if there are any more Scrap Child nodes
+            foreach (ScrapElement scrapObj in scrapIteratorArgs.ScrapConfigObj.Scraps)
             {
-                CalculateRootWebDataNodePerformance(scrapNode);
                 if (!ConfigScrapElementFactory(args, scrapNode)) return;
+            }
+        }
+
+        private void ResetIfNew(ScrapElement rootScrapObj)
+        {
+            if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName) &&
+                    Performance.CurrentScrapNodeName != rootScrapObj.IdString)
+            {
+                foreach (var parserkv in scrapParsers)
+                    parserkv.Value.Reset();
             }
         }
 
@@ -165,43 +179,43 @@ namespace ScrapEngine.Bl
         /// <param name="parentConfig"></param>
         /// <param name="scrapNode"></param>
         /// <returns></returns>
-        private bool ConfigScrapElementFactory(ScrapIteratorArgs args, XmlNode nextChildNode)
+        private bool ConfigScrapElementFactory(ScrapIteratorArgs scrapIteratorArgs)
         {
             bool bProcessed = true;
-            if (nextChildNode == null) bProcessed = false;
 
-            logger.InfoFormat("Parsing Config scrap node {0}", nextChildNode.LocalName);
+            ScrapConfigParser configParser = GetParser(scrapIteratorArgs.ScrapConfigObj);
 
-            if (scrapParsers.ContainsKey(nextChildNode.LocalName))
-            {
-                scrapParsers[nextChildNode.LocalName].Process(
-                    scrapParsers[nextChildNode.LocalName].CreateArgs(args, nextChildNode));
-            }
+            if (configParser != null) configParser.Process(scrapIteratorArgs);
             else bProcessed = false;
-            
+
             return bProcessed;
         }
 
         /// <summary>
-        /// Calculate processing of Root Webdata single node
+        /// This method calculates the total time taken for processing a single root level Scrap node
+        /// This method identifies a new root Scrap node by the 'id' attribute value
         /// </summary>
         /// <param name="xmlNode"></param>
-        private void CalculateRootWebDataNodePerformance(XmlNode scrapNode)
+        private void CalculateRootWebDataNodePerformance(ScrapElement rootScrapObj)
         {
-            if (scrapNode == null || scrapNode.Attributes == null) return;
+            if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName) &&
+                    Performance.CurrentScrapNodeName != rootScrapObj.IdString)
+                Performance.FinalChildNode();
 
-            XmlAttribute idAttribute = scrapNode.Attributes["id"];
-            if (idAttribute != null)
-            {
-                if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName) &&
-                    Performance.CurrentScrapNodeName != idAttribute.Value)
-                    Performance.FinalChildNode();
+            if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName))
+                WebDbContext.AddMetadata(Performance.CurrentScrapNodeName, Performance);
 
-                if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName))
-                    WebDbContext.AddMetadata(Performance.CurrentScrapNodeName, Performance);
+            Performance.NewChildNode(rootScrapObj.IdString);
+        }
 
-                Performance.NewChildNode(idAttribute.Value);
-            }
+        private ScrapConfigParser GetParser(ScrapElement scrapObj)
+        {
+            if (scrapObj is ScrapHtmlTableElement)
+                return scrapParsers[ScrapXmlConsts.ScrapHtmlTableNodeName];
+            else if (scrapObj is ScrapCsvElement)
+                return scrapParsers[ScrapXmlConsts.ScrapCsvNodeName];
+            else
+                return null;
         }
     }
 }

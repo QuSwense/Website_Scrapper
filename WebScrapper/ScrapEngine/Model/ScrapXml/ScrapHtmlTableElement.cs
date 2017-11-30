@@ -1,4 +1,5 @@
-﻿using WebReader.Model;
+﻿using ScrapEngine.Common;
+using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
@@ -8,14 +9,9 @@ namespace ScrapEngine.Model
     public class ScrapHtmlTableElement : ScrapElement
     {
         /// <summary>
-        /// The name of the Element tag
-        /// </summary>
-        public static string TagName = "ScrapHtmlTable";
-
-        /// <summary>
         /// The Xpath
         /// </summary>
-        [DXmlAttribute("xpath")]
+        [DXmlAttribute(ScrapXmlConsts.XPathAttributeName, IsMandatory = true)]
         public string XPath { get; set; }
 
         /// <summary>

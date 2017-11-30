@@ -26,5 +26,7 @@ namespace ScrapEngine.Bl.Parser
             if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
             return htmlValue.Replace("\\n", "\n").Replace("\\t", "\t");
         }
+
+        public virtual void Reset() { }
     }
 }

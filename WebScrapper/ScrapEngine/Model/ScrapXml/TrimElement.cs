@@ -1,4 +1,5 @@
-﻿using ScrapEngine.Model.ScrapXml;
+﻿using ScrapEngine.Common;
+using ScrapEngine.Model.ScrapXml;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
@@ -11,15 +12,12 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The data
         /// </summary>
-        [DXmlAttribute("data")]
+        [DXmlAttribute(ScrapXmlConsts.DataAttributeName)]
         public string Data { get; set; }
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public TrimElement()
-        {
-            manipulateType = EManipulateType.Trim;
-        }
+        public TrimElement() { }
     }
 }

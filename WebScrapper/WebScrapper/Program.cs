@@ -52,6 +52,12 @@ namespace WebScrapper
             // Read database generic config
             DynamicGenericDbConfig.I.Read();
 
+            // Before starting the loops check the global database configs
+            AppGenericConfigPathHelper.I.DbScriptsTableMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsPerformanceMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.AssertExists();
+
             // If application topic value is "*" run scrapper for all
             // available application folders
             if (string.Compare(options.AppTopic, "*", true) == 0)

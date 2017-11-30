@@ -84,7 +84,13 @@ namespace ScrapEngine.Db
 
             try
             {
-                WebScrapDb.CreateMetadata();
+                // Create global metadata tables
+                //WebScrapDb.CreateMetadata();
+                WebScrapDb.Create(DynamicGenericDbConfig.I.TableMetadataConfigs);
+                WebScrapDb.Create(DynamicGenericDbConfig.I.TableScrapMetadataConfigs);
+                WebScrapDb.Create(DynamicGenericDbConfig.I.TablePerformanceMetadataConfigs);
+                WebScrapDb.Create(DynamicGenericDbConfig.I.TableColumnScrapMetadataConfigs);
+
                 WebScrapDb.AddTableMetadata(MetaDbConfig.TableMetadatas);
                 WebScrapDb.Create(MetaDbConfig.TableColumnConfigs);
             }
@@ -123,21 +129,7 @@ namespace ScrapEngine.Db
                 WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
             }
         }
-
-        /// <summary>
-        /// Add performance metadata
-        /// </summary>
-        /// <param name="performance"></param>
-        public void Add(PerformanceMeasure performanceMeasure)
-        {
-            foreach (var performance in performanceMeasure.StorePerformances)
-            {
-                //TODO: WebScrapDb.AddPerformance(performance.Key, performance.Value.ScrapElapsedList, "TotalColumnsUpdate");
-                WebScrapDb.AddPerformance(performance.Key, performance.Value.ElapsedHtmlLoads, "WebPageLoad");
-                WebScrapDb.AddPerformance(performance.Key, performance.Value.ElapsedDbUpdates, "DbUpdate");
-            }
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>

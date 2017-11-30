@@ -84,7 +84,7 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="scrapNode"></param>
         /// <param name="parentScrapConfigObj"></param>
         /// <returns></returns>
-        protected T ParseScrapElementAttributes<T>(ScrapIteratorArgs args)
+        protected T ParseScrapElementAttributes<T>(ScrapElement scrapObj)
             where T : ScrapElement, new()
         {
             var webScrapConfigObj =

@@ -1,30 +1,27 @@
-﻿using WebReader.Model;
+﻿using ScrapEngine.Common;
+using WebCommon.Const;
+using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
     public class ScrapCsvElement : ScrapElement
     {
         /// <summary>
-        /// The name of the Element tag
-        /// </summary>
-        public static string TagName = "ScrapCsv";
-
-        /// <summary>
         /// The Xpath
         /// </summary>
-        [DXmlAttribute("delimiter")]
+        [DXmlAttribute(ScrapXmlConsts.DelimiterAttributeName, IsMandatory = true)]
         public string Delimiter { get; set; }
 
         /// <summary>
         /// The Xpath
         /// </summary>
-        [DXmlAttribute("skipfirst")]
+        [DXmlAttribute(ScrapXmlConsts.SkipFirstAttributeName)]
         public int SkipFirstLines { get; set; }
 
         public ScrapCsvElement()
         {
             SkipFirstLines = 0;
-            Delimiter = "\\t";
+            Delimiter = ASCIICharacters.Tab;
         }
     }
 }

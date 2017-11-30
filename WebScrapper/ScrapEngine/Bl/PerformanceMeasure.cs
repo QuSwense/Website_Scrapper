@@ -107,7 +107,7 @@ namespace ScrapEngine.Bl
             string id = scrapArgs.ScrapConfig.Id;
 
             StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates
-                .Add(scrapArgs.NodeIndex.ToString(), TimeSpan.MinValue);
+                .Add(scrapArgs.NodeIndexId, TimeSpan.MinValue);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace ScrapEngine.Bl
             stopwatchTemp.Stop();
             //string key = GetColumnKey(colValues, keyIndex);
 
-            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates[scrapArgs.NodeIndex.ToString()] =
+            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates[scrapArgs.NodeIndexId] =
                 stopwatchTemp.Elapsed;
         }
 

@@ -10,11 +10,6 @@ namespace ScrapEngine.Model
     public class ManipulateElement
     {
         /// <summary>
-        /// The name of the Element tag
-        /// </summary>
-        public static string TagName = "Manipulate";
-
-        /// <summary>
         /// The list of manipulate Items tags. The order of the manipulation tags
         /// are important
         /// </summary>

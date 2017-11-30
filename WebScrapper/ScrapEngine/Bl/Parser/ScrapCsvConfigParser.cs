@@ -45,19 +45,20 @@ namespace ScrapEngine.Bl.Parser
             // This finally scraps the html webpage data
             using (StringReader reader = FetchFileReader(webScrapConfigObj))
             {
-                int nodeIndex = -1;
+                //int nodeIndex = -1;
                 string fileLine = "";
                 while ((fileLine = reader.ReadLine()) != null)
                 {
-                    nodeIndex++;
-                    if (webScrapConfigObj.SkipFirstLines > nodeIndex) continue;
+                    args.NodeIndex++;
+                    if (webScrapConfigObj.SkipFirstLines > args.NodeIndex) continue;
 
                     logger.DebugFormat("Parsing Config ScrapCsv {0}th node with data '{1}'",
-                        nodeIndex, fileLine);
+                        args.NodeIndex, fileLine);
 
                     // Set current state
                     SetCurrentState(args, new ScrapIteratorCsvArgs()
                     {
+                        NodeIndex = args.NodeIndex,
                         ScrapConfigNode = args.ScrapConfigNode,
                         ScrapConfigObj = webScrapConfigObj,
                         WebHtmlNode = args.WebHtmlNode
@@ -67,7 +68,7 @@ namespace ScrapEngine.Bl.Parser
                     ProcessColumnParser(new ColumnScrapIteratorFileArgs()
                     {
                         FileLine = fileLine,
-                        NodeIndex = nodeIndex,
+                        NodeIndexId = currentScrapIteratorCsv.NodeIndexId,
                         ScrapConfig = currentScrapIteratorCsv.ScrapConfigObj,
                         ScrapNode = args.ScrapConfigNode
                     });

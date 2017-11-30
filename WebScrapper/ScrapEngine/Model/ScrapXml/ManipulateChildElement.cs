@@ -1,4 +1,5 @@
-﻿using WebCommon.Error;
+﻿using ScrapEngine.Common;
+using WebCommon.Error;
 
 namespace ScrapEngine.Model.ScrapXml
 {
@@ -9,39 +10,13 @@ namespace ScrapEngine.Model.ScrapXml
     public class ManipulateChildElement
     {
         /// <summary>
-        /// Type of Manupulate class type
+        /// Points to the parent scrap node
         /// </summary>
-        public enum EManipulateType
-        {
-            Split,
-            Trim,
-            Replace,
-            Regex
-        }
-
-        /// <summary>
-        /// The manipulate child object type
-        /// </summary>
-        protected EManipulateType manipulateType;
+        public ColumnElement Parent { get; set; }
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public ManipulateChildElement() { }
-
-        /// <summary>
-        /// Create an instance of Manipulate child
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static ManipulateChildElement Create(string name)
-        {
-            if (name == "Split") return new SplitElement();
-            else if (name == "Trim") return new TrimElement();
-            else if (name == "Regex") return new RegexElement();
-            else if (name == "Replace") return new ReplaceElement();
-            else
-                throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
-        }
     }
 }

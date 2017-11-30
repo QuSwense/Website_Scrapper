@@ -62,7 +62,13 @@
     </Column>
   </ScrapHtmlTable>
   <ScrapHtmlTable id="all_languages" name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" xpath="//body/p[4]/table//table//tr[position() > 1]">
-    <Column name="nm" xpath="td[1]"></Column>
+    <Column name="nm" xpath="td[1]">
+      <Manipulate>
+          <RegexReplace pattern=" ?\(.*?\)" replace="" />
+          <Split data="," index="*"></Split>
+          <Trim />
+        </Manipulate>
+    </Column>
     <Column name="iso6391" xpath="td[2]"></Column>
   </ScrapHtmlTable>
   <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">

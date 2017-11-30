@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Combinatorics\GroupCombinations.cs" />
+    <Compile Include="Const\ASCIICharacters.cs" />
     <Compile Include="Error\AppTopicConfigException.cs" />
     <Compile Include="Error\AppTopicDbConfigException.cs" />
     <Compile Include="Error\CombinatoricsException.cs" />

@@ -1,0 +1,4 @@
+﻿tblperfmdt,nm,The name of the table,string,30,,,,
+tblperfmdt,pkey,Primary Key of the column names whose performance update is measured,string,50,,,,
+tblperfmdt,typ,Type of performance,string,50,,,,
+tblperfmdt,timespan,The performance timer,string,30,,,,

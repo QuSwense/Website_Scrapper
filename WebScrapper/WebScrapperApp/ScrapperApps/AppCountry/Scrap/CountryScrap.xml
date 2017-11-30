@@ -1,9 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
-  <ScrapHtmlTable id="all_languages" name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" xpath="//body/p[4]/table//table//tr[position() > 1]">
-    <Column name="nm" xpath="td[1]"></Column>
-    <Column name="iso6391" xpath="td[2]"></Column>
-  </ScrapHtmlTable>
   <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">
     <ScrapHtmlTable xpath="//body/div[2]/table[1]" url="@{parentValue}">
       <Column name="iso31661a2" xpath=".//tr[2]/td[2]" isunique="true">

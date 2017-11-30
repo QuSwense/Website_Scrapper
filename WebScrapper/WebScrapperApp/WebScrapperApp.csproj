@@ -131,7 +131,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="App.config" />
-    <None Include="ScrapperApps\Config\DbScripts\col_scrap_mdt.csv" />
+    <None Include="ScrapperApps\Config\DbScripts\col_scrap_mdt.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ScrapperApps\Config\DbScripts\performance_mdt.csv" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ScrapperApps\AppCountry\DbScripts\table_columns.csv">

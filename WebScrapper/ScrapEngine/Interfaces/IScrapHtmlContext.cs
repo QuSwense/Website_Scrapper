@@ -1,4 +1,7 @@
-﻿namespace ScrapEngine.Interfaces
+﻿using ScrapEngine.Model;
+using System.Collections.Generic;
+
+namespace ScrapEngine.Interfaces
 {
     public interface IScrapHtmlContext
     {
@@ -6,7 +9,9 @@
         /// Reference to the Scrapper Engine context class
         /// </summary>
         IScrapEngineContext EngineContext { get; }
-        
+
+        List<ScrapElement> RootScrapNodes { get; }
+
         /// <summary>
         /// Constructor initializes with parent engine
         /// </summary>

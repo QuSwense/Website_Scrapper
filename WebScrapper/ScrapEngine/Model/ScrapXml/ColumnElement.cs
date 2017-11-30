@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ScrapEngine.Common;
+using ScrapEngine.Model.ScrapXml;
+using System;
 using System.Collections.Generic;
 using WebReader.Model;
 
@@ -9,38 +11,30 @@ namespace ScrapEngine.Model
     /// </summary>
     public class ColumnElement
     {
-        /// <summary>
-        /// The name of the Element tag
-        /// </summary>
-        public static string TagName = "Column";
-
-        /// <summary>
-        /// Points to the parent scrap node
-        /// </summary>
-        public ScrapElement Parent { get; set; }
+        #region Xml Attributes
 
         /// <summary>
         /// The name of the column
         /// </summary>
-        [DXmlAttribute("name", IsMandatory = true)]
+        [DXmlAttribute(ScrapXmlConsts.NameAttributeName, IsMandatory = true)]
         public string Name { get; set; }
 
         /// <summary>
         /// Whether this column is the unique key for insertion or updation
         /// </summary>
-        [DXmlAttribute("isunique")]
+        [DXmlAttribute(ScrapXmlConsts.IsUniqueAttributeName)]
         public bool IsUnique { get; set; }
 
         /// <summary>
         /// The index element in case of csv
         /// </summary>
-        [DXmlAttribute("index")]
+        [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
         public int Index { get; set; }
 
         /// <summary>
         /// The xpath
         /// </summary>
-        [DXmlAttribute("xpath")]
+        [DXmlAttribute(ScrapXmlConsts.XPathAttributeName)]
         public string XPath { get; set; }
 
         /// <summary>
@@ -49,38 +43,57 @@ namespace ScrapEngine.Model
         /// e.g, (col, col21), (col1, col22), etc. for col2.Cardinality = 2
         /// To represent 'n' cardinality use '*' in xml and as value we will use '-1'
         /// </summary>
-        [DXmlAttribute("cardinal")]
+        [DXmlAttribute(ScrapXmlConsts.CardinalAttributeName)]
         public string CardinalString { get; set; }
 
-        /// <summary>
-        /// The xpath
-        /// </summary>
-        [DXmlAttribute("level")]
-        public int Level { get; set; }
+        #endregion Xml Attributes
 
+        #region Calculated
+
+        /// <summary>
+        /// The integer value for the Cardinal type
+        /// </summary>
         public int Cardinal
         {
             get
             {
-                if (CardinalString == "*") return -1;
+                if (CardinalString == ScrapXmlConsts.AllValue) return -1;
                 else if(string.IsNullOrEmpty(CardinalString)) return 0;
                 return Convert.ToInt32(CardinalString);
             }
         }
 
+        #endregion Calculated
+
+        #region References
+
         /// <summary>
         /// The manipulate tag
         /// </summary>
-        public List<ManipulateElement> Manipulations { get; set; }
-        
+        public List<ManipulateChildElement> Manipulations { get; set; }
+
+        /// <summary>
+        /// Points to the parent scrap node
+        /// </summary>
+        public ScrapElement Parent { get; set; }
+
+        #endregion References
+
+        #region States
+
+
+
+        #endregion States
+
         /// <summary>
         /// Constructor
         /// </summary>
         public ColumnElement()
         {
-            Manipulations = new List<ManipulateElement>();
+            Manipulations = new List<ManipulateChildElement>();
             CardinalString = "1";
-            Level = Int32.MinValue;
+            Index = -1;
+            IsUnique = false;
         }
     }
 }

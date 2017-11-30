@@ -84,17 +84,17 @@ namespace SqliteDatabase
             Connection.Close();
         }
 
-        protected void CreateTableMetadata()
-        {
-            StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS mdt (");
-            SQL.Append("tblnm TEXT,");
-            SQL.Append("dspnm TEXT,");
-            SQL.Append("dsc TEXT,");
-            SQL.Append(" PRIMARY KEY(tblnm))");
+        //protected void CreateTableMetadata()
+        //{
+        //    StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS mdt (");
+        //    SQL.Append("tblnm TEXT,");
+        //    SQL.Append("dspnm TEXT,");
+        //    SQL.Append("dsc TEXT,");
+        //    SQL.Append(" PRIMARY KEY(tblnm))");
 
-            ExecuteDDL(SQL.ToString());
-        }
-
+        //    ExecuteDDL(SQL.ToString());
+        //}
+        
         public void Create(DbTablesDefinitionModel tableColumnConfigs)
         {
             CreateTableQuery createTableQueryObj = new CreateTableQuery();
@@ -106,34 +106,34 @@ namespace SqliteDatabase
             }
         }
 
-        protected void CreateTableScrapMetadata()
-        {
-            StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS tblscrpmdt (");
-            SQL.Append("uid INTEGER,");
-            SQL.Append("nm TEXT,");
-            SQL.Append("url1 TEXT,");
-            SQL.Append("url2 TEXT,");
-            SQL.Append("url3 TEXT,");
-            SQL.Append("url4 TEXT,");
-            SQL.Append("xpath1 TEXT,");
-            SQL.Append("xpath2 TEXT,");
-            SQL.Append("xpath3 TEXT,");
-            SQL.Append("xpath4 TEXT,");
-            SQL.Append(" PRIMARY KEY(uid, nm))");
+        //protected void CreateTableScrapMetadata()
+        //{
+        //    StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS tblscrpmdt (");
+        //    SQL.Append("uid INTEGER,");
+        //    SQL.Append("nm TEXT,");
+        //    SQL.Append("url1 TEXT,");
+        //    SQL.Append("url2 TEXT,");
+        //    SQL.Append("url3 TEXT,");
+        //    SQL.Append("url4 TEXT,");
+        //    SQL.Append("xpath1 TEXT,");
+        //    SQL.Append("xpath2 TEXT,");
+        //    SQL.Append("xpath3 TEXT,");
+        //    SQL.Append("xpath4 TEXT,");
+        //    SQL.Append(" PRIMARY KEY(uid, nm))");
 
-            ExecuteDDL(SQL.ToString());
-        }
+        //    ExecuteDDL(SQL.ToString());
+        //}
 
-        protected void CreateTablePerformanceMetdata()
-        {
-            StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS tblperfmdt (");
-            SQL.Append("nm TEXT,");
-            SQL.Append("pkey TEXT,");
-            SQL.Append("typ TEXT,");
-            SQL.Append("timespan TEXT)");
+        //protected void CreateTablePerformanceMetdata()
+        //{
+        //    StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS tblperfmdt (");
+        //    SQL.Append("nm TEXT,");
+        //    SQL.Append("pkey TEXT,");
+        //    SQL.Append("typ TEXT,");
+        //    SQL.Append("timespan TEXT)");
 
-            ExecuteDDL(SQL.ToString());
-        }
+        //    ExecuteDDL(SQL.ToString());
+        //}
 
         public void AddOrUpdate(string name, List<DynamicTableDataInsertModel> row, bool doUpdateOnly = false)
         {
@@ -207,27 +207,27 @@ namespace SqliteDatabase
             ExecuteDDL(commandQuery.SQL);
         }
 
-        protected void CreateColumnScrapMetadata()
-        {
-            StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS colscrpmdt (");
-            SQL.Append("colm TEXT,");
-            SQL.Append("dspnm TEXT,");
-            SQL.Append("dsc TEXT,");
-            SQL.Append("xpath TEXT,");
-            SQL.Append("indx INTEGER,");
-            SQL.Append("uid INTEGER,");
-            SQL.Append(" PRIMARY KEY(colm, uid))");
+        //protected void CreateColumnScrapMetadata()
+        //{
+        //    StringBuilder SQL = new StringBuilder("CREATE TABLE IF NOT EXISTS colscrpmdt (");
+        //    SQL.Append("colm TEXT,");
+        //    SQL.Append("dspnm TEXT,");
+        //    SQL.Append("dsc TEXT,");
+        //    SQL.Append("xpath TEXT,");
+        //    SQL.Append("indx INTEGER,");
+        //    SQL.Append("uid INTEGER,");
+        //    SQL.Append(" PRIMARY KEY(colm, uid))");
 
-            ExecuteDDL(SQL.ToString());
-        }
+        //    ExecuteDDL(SQL.ToString());
+        //}
 
-        public void CreateMetadata()
-        {
-            CreateTableMetadata();
-            CreateTableScrapMetadata();
-            CreateColumnScrapMetadata();
-            CreateTablePerformanceMetdata();
-        }
+        //public void CreateMetadata()
+        //{
+        //    CreateTableMetadata();
+        //    CreateTableScrapMetadata();
+        //    CreateColumnScrapMetadata();
+        //    CreateTablePerformanceMetdata();
+        //}
 
         /// <summary>
         /// Execute Data Definiton Language

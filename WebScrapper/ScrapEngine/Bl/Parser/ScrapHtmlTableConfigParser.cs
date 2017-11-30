@@ -33,48 +33,49 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public override void Process(ScrapIteratorArgs args)
+        public override void Process(ScrapIteratorArgs scrapIteratorArgs)
         {
             logger.Info("Parsing Config ScrapHtmlTable node");
 
-            var webScrapConfigObj = 
-                ParseScrapElementAttributes<ScrapHtmlTableElement>(args);
+            ScrapIteratorHtmlArgs scrapIteratorHtmlArgs = scrapIteratorArgs as ScrapIteratorHtmlArgs;
 
             // This finally scraps the html webpage data
-            var webNodeNavigatorList = FetchHtmlTable(webScrapConfigObj);
+            var webNodeNavigatorList = FetchHtmlTable(scrapIteratorHtmlArgs.ScrapConfigObj
+                as ScrapHtmlTableElement);
 
+            // Loop through the html nodes
             if (webNodeNavigatorList != null && webNodeNavigatorList.Count > 0)
             {
                 logger.DebugFormat("{0} html Nodes found which will be parsed in loop.", webNodeNavigatorList.Count);
 
                 // Process
-                int nodeIndex = 0;
+                //int nodeIndex = 0;
                 foreach (var webNodeNavigator in webNodeNavigatorList)
                 {
-                    logger.DebugFormat("Parsing Config ScrapHtmlTable {0}th node with data", 
-                        nodeIndex);
+                    ScrapIteratorHtmlArgs childScrapIteratorHtmlArgs =
+                        new ScrapIteratorHtmlArgs();
+                    childScrapIteratorHtmlArgs.CloneData(scrapIteratorArgs);
 
-                    // Set current state
-                    SetCurrentState(args, new ScrapIteratorHtmlArgs()
-                    {
-                        ScrapConfigNode = args.ScrapConfigNode,
-                        ScrapConfigObj = webScrapConfigObj,
-                        WebHtmlNode = webNodeNavigator
-                    }, ref currentScrapIteratorHtml);
+                    childScrapIteratorHtmlArgs.NodeIndex++;
+                    childScrapIteratorHtmlArgs.WebHtmlNode = webNodeNavigator;
+                    childScrapIteratorHtmlArgs.Parent = scrapIteratorArgs;
+
+                    logger.DebugFormat("Parsing Config ScrapHtmlTable {0}th node with data",
+                        scrapIteratorHtmlArgs.NodeIndex);
+
+                    configParser.StateModel.AddNewScrap(childScrapIteratorHtmlArgs);
 
                     // Read the child Scraps nodes which are the individual reader config nodes
-                    configParser.ParseChildScrapNodes(currentScrapIteratorHtml);
+                    configParser.ParseChildScrapNodes(childScrapIteratorHtmlArgs);
 
-                    // Process column values
-                    ProcessColumnParser(new ColumnScrapIteratorHtmlArgs()
+                    // Process column values for this scrapped node
+                    configParser.StateModel.AddNewColumn(new ColumnScrapIteratorHtmlArgs()
                     {
-                        NodeIndex = nodeIndex,
-                        ScrapNode = currentScrapIteratorHtml.ScrapConfigNode,
-                        ScrapConfig = currentScrapIteratorHtml.ScrapConfigObj,
+                        NodeIndexId = currentScrapIteratorHtml.NodeIndexId,
+                        Parent = currentScrapIteratorHtml.ScrapConfigObj,
                         WebHtmlNode = currentScrapIteratorHtml.WebHtmlNode
                     });
-
-                    nodeIndex++;
+                    ProcessColumnParser(configParser.StateModel.CurrentColumnScrapIteratorArgs);
                 }
             }
         }
@@ -112,6 +113,11 @@ namespace ScrapEngine.Bl.Parser
                 ScrapConfigObj = args.ScrapConfigObj,
                 WebHtmlNode = args.WebHtmlNode
             };
+        }
+
+        public override void Reset()
+        {
+            currentScrapIteratorHtml = null;
         }
     }
 }

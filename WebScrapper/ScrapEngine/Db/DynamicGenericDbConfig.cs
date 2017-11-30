@@ -23,12 +23,17 @@ namespace ScrapEngine.Db
         /// <summary>
         /// This data set stores the table column informations
         /// </summary>
-        public DbTablesDefinitionModel TableColumnMetadataConfigs { get; protected set; }
+        public DbTablesDefinitionModel TablePerformanceMetadataConfigs { get; protected set; }
 
         /// <summary>
         /// This data set stores the table column rows informations
         /// </summary>
-        public DbTablesDefinitionModel TableColumnRowMetadataConfigs { get; protected set; }
+        public DbTablesDefinitionModel TableScrapMetadataConfigs { get; protected set; }
+
+        /// <summary>
+        /// This data set stores the table column rows informations
+        /// </summary>
+        public DbTablesDefinitionModel TableColumnScrapMetadataConfigs { get; protected set; }
 
         /// <summary>
         /// Get the name of the metdata table
@@ -44,11 +49,11 @@ namespace ScrapEngine.Db
         /// <summary>
         /// Get the table name for the column metadata information
         /// </summary>
-        public string ColumnMetadataTableName
+        public string PerformanceMetadataTableName
         {
             get
             {
-                return TableColumnMetadataConfigs.Keys.First();
+                return TablePerformanceMetadataConfigs.Keys.First();
             }
         }
 
@@ -59,7 +64,18 @@ namespace ScrapEngine.Db
         {
             get
             {
-                return TableColumnRowMetadataConfigs.Keys.First();
+                return TableScrapMetadataConfigs.Keys.First();
+            }
+        }
+
+        /// <summary>
+        /// Get the table name for the row metadata information
+        /// </summary>
+        public string ColumnScrapMetadataTableName
+        {
+            get
+            {
+                return TableColumnScrapMetadataConfigs.Keys.First();
             }
         }
 
@@ -90,8 +106,9 @@ namespace ScrapEngine.Db
         public DynamicGenericDbConfig()
         {
             TableMetadataConfigs = new DbTablesDefinitionModel("Table Metadata");
-            TableColumnMetadataConfigs = new DbTablesDefinitionModel("Table column metadata");
-            TableColumnRowMetadataConfigs = new DbTablesDefinitionModel("Table rows metadata");
+            TablePerformanceMetadataConfigs = new DbTablesDefinitionModel("Table performance metadata");
+            TableScrapMetadataConfigs = new DbTablesDefinitionModel("Table rows metadata");
+            TableColumnScrapMetadataConfigs = new DbTablesDefinitionModel("Table column scrap metadata");
         }
 
         #endregion Constructor
@@ -105,15 +122,18 @@ namespace ScrapEngine.Db
         {
             AppGenericConfigPathHelper.I.DbScriptsTableMdt.AssertExists();
             AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsPerformanceMdt.AssertExists();
             AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.AssertExists();
 
             TableMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableMdt.FullPath);
-            TableColumnMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.FullPath);
-            TableColumnRowMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.FullPath);
+            TablePerformanceMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsPerformanceMdt.FullPath);
+            TableScrapMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.FullPath);
+            TableColumnScrapMetadataConfigs = CSVReader.Read<DbTablesDefinitionModel>(AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.FullPath);
 
             AssertConfig(TableMetadataConfigs);
-            AssertConfig(TableColumnMetadataConfigs);
-            AssertConfig(TableColumnRowMetadataConfigs);
+            AssertConfig(TablePerformanceMetadataConfigs);
+            AssertConfig(TableScrapMetadataConfigs);
+            AssertConfig(TableColumnScrapMetadataConfigs);
         }
 
         #endregion Load

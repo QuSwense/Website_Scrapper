@@ -23,6 +23,7 @@ namespace WebCommon.Error
             MANIPULATE_REGEX_INDEX_INVALID,
             MANIPULATE_REPLACE_INSTRING_EMPTY,
             SCRAP_INDEX_INVALID,
+            NOT_IMPLEMENTED,
         }
 
         /// <summary>
@@ -91,6 +92,8 @@ namespace WebCommon.Error
                     return string.Format("The Manipulate Replace node has invalid In String attribute {0}", dataList.IndexedOrDefault(0));
                 case EErrorType.SCRAP_INDEX_INVALID:
                     return string.Format("The index of the Scrap elelemtn is invalid");
+                case EErrorType.NOT_IMPLEMENTED:
+                    return string.Format("The Config element type is not implemented");
                 default:
                     return "Unknwon Web Scrap Parser error";
             }

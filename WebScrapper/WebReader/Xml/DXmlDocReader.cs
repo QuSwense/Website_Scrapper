@@ -80,6 +80,15 @@ namespace WebReader.Xml
             return currentElement.SelectNodes(xpath);
         }
 
+        public XmlNodeList GetChildNodes(XmlNode currentElement = null)
+        {
+            logger.Debug("Read the next set of child nodes of current element");
+
+            if (currentElement == null)
+                return xmlDocument.ChildNodes;
+            return currentElement.ChildNodes;
+        }
+
         /// <summary>
         /// Parse and Read the attributes on the element and store it in the type object
         /// </summary>

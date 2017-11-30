@@ -45,8 +45,9 @@
             GlobalConfig = new PathGeneric("Config", ScrapperApps);
             GlobalDbScripts = new PathGeneric("DbScripts", GlobalConfig);
             DbScriptsTableScrapMdt = new PathGeneric("table_scrap_mdt.csv", GlobalDbScripts, true);
-            DbScriptsColumnScrapMdt = new PathGeneric("col_scrap_mdt.csv", GlobalDbScripts, true);
+            DbScriptsPerformanceMdt = new PathGeneric("performance_mdt.csv", GlobalDbScripts, true);
             DbScriptsTableMdt = new PathGeneric("table_mdt.csv", GlobalDbScripts, true);
+            DbScriptsColumnScrapMdt = new PathGeneric("col_scrap_mdt.csv", GlobalDbScripts, true);
         }
 
         #endregion Singleton
@@ -90,12 +91,17 @@
         /// <summary>
         /// The name of table column rows metdata file
         /// </summary>
-        public PathGeneric DbScriptsColumnScrapMdt { get; protected set; }
+        public PathGeneric DbScriptsPerformanceMdt { get; protected set; }
 
         /// <summary>
         /// The name of table metdata file
         /// </summary>
         public PathGeneric DbScriptsTableMdt { get; protected set; }
+
+        /// <summary>
+        /// The column scrap metdata file
+        /// </summary>
+        public PathGeneric DbScriptsColumnScrapMdt { get; protected set; }
 
         #endregion Accessor
     }

@@ -26,6 +26,8 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         private ScrapRegexConfigParser scrapRegexConfigParser;
 
+        private ScrapRegexReplaceParser scrapRegexReplaceParser;
+
         /// <summary>
         /// Parameterized constructor
         /// </summary>
@@ -36,6 +38,7 @@ namespace ScrapEngine.Bl.Parser
             scrapTrimConfigParser = new ScrapTrimConfigParser(configParser);
             scrapReplaceConfigParser = new ScrapReplaceConfigParser(configParser);
             scrapRegexConfigParser = new ScrapRegexConfigParser(configParser);
+            scrapRegexReplaceParser = new ScrapRegexReplaceParser(configParser);
         }
 
         /// <summary>
@@ -53,6 +56,8 @@ namespace ScrapEngine.Bl.Parser
                 return scrapReplaceConfigParser;
             else if (manipulateChild is RegexElement)
                 return scrapRegexConfigParser;
+            else if (manipulateChild is RegexReplaceElement)
+                return scrapRegexReplaceParser;
             else
                 throw new ScrapParserException(ScrapParserException.EErrorType.UNKNOWN_MANIPULATE_CHILD_TYPE);
         }
@@ -68,6 +73,7 @@ namespace ScrapEngine.Bl.Parser
             else if (name == "Trim") return scrapTrimConfigParser;
             else if (name == "Regex") return scrapRegexConfigParser;
             else if (name == "Replace") return scrapReplaceConfigParser;
+            else if (name == "RegexReplace") return scrapRegexReplaceParser;
             else
                 throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
         }
@@ -83,6 +89,7 @@ namespace ScrapEngine.Bl.Parser
             else if (name == "Trim") return new TrimElement();
             else if (name == "Regex") return new RegexElement();
             else if (name == "Replace") return new ReplaceElement();
+            else if (name == "RegexReplace") return new RegexReplaceElement();
             else
                 throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
         }

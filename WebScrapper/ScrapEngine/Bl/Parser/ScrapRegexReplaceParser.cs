@@ -1,23 +1,24 @@
 ﻿using ScrapEngine.Model;
 using ScrapEngine.Model.ScrapXml;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
-    /// <summary>
-    /// The business logic class which parses a Regex tag and interprets the results
-    /// </summary>
-    public class ScrapRegexConfigParser : ScrapManipulateChildConfigParser
+    public class ScrapRegexReplaceParser : ScrapManipulateChildConfigParser
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="configParser"></param>
-        public ScrapRegexConfigParser(WebScrapConfigParser configParser)
+        public ScrapRegexReplaceParser(WebScrapConfigParser configParser)
             : base(configParser) { }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         public override ManipulateChildElement Process(XmlNode regexNode, ManipulateElement webConfigObj)
         {
-            RegexElement configRegexObj = configParser.XmlConfigReader.ReadElement<RegexElement>(regexNode);
+            RegexReplaceElement configRegexObj = configParser.XmlConfigReader.ReadElement<RegexReplaceElement>(regexNode);
             configRegexObj.Pattern = HttpUtility.HtmlDecode(configRegexObj.Pattern);
             Assert(configRegexObj);
             return configRegexObj;
@@ -43,23 +44,14 @@ namespace ScrapEngine.Bl.Parser
         {
             if (string.IsNullOrEmpty(result.OriginalValue)) return;
 
-            RegexElement regexConfig = (RegexElement)manipulateChild;
+            RegexReplaceElement regexConfig = (RegexReplaceElement)manipulateChild;
 
             List<string> finalResults = new List<string>();
             Regex regexPattern = new Regex(regexConfig.Pattern);
 
-            for(int i = 0; i < result.Results.Count; ++i)
+            for (int i = 0; i < result.Results.Count; ++i)
             {
-                MatchCollection matchlist = regexPattern.Matches(result.Results[i]);
-
-                if (regexConfig.Index >= 0 && matchlist.Count > regexConfig.Index)
-                        finalResults.Add(matchlist[regexConfig.Index].Value);
-                else if (regexConfig.Index == -1)
-                    foreach (Match match in matchlist)
-                        finalResults.Add(match.Value);
-                else if (regexConfig.Index == -2 && matchlist.Count > 0) // Add last
-                    finalResults.Add(matchlist[matchlist.Count - 1].Value);
-                else finalResults.Add(result.Results[i]);
+                finalResults.Add(Regex.Replace(result.Results[i], regexConfig.Pattern, regexConfig.Replace));
             }
 
             result.Results = new List<string>(finalResults);
@@ -69,13 +61,10 @@ namespace ScrapEngine.Bl.Parser
         /// Assert regex element
         /// </summary>
         /// <param name="regexElement"></param>
-        private void Assert(RegexElement regexElement)
+        private void Assert(RegexReplaceElement regexElement)
         {
             if (string.IsNullOrEmpty(regexElement.Pattern))
                 throw new ScrapParserException(ScrapParserException.EErrorType.MANIPULATE_SPLIT_DATA_EMPTY);
-            else if (!(regexElement.Index == -1 || regexElement.Index == -2 || regexElement.Index >= 0))
-                throw new ScrapParserException(ScrapParserException.EErrorType.MANIPULATE_SPLIT_INDEX_INVALID,
-                    new string[] { regexElement.Index.ToString() });
         }
     }
 }

@@ -1,48 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using ScrapEngine.Common;
+using System.Collections.Generic;
 using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
     public abstract class ScrapElement
     {
-        /// <summary>
-        /// The list of child Scrap element
-        /// </summary>
-        public List<ScrapElement> Scraps { get; set; }
+        #region Xml Attributes
 
         /// <summary>
         /// The id of the node
         /// </summary>
-        [DXmlAttribute("id")]
+        [DXmlAttribute(ScrapXmlConsts.IdAttributeName)]
         public string IdString { get; set; }
 
         /// <summary>
         /// The name of the node
         /// </summary>
-        [DXmlAttribute("name")]
+        [DXmlAttribute(ScrapXmlConsts.NameAttributeName)]
         public string Name { get; set; }
 
         /// <summary>
         /// The url
         /// </summary>
-        [DXmlAttribute("url")]
+        [DXmlAttribute(ScrapXmlConsts.UrlAttributeName)]
         public string Url { get; set; }
 
         /// <summary>
         /// The type of the scrap node
         /// </summary>
-        [DXmlAttribute("doupdateonly")]
+        [DXmlAttribute(ScrapXmlConsts.DoUpdateOnlyAttributeName)]
         public bool DoUpdateOnly { get; set; }
 
-        /// <summary>
-        /// The list of column nodes
-        /// </summary>
-        public List<ColumnElement> Columns { get; set; }
+        #region Xml Attributes
 
-        /// <summary>
-        /// The parent node
-        /// </summary>
-        public ScrapElement Parent { get; set; }
+        #region Calculated
 
         /// <summary>
         /// Get the level with respect to the parent Scrap node
@@ -61,13 +53,6 @@ namespace ScrapEngine.Model
 
                 return level;
             }
-        }
-
-        public ScrapElement()
-        {
-            Scraps = new List<ScrapElement>();
-            Columns = new List<ColumnElement>();
-            DoUpdateOnly = false;
         }
 
         /// <summary>
@@ -115,5 +100,33 @@ namespace ScrapEngine.Model
                 return string.Empty;
             }
         }
+
+        #endregion Calculated
+
+        /// <summary>
+        /// The list of column nodes
+        /// </summary>
+        public List<ColumnElement> Columns { get; set; }
+
+        /// <summary>
+        /// The parent node
+        /// </summary>
+        public ScrapElement Parent { get; set; }
+
+        
+
+        /// <summary>
+        /// The list of child Scrap element
+        /// </summary>
+        public List<ScrapElement> Scraps { get; set; }
+
+        public ScrapElement()
+        {
+            Scraps = new List<ScrapElement>();
+            Columns = new List<ColumnElement>();
+            DoUpdateOnly = false;
+        }
+
+        
     }
 }
