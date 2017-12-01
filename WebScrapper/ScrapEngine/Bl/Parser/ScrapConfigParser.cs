@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
 using WebCommon.Error;
+using WebReader.Model;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -79,102 +80,46 @@ namespace ScrapEngine.Bl.Parser
         }
 
         /// <summary>
-        /// Parse scrap element attributes
-        /// </summary>
-        /// <param name="scrapNode"></param>
-        /// <param name="parentScrapConfigObj"></param>
-        /// <returns></returns>
-        protected T ParseScrapElementAttributes<T>(ScrapElement scrapObj)
-            where T : ScrapElement, new()
-        {
-            var webScrapConfigObj =
-                configParser.XmlConfigReader.ReadElement<T>(args.ScrapConfigNode);
-            webScrapConfigObj.Parent = args.ScrapConfigObj;
-            webScrapConfigObj.Url = ParseUrlValue(webScrapConfigObj, args.WebHtmlNode);
-            return webScrapConfigObj;
-        }
-
-        /// <summary>
         /// Parse url value
         /// </summary>
         /// <param name="urlValue"></param>
         /// <param name="scrapNode"></param>
         /// <returns></returns>
-        protected string ParseUrlValue(ScrapElement configScrap, HtmlNodeNavigator htmlNode)
+        protected string ParseUrlValue(ScrapIteratorArgs childScrapIteratorArgs)
         {
-            Debug.Assert(!(configScrap == null));
-
-            string urlValue = configScrap.Url;
+            string urlValue = childScrapIteratorArgs.ScrapConfigObj.Url;
 
             if (string.IsNullOrEmpty(urlValue) ||
-                configScrap.Parent == null ||
-                string.IsNullOrEmpty(configScrap.Parent.Url)) return urlValue;
+                childScrapIteratorArgs.ScrapConfigObj.Parent == null ||
+                string.IsNullOrEmpty(childScrapIteratorArgs.ScrapConfigObj.Parent.Url)) return urlValue;
             if (!urlValue.StartsWith("@")) return urlValue;
-            if (htmlNode == null) return urlValue;
+            if (childScrapIteratorArgs.WebHtmlNode == null) return urlValue;
 
             if (urlValue.Contains("{parentValue}"))
             {
-                urlValue = new Uri(new Uri(configScrap.Parent.Url),
-                    htmlNode.Value).AbsoluteUri;
+                urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
+                    childScrapIteratorArgs.WebHtmlNode.Value).AbsoluteUri;
             }
 
             return urlValue;
         }
 
         /// <summary>
-        /// Create new args to pass to Process method
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public virtual ScrapIteratorArgs CreateArgs(ScrapIteratorArgs args, XmlNode nextChildNode) { return null; }
-
-        /// <summary>
         /// A common method to call COlumn parser with arguments
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="args"></param>
-        protected void ProcessColumnParser<T>(T args)
-            where T : ColumnScrapIteratorArgs
+        protected void ProcessColumnParser(ColumnScrapIteratorArgs args)
         {
             // Check the constraints on the Scrap nodes
             // 1. Only maximum 4 levels is allowed
             // 2. Only one "name" tag should be present from the top level to bottom Scrap
             //    If multiple "name" tag is present throw error
-            AssertLevelConstraint(args.ScrapConfig);
-            AssertScrapNameAttribute(args.ScrapConfig);
+            AssertLevelConstraint(args.Parent);
+            AssertScrapNameAttribute(args.Parent);
 
             // Read the Column nodes which are the individual reader config nodes
             scrapColumnConfigParser.Process(args);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="args"></param>
-        /// <param name="iteratorArgs"></param>
-        protected void SetCurrentState<T>(ScrapIteratorArgs args, T newIterator, ref T currentIterator)
-            where T : ScrapIteratorArgs
-        {
-            // Only the root of Scrap nodes contains the 'id' attribute
-            if (!string.IsNullOrEmpty(newIterator.ScrapConfigObj.IdString))
-            {
-                currentIterator = newIterator;
-
-                if(!configParser.WebScrapStates.ContainsKey(currentIterator.ScrapConfigObj.IdString))
-                    configParser.WebScrapStates.Add(currentIterator.ScrapConfigObj.IdString, 
-                        new List<ScrapIteratorArgs>());
-                configParser.WebScrapStates[currentIterator.ScrapConfigObj.IdString].Add(currentIterator);
-            }
-            else
-            {
-                if (currentIterator != null)
-                {
-                    newIterator.Parent = currentIterator;
-                    currentIterator.Child.Add(newIterator);
-                    currentIterator = newIterator;
-                }
-            }
         }
     }
 }

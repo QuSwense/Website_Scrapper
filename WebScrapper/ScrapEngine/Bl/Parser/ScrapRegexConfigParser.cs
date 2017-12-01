@@ -19,21 +19,7 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configParser"></param>
         public ScrapRegexConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
-
-        /// <summary>
-        /// Parse the Regex element
-        /// </summary>
-        /// <param name="regexNode"></param>
-        /// <param name="webConfigObj"></param>
-        /// <returns></returns>
-        public override ManipulateChildElement Process(XmlNode regexNode, ManipulateElement webConfigObj)
-        {
-            RegexElement configRegexObj = configParser.XmlConfigReader.ReadElement<RegexElement>(regexNode);
-            configRegexObj.Pattern = HttpUtility.HtmlDecode(configRegexObj.Pattern);
-            Assert(configRegexObj);
-            return configRegexObj;
-        }
-
+        
         /// <summary>
         /// Process multiple results
         /// </summary>

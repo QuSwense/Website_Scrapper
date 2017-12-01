@@ -10,16 +10,6 @@ namespace ScrapEngine.Bl.Parser
     {
         public ScrapReplaceConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
-
-        public override ManipulateChildElement Process(XmlNode replaceNode, ManipulateElement webConfigObj)
-        {
-            ReplaceElement configReplaceObj = configParser.XmlConfigReader.ReadElement<ReplaceElement>(replaceNode);
-            configReplaceObj.InString = Normalize(configReplaceObj.InString);
-            configReplaceObj.OutString = Normalize(configReplaceObj.OutString);
-            Assert(configReplaceObj);
-
-            return configReplaceObj;
-        }
         
         public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
         {

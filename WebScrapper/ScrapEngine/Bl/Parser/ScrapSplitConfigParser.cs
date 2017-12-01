@@ -18,20 +18,7 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configParser"></param>
         public ScrapSplitConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
-
-        /// <summary>
-        /// Process the Split element
-        /// </summary>
-        /// <param name="childManipulateNode"></param>
-        /// <param name="webConfigObj"></param>
-        /// <returns></returns>
-        public override ManipulateChildElement Process(XmlNode childManipulateNode, ManipulateElement webConfigObj)
-        {
-            SplitElement splitElement = configParser.XmlConfigReader.ReadElement<SplitElement>(childManipulateNode);
-            Assert(splitElement);
-            return splitElement;
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>

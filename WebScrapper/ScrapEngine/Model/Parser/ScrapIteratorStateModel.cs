@@ -14,12 +14,15 @@ namespace ScrapEngine.Model.Parser
         /// </summary>
         public Dictionary<string, ScrapIteratorArgs> WebScrapArgs { get; set; }
 
+        public Dictionary<string, bool> ColumnMetadataUpdateFlags { get; set; }
+
         public ScrapIteratorArgs CurrentScrapIteratorArgs { get; protected set; }
         public ColumnScrapIteratorArgs CurrentColumnScrapIteratorArgs { get; protected set; }
 
         public ScrapIteratorStateModel()
         {
             WebScrapArgs = new Dictionary<string, ScrapIteratorArgs>();
+            ColumnMetadataUpdateFlags = new Dictionary<string, bool>();
         }
 
         public void AddRootScrapArgsState(ScrapIteratorArgs scrapIteratorArgs)
@@ -30,16 +33,38 @@ namespace ScrapEngine.Model.Parser
             CurrentScrapIteratorArgs = scrapIteratorArgs;
         }
 
-        public void AddNewScrap(ScrapIteratorHtmlArgs childScrapIteratorHtmlArgs)
+        public void AddNewScrap(ScrapIteratorArgs scrapIteratorArgs)
         {
-            CurrentScrapIteratorArgs.Child.Add(childScrapIteratorHtmlArgs);
-            CurrentScrapIteratorArgs = childScrapIteratorHtmlArgs;
+            CurrentScrapIteratorArgs.Child.Add(scrapIteratorArgs);
+            CurrentScrapIteratorArgs = scrapIteratorArgs;
         }
 
         public void AddNewColumn(ColumnScrapIteratorArgs columnScrapIteratorArgs)
         {
             CurrentScrapIteratorArgs.Columns.Add(columnScrapIteratorArgs);
             CurrentColumnScrapIteratorArgs = columnScrapIteratorArgs;
+        }
+
+        public bool IsColumnMetadataUpdated
+        {
+            get
+            {
+                if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.Id)) return false;
+                else
+                {
+                    return ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.Id];
+                }
+            }
+        }
+
+        public void SetColumnMetadataFlag()
+        {
+            if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.Id))
+            {
+                ColumnMetadataUpdateFlags.Add(CurrentColumnScrapIteratorArgs.Parent.Id, true);
+            }
+            else
+                ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.Id] = true;
         }
     }
 }

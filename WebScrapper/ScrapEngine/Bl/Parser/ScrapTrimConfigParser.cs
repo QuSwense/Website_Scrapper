@@ -9,15 +9,7 @@ namespace ScrapEngine.Bl.Parser
     {
         public ScrapTrimConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
-
-        public override ManipulateChildElement Process(XmlNode trimNode, ManipulateElement webConfigObj)
-        {
-            TrimElement configTrimObj = configParser.XmlConfigReader.ReadElement<TrimElement>(trimNode);
-            configTrimObj.Data = Normalize(configTrimObj.Data);
-            Assert(configTrimObj);
-            return configTrimObj;
-        }
-
+        
         public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
         {
             if (string.IsNullOrEmpty(result.OriginalValue)) return;

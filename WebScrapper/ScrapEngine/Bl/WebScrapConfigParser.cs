@@ -94,7 +94,6 @@ namespace ScrapEngine.Bl
         public WebScrapConfigParser()
         {
             Performance = new PerformanceMeasure();
-            //WebScrapStates = new Dictionary<string, List<ScrapIteratorArgs>>();
             StateModel = new ScrapIteratorStateModel();
 
             RegisterParsers();
@@ -156,7 +155,8 @@ namespace ScrapEngine.Bl
             // Check if there are any more Scrap Child nodes
             foreach (ScrapElement scrapObj in scrapIteratorArgs.ScrapConfigObj.Scraps)
             {
-                if (!ConfigScrapElementFactory(args, scrapNode)) return;
+                scrapIteratorArgs.ScrapConfigObj = scrapObj;
+                if (!ConfigScrapElementFactory(scrapIteratorArgs)) return;
             }
         }
 

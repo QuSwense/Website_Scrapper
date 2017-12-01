@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using WebCommon.Const;
 using WebCommon.Error;
 using WebReader.Xml;
 
@@ -39,6 +40,8 @@ namespace ScrapEngine.Bl.Parser
 
             foreach (XmlNode webDataNode in xmlDocReader.GetChildNodes())
             {
+                if (webDataNode is XmlDeclaration) continue;
+
                 if (webDataNode.LocalName != ScrapXmlConsts.WebDataNodeName)
                     throw new ScrapXmlException(ScrapXmlException.EErrorType.NODE_NOT_FOUND,
                         ScrapXmlConsts.WebDataNodeName);
@@ -76,21 +79,29 @@ namespace ScrapEngine.Bl.Parser
             }
         }
 
-        protected void ParseScrapNode(XmlNode webDataNode, ScrapElement parentScrap = null)
+        protected void ParseScrapNode(XmlNode webDataNode, ScrapElement parentScrap)
         {
             foreach (XmlNode scrapNode in xmlDocReader.GetChildNodes(webDataNode))
             {
                 ScrapElement currentScrap = null;
                 if (scrapNode.LocalName == ScrapXmlConsts.ScrapHtmlTableNodeName)
+                {
                     currentScrap = xmlDocReader.ReadElement<ScrapHtmlTableElement>(scrapNode);
+                    currentScrap.Parent = parentScrap;
+                    parentScrap.Scraps.Add(currentScrap);
+                    ParseScrapNode(scrapNode, currentScrap);
+                }
                 else if (scrapNode.LocalName == ScrapXmlConsts.ScrapCsvNodeName)
-                    currentScrap = xmlDocReader.ReadElement<ScrapCsvElement>(scrapNode);
+                {
+                    ScrapCsvElement currentCsvScrap = xmlDocReader.ReadElement<ScrapCsvElement>(scrapNode);
+                    currentCsvScrap.Delimiter = Normalize(currentCsvScrap.Delimiter);
+                    currentScrap = currentCsvScrap;
+                    currentScrap.Parent = parentScrap;
+                    parentScrap.Scraps.Add(currentScrap);
+                    ParseScrapNode(scrapNode, currentScrap);
+                }
                 else
                     ParseScrapChildNode(scrapNode, parentScrap);
-
-                currentScrap.Parent = parentScrap;
-                parentScrap.Scraps.Add(currentScrap);
-                ParseScrapNode(scrapNode, currentScrap);
             }
         }
 
@@ -128,14 +139,20 @@ namespace ScrapEngine.Bl.Parser
 
             if (manipulateNodeList != null)
             {
-                if (manipulateNodeList.Count != 1)
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.CHILD_NODE_PER_NODE_COUNT, "1",
-                        ScrapXmlConsts.ManipulateNodeName, ScrapXmlConsts.ColumnNodeName);
-
                 foreach (XmlNode manipulateNode in manipulateNodeList)
                 {
                     if (manipulateNode.LocalName == ScrapXmlConsts.ManipulateNodeName)
-                        ParseManipulateNode(manipulateNode, columnScrap);
+                    {
+                        XmlNodeList manipulateChildNodeList = xmlDocReader.GetChildNodes(manipulateNode);
+
+                        if(manipulateChildNodeList != null && manipulateChildNodeList.Count > 0)
+                        {
+                            foreach (XmlNode manipulateChildNode in xmlDocReader.GetChildNodes(manipulateNode))
+                            {
+                                ParseManipulateNode(manipulateChildNode, columnScrap);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -145,20 +162,49 @@ namespace ScrapEngine.Bl.Parser
             ManipulateChildElement manipulateScrap = null;
 
             if (manipulateNode.LocalName == ScrapXmlConsts.SplitNodeName)
-                manipulateScrap = xmlDocReader.ReadElement<SplitElement>(manipulateNode);
+            {
+                SplitElement splitElement = xmlDocReader.ReadElement<SplitElement>(manipulateNode);
+                splitElement.Data = Normalize(splitElement.Data);
+                manipulateScrap = splitElement;
+            }
             else if (manipulateNode.LocalName == ScrapXmlConsts.TrimNodeName)
-                manipulateScrap = xmlDocReader.ReadElement<TrimElement>(manipulateNode);
+            {
+                TrimElement trimElement = xmlDocReader.ReadElement<TrimElement>(manipulateNode);
+                trimElement.Data = Normalize(trimElement.Data);
+                manipulateScrap = trimElement;
+            }
             else if (manipulateNode.LocalName == ScrapXmlConsts.RegexNodeName)
-                manipulateScrap = xmlDocReader.ReadElement<RegexElement>(manipulateNode);
+            {
+                RegexElement regexElement = xmlDocReader.ReadElement<RegexElement>(manipulateNode);
+                regexElement.Pattern = Normalize(regexElement.Pattern);
+                manipulateScrap = regexElement;
+            }
             else if (manipulateNode.LocalName == ScrapXmlConsts.ReplaceNodeName)
-                manipulateScrap = xmlDocReader.ReadElement<ReplaceElement>(manipulateNode);
+            {
+                ReplaceElement replaceElement = xmlDocReader.ReadElement<ReplaceElement>(manipulateNode);
+                replaceElement.InString = Normalize(replaceElement.InString);
+                replaceElement.OutString = Normalize(replaceElement.OutString);
+                manipulateScrap = replaceElement;
+            }
             else if (manipulateNode.LocalName == ScrapXmlConsts.RegexReplaceNodeName)
-                manipulateScrap = xmlDocReader.ReadElement<RegexReplaceElement>(manipulateNode);
+            {
+                RegexReplaceElement regexReplaceElement = xmlDocReader.ReadElement<RegexReplaceElement>(manipulateNode);
+                regexReplaceElement.Pattern = Normalize(regexReplaceElement.Pattern);
+                regexReplaceElement.Replace = Normalize(regexReplaceElement.Replace);
+                manipulateScrap = regexReplaceElement;
+            }
             else
                 throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
 
             manipulateScrap.Parent = columnScrap;
             columnScrap.Manipulations.Add(manipulateScrap);
+        }
+
+        protected string Normalize(string htmlValue)
+        {
+            if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
+            return htmlValue.Replace(ASCIICharacters.NewLineString, ASCIICharacters.NewLine)
+                .Replace(ASCIICharacters.TabString, ASCIICharacters.Tab);
         }
     }
 }

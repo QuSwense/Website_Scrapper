@@ -50,6 +50,6 @@ namespace ScrapEngine.Common
         public static string AllValue { get { return "*"; } }
         public static string LastIndexValue { get { return "last"; } }
 
-        #region Values
+        #endregion Values
     }
 }

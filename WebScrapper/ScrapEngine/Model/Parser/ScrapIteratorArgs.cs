@@ -73,7 +73,7 @@ namespace ScrapEngine.Model.Parser
         /// 
         /// </summary>
         /// <param name="args"></param>
-        public void CloneData(ScrapIteratorArgs args)
+        public virtual void CloneData(ScrapIteratorArgs args)
         {
             this.NodeIndex = args.NodeIndex;
             this.ScrapConfigObj = args.ScrapConfigObj;

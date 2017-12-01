@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using System;
 using System.Collections.Generic;
 using WebReader.Model;
 
@@ -32,7 +33,7 @@ namespace ScrapEngine.Model
         [DXmlAttribute(ScrapXmlConsts.DoUpdateOnlyAttributeName)]
         public bool DoUpdateOnly { get; set; }
 
-        #region Xml Attributes
+        #endregion Xml Attributes
 
         #region Calculated
 
@@ -106,6 +107,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The list of column nodes
         /// </summary>
+        [DXmlElement(ScrapXmlConsts.ColumnNodeName)]
         public List<ColumnElement> Columns { get; set; }
 
         /// <summary>
@@ -113,11 +115,11 @@ namespace ScrapEngine.Model
         /// </summary>
         public ScrapElement Parent { get; set; }
 
-        
-
         /// <summary>
         /// The list of child Scrap element
         /// </summary>
+        [DXmlElement(ScrapXmlConsts.ScrapHtmlTableNodeName, typeof(ScrapHtmlTableElement))]
+        [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, typeof(ScrapCsvElement))]
         public List<ScrapElement> Scraps { get; set; }
 
         public ScrapElement()

@@ -70,20 +70,17 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The manipulate tag
         /// </summary>
+        [DXmlElement(ScrapXmlConsts.ManipulateNodeName)]
         public List<ManipulateChildElement> Manipulations { get; set; }
 
         /// <summary>
-        /// Points to the parent scrap node
+        /// The parent node
         /// </summary>
         public ScrapElement Parent { get; set; }
 
         #endregion References
 
-        #region States
-
-
-
-        #endregion States
+        #region Constructor
 
         /// <summary>
         /// Constructor
@@ -95,5 +92,7 @@ namespace ScrapEngine.Model
             Index = -1;
             IsUnique = false;
         }
+
+        #endregion Constructor
     }
 }

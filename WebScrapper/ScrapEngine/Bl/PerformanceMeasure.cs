@@ -98,15 +98,14 @@ namespace ScrapEngine.Bl
         /// Add a new url load
         /// </summary>
         /// <param name="url"></param>
-        public void NewDbUpdate<T>(List<List<DynamicTableDataInsertModel>> colValues, T scrapArgs)
-            where T : ColumnScrapIteratorArgs
+        public void NewDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapIteratorArgs scrapArgs)
         {
             stopwatchTemp = new Stopwatch();
             stopwatchTemp.Start();
 
-            string id = scrapArgs.ScrapConfig.Id;
+            string id = scrapArgs.Parent.Id;
 
-            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates
+            StorePerformances[scrapArgs.Parent.Id].ElapsedDbUpdates
                 .Add(scrapArgs.NodeIndexId, TimeSpan.MinValue);
         }
 
@@ -114,13 +113,12 @@ namespace ScrapEngine.Bl
         /// Time the load of url
         /// </summary>
         /// <param name="url"></param>
-        public void FinalDbUpdate<T>(List<List<DynamicTableDataInsertModel>> colValues, T scrapArgs)
-            where T : ColumnScrapIteratorArgs
+        public void FinalDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapIteratorArgs scrapArgs)
         {
             stopwatchTemp.Stop();
             //string key = GetColumnKey(colValues, keyIndex);
 
-            StorePerformances[scrapArgs.ScrapConfig.Id].ElapsedDbUpdates[scrapArgs.NodeIndexId] =
+            StorePerformances[scrapArgs.Parent.Id].ElapsedDbUpdates[scrapArgs.NodeIndexId] =
                 stopwatchTemp.Elapsed;
         }
 

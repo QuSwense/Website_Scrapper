@@ -8,7 +8,7 @@
 
         public override void PreProcess()
         {
-            ScrapCsvElement ScrapConfigCsv = ScrapConfig as ScrapCsvElement;
+            ScrapCsvElement ScrapConfigCsv = Parent as ScrapCsvElement;
             if (ScrapConfigCsv != null)
             {
                 splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });

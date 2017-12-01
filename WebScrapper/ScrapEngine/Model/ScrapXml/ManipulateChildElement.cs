@@ -1,5 +1,6 @@
 ﻿using ScrapEngine.Common;
 using WebCommon.Error;
+using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
 {
@@ -9,14 +10,22 @@ namespace ScrapEngine.Model.ScrapXml
     /// </summary>
     public class ManipulateChildElement
     {
+        #region References
+
         /// <summary>
         /// Points to the parent scrap node
         /// </summary>
         public ColumnElement Parent { get; set; }
 
+        #endregion References
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor
         /// </summary>
         public ManipulateChildElement() { }
+
+        #endregion Constructor
     }
 }

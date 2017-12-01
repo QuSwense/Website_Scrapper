@@ -5,6 +5,9 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
+    /// <summary>
+    /// A mnipulation Child element
+    /// </summary>
     public class RegexElement : ManipulateChildElement
     {
         /// <summary>
@@ -18,7 +21,7 @@ namespace ScrapEngine.Model
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
         public string IndexString { get; set; }
-
+        
         /// <summary>
         /// The index of the regex matched groups. '*'(-1) for all of them 
         /// The index of the last elelment is represented by -2.

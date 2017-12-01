@@ -9,7 +9,8 @@ namespace WebCommon.Error
         /// </summary>
         public enum EErrorType
         {
-            ATRRIBUTE_VALUE_NULL
+            ATRRIBUTE_VALUE_NULL,
+            XML_ATTRIBUTE_NOT_MAPPED
         }
 
         /// <summary>
@@ -47,6 +48,8 @@ namespace WebCommon.Error
             {
                 case EErrorType.ATRRIBUTE_VALUE_NULL:
                     return string.Format("The value for the attribute '{0}' cannot be null", attrName);
+                case EErrorType.XML_ATTRIBUTE_NOT_MAPPED:
+                    return string.Format("The xml attribute '{0}' is not mapped", attrName);
                 default:
                     return "Unknwon Xml document reader exception error";
             }

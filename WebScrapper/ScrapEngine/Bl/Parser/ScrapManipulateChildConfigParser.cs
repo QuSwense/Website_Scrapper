@@ -8,8 +8,7 @@ namespace ScrapEngine.Bl.Parser
     {
         public ScrapManipulateChildConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
-
-        public virtual ManipulateChildElement Process(XmlNode manipulateNode, ManipulateElement webConfigObj) { return null; }
+        
         public virtual void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild) { }
     }
 }

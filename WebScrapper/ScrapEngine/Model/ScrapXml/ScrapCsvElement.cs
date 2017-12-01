@@ -21,7 +21,7 @@ namespace ScrapEngine.Model
         public ScrapCsvElement()
         {
             SkipFirstLines = 0;
-            Delimiter = ASCIICharacters.Tab;
+            Delimiter = ASCIICharacters.TabString;
         }
     }
 }

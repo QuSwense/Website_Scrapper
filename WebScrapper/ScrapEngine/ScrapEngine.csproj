@@ -102,7 +102,6 @@
     <Compile Include="Bl\Parser\ScrapCsvConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapHtmlTableConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapManipulateChildConfigParser.cs" />
-    <Compile Include="Bl\Parser\ScrapManipulateConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapRegexConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapRegexReplaceParser.cs" />
     <Compile Include="Bl\Parser\ScrapReplaceConfigParser.cs" />
@@ -138,7 +137,6 @@
     <Compile Include="Model\Parser\ColumnScrapIteratorFileArgs.cs" />
     <Compile Include="Model\Parser\ColumnScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\ScrapXml\ColumnElement.cs" />
-    <Compile Include="Model\ScrapXml\ManipulateElement.cs" />
     <Compile Include="Model\ScrapXml\RegexElement.cs" />
     <Compile Include="Model\ScrapXml\RegexReplaceElement.cs" />
     <Compile Include="Model\ScrapXml\ReplaceElement.cs" />

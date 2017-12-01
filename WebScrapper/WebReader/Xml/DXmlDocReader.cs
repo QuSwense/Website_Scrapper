@@ -5,6 +5,8 @@ using WebReader.Model;
 using WebCommon.Extn;
 using WebCommon.Error;
 using log4net;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace WebReader.Xml
 {

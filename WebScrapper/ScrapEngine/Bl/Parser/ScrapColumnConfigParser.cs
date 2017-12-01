@@ -16,9 +16,10 @@ namespace ScrapEngine.Bl.Parser
         public static ILog logger = LogManager.GetLogger(typeof(ScrapColumnConfigParser));
 
         /// <summary>
-        /// The Manipulate Config tag object parser
+        /// Split Manipulate tag
         /// </summary>
-        protected ScrapManipulateConfigParser scrapManipulateConfigParser;
+        private ManipulateChildFactory manipulateChildFactory;
+        
 
         /// <summary>
         /// Constructor
@@ -27,7 +28,7 @@ namespace ScrapEngine.Bl.Parser
         public ScrapColumnConfigParser(WebScrapConfigParser configParser)
             : base(configParser)
         {
-            scrapManipulateConfigParser = new ScrapManipulateConfigParser(configParser);
+            manipulateChildFactory = new ManipulateChildFactory(configParser);
         }
 
         /// <summary>
@@ -38,12 +39,11 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="configScrap"></param>
         /// <param name="htmlNode"></param>
         /// <param name="fileLine"></param>
-        public void Process<T>(T args)
-            where T : ColumnScrapIteratorArgs
+        public void Process(ColumnScrapIteratorArgs columnScrapIteratorArgs)
         {
             logger.DebugFormat("Scrapping data from online text file");
-            ParseColumnsConfig(args.ScrapNode, args.ScrapConfig);
-            ColumnScrapIterator(args);
+            ParseColumnsConfig(columnScrapIteratorArgs);
+            ColumnScrapIterator(columnScrapIteratorArgs);
         }
 
         /// <summary>
@@ -51,59 +51,14 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <param name="scrapNode"></param>
         /// <param name="configScrap"></param>
-        private void ParseColumnsConfig(XmlNode scrapNode, ScrapElement configScrap)
+        private void ParseColumnsConfig(ColumnScrapIteratorArgs columnScrapIteratorArgs)
         {
-            if (configScrap.Columns.Count <= 0)
+            if (configParser.StateModel.IsColumnMetadataUpdated)
             {
-                XmlNodeList columnNodeList = scrapNode.SelectNodes(ColumnElement.TagName);
-
-                if (columnNodeList != null && columnNodeList.Count > 0)
-                {
-                    foreach (XmlNode columnNode in columnNodeList)
-                    {
-                        configScrap.Columns.Add(
-                            ParseColumnElement(columnNode, configScrap));
-                    }
-                }
-            }
-
-            if(configScrap.Columns.Count > 0)
                 // Load the table with partial columns in memory
-                configParser.WebDbContext.AddMetadata(configScrap);
-        }
-
-        /// <summary>
-        /// Parse the Column tag in config file
-        /// </summary>
-        /// <param name="nodeIndex"></param>
-        /// <param name="columnNode"></param>
-        /// <param name="webScrapConfigObj"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        private ColumnElement ParseColumnElement(XmlNode columnNode, ScrapElement configScrap)
-        {
-            var webColumnConfigObj = ParseColumnElementAttributes(columnNode, configScrap);
-
-            // Check if manipulate tag is present
-            scrapManipulateConfigParser.Process(columnNode, webColumnConfigObj);
-
-            return webColumnConfigObj;
-        }
-
-        /// <summary>
-        /// Parse the Config Xml Column attribute
-        /// </summary>
-        /// <param name="columnNode"></param>
-        /// <param name="webScrapConfigObj"></param>
-        /// <returns></returns>
-        private ColumnElement ParseColumnElementAttributes(XmlNode columnNode, ScrapElement configScrap)
-        {
-            var webColumnConfigObj = 
-                configParser.XmlConfigReader.ReadElement<ColumnElement>(columnNode);
-            webColumnConfigObj.Parent = configScrap;
-            webColumnConfigObj.Name = webColumnConfigObj.Name;
-
-            return webColumnConfigObj;
+                configParser.WebDbContext.AddMetadata(columnScrapIteratorArgs.Parent);
+                configParser.StateModel.SetColumnMetadataFlag();
+            }
         }
 
         /// <summary>
@@ -112,18 +67,17 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="count"></param>
         /// <param name="scrapConfig"></param>
         /// <param name="webnodeNavigator"></param>
-        private void ColumnScrapIterator<T>(T scrapArgs)
-            where T : ColumnScrapIteratorArgs
+        private void ColumnScrapIterator(ColumnScrapIteratorArgs scrapArgs)
         {
             List<List<DynamicTableDataInsertModel>> rows = new List<List<DynamicTableDataInsertModel>>();
             bool doSkipDbAddUpdate = false;
             scrapArgs.PreProcess();
-            for (int indx = 0; indx < scrapArgs.ScrapConfig.Columns.Count; ++indx)
+            for (int indx = 0; indx < scrapArgs.Parent.Columns.Count; ++indx)
             {
                 // A list to store multiple column values for >1 cardinal values
                 List<DynamicTableDataInsertModel> colValues = new List<DynamicTableDataInsertModel>();
 
-                ColumnElement columnConfig = scrapArgs.ScrapConfig.Columns[indx];
+                ColumnElement columnConfig = scrapArgs.Parent.Columns[indx];
                 ManipulateHtmlData manipulateHtml = null;
                 
                 manipulateHtml = Manipulate(columnConfig, scrapArgs.GetDataIterator(columnConfig));
@@ -142,7 +96,7 @@ namespace ScrapEngine.Bl.Parser
                     tableDataColumn.IsPk = columnConfig.IsUnique;
                     tableDataColumn.Value = result;
                     tableDataColumn.DataType =
-                        configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.ScrapConfig.TableName][columnConfig.Name].DataType;
+                        configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.Parent.TableName][columnConfig.Name].DataType;
 
                     if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
                         continue;
@@ -152,11 +106,11 @@ namespace ScrapEngine.Bl.Parser
                 rows.Add(colValues);
             }
 
-            if (!doSkipDbAddUpdate && scrapArgs.ScrapConfig.Columns.Count > 0)
+            if (!doSkipDbAddUpdate && scrapArgs.Parent.Columns.Count > 0)
             {
                 configParser.Performance.NewDbUpdate(rows, scrapArgs);
 
-                configParser.WebDbContext.AddOrUpdate(scrapArgs.ScrapConfig, rows);
+                configParser.WebDbContext.AddOrUpdate(scrapArgs.Parent, rows);
 
                 configParser.Performance.FinalDbUpdate(rows, scrapArgs);
             }
@@ -179,9 +133,14 @@ namespace ScrapEngine.Bl.Parser
             result.Cardinality = columnConfig.Cardinal;
 
             // Even if Scrapped data is null send to manipulation tag. As there can be a default
-            // manipulation defined
-            scrapManipulateConfigParser.Process(columnConfig, result);
-
+            if (columnConfig.Manipulations != null && columnConfig.Manipulations.Count > 0)
+            {
+                foreach (var manipulateChild in columnConfig.Manipulations)
+                {
+                    manipulateChildFactory.GetParser(manipulateChild).Process(result, manipulateChild);
+                }
+            }
+            
             logger.DebugFormat("For Column '{0}' Final manipulated data '{1}'", columnConfig.Name, result.OriginalValue);
 
             return result;

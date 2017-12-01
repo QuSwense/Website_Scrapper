@@ -8,6 +8,9 @@ namespace WebCommon.Const
 {
     public class ASCIICharacters
     {
-        public static string Tab { get { return "\\t"; } }
+        public static string TabString { get { return "\\t"; } }
+        public static string Tab { get { return "\t"; } }
+        public static string NewLineString { get { return "\\n"; } }
+        public static string NewLine { get { return "\n"; } }
     }
 }
