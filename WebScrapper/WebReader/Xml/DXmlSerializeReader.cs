@@ -24,10 +24,10 @@ namespace WebReader.Xml
         {
             logger.DebugFormat("Try to parse and read the xml file {0} into {1} object", fileName, typeof(T));
 
-            XmlSerializer configXmlSerializer = new XmlSerializer(typeof(T));
-            using (XmlReader reader = XmlReader.Create(fileName))
+            var configXmlSerializer = new XmlSerializer(typeof(T));
+            using (var reader = XmlReader.Create(fileName))
             {
-                XmlDeserializationEvents deserializeEvents = new XmlDeserializationEvents();
+                var deserializeEvents = new XmlDeserializationEvents();
                 deserializeEvents.OnUnknownAttribute += OnUnknownAttribute;
                 deserializeEvents.OnUnknownElement += OnUnknownElement;
                 deserializeEvents.OnUnknownNode += OnUnknownNode;

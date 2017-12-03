@@ -213,5 +213,19 @@ namespace ScrapEngine.Db
         }
 
         #endregion Create
+
+        #region Validate
+
+        public int ValidateExists(string table, string column, string value)
+        {
+            return WebScrapDb.ValidateExists(table, column, value);
+        }
+
+        public string SelectSingle(string tableExists, string columnExists, string table, string column, string result)
+        {
+            return WebScrapDb.SelectSingle(tableExists, columnExists, table, column, result);
+        }
+
+        #endregion Validate
     }
 }

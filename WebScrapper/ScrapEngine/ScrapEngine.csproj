@@ -100,13 +100,18 @@
     <Compile Include="Bl\Parser\ScrapColumnConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapCsvConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapDbChangeConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapDbChangeExistsConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapDbChangeSelectConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapHtmlTableConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapManipulateChildConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapPurgeConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapRegexConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapRegexReplaceParser.cs" />
     <Compile Include="Bl\Parser\ScrapReplaceConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapSplitConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapTrimConfigParser.cs" />
+    <Compile Include="Bl\Parser\ScrapValidateConfigParser.cs" />
     <Compile Include="Bl\Parser\WebDataScrapConfigXmlParser.cs" />
     <Compile Include="Bl\PerformanceMeasure.cs" />
     <Compile Include="Bl\WebScrapConfigParser.cs" />
@@ -115,6 +120,7 @@
     <Compile Include="Db\DynamicAppDbConfig.cs" />
     <Compile Include="Db\DynamicGenericDbConfig.cs" />
     <Compile Include="Db\ScrapDbContext.cs" />
+    <Compile Include="Interfaces\IColumnChild.cs" />
     <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Interfaces\IInnerBaseParser.cs" />
     <Compile Include="Model\Parser\ParserIteratorArgs.cs" />
@@ -123,6 +129,9 @@
     <Compile Include="Model\Parser\ScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\Parser\ScrapIteratorStateModel.cs" />
     <Compile Include="Model\PerformanceState.cs" />
+    <Compile Include="Model\ScrapXml\DbchangeElement.cs" />
+    <Compile Include="Model\ScrapXml\DbchangeExistsElement.cs" />
+    <Compile Include="Model\ScrapXml\DbchangeSelectElement.cs" />
     <Compile Include="Model\ScrapXml\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
@@ -137,6 +146,7 @@
     <Compile Include="Model\Parser\ColumnScrapIteratorFileArgs.cs" />
     <Compile Include="Model\Parser\ColumnScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\ScrapXml\ColumnElement.cs" />
+    <Compile Include="Model\ScrapXml\PurgeElement.cs" />
     <Compile Include="Model\ScrapXml\RegexElement.cs" />
     <Compile Include="Model\ScrapXml\RegexReplaceElement.cs" />
     <Compile Include="Model\ScrapXml\ReplaceElement.cs" />
@@ -145,6 +155,7 @@
     <Compile Include="Model\ScrapXml\ScrapHtmlTableElement.cs" />
     <Compile Include="Model\ScrapXml\SplitElement.cs" />
     <Compile Include="Model\ScrapXml\TrimElement.cs" />
+    <Compile Include="Model\ScrapXml\ValidateElement.cs" />
     <Compile Include="Model\WebScrapParserColumnCsvStateModel.cs" />
     <Compile Include="Model\WebScrapParserColumnHtmlStateModel.cs" />
     <Compile Include="Model\WebScrapParserStateModel.cs" />

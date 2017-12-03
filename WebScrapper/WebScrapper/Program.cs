@@ -24,10 +24,10 @@ namespace WebScrapper
             logger.Info("Start of the Application Data Scrapper");
 
             // Parse arguments
-            CommandOptions options = new CommandOptions();
+            var options = new CommandOptions();
             
             if (!Parser.Default.ParseArguments(args, options))
-                throw new CommandLineException(args, CommandLineException.EErrorType.PARSE_ERROR);
+                throw new CommandLineException(CommandLineException.EErrorType.PARSE_ERROR, args);
 
             if(logger.IsDebugEnabled)
                 logger.DebugFormat("Command line arguments parsed : \n{0}", string.Join(Environment.NewLine,
@@ -46,7 +46,7 @@ namespace WebScrapper
                 AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
 
             // Read the generic application configuration file independent of any application topic
-            ApplicationConfig appGenericConfig = DXmlSerializeReader.Load<ApplicationConfig>(
+            var appGenericConfig = DXmlSerializeReader.Load<ApplicationConfig>(
                 AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
 
             // Read database generic config

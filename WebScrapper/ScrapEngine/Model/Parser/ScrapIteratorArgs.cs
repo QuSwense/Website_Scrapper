@@ -51,7 +51,7 @@ namespace ScrapEngine.Model.Parser
 
                 while(tmpIterator != null)
                 {
-                    idCreateList.Add(tmpIterator.NodeIndex.ToString());
+                    idCreateList.Insert(0, tmpIterator.NodeIndex.ToString());
                     tmpIterator = tmpIterator.Parent;
                 }
 

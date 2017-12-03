@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
+  <ScrapHtmlTable id="all_languages" name="lang" url="http://www.loc.gov/standards/iso639-2/php/code_list.php" xpath="//body//table//table[1]//tr[position() > 1]">
+    <Column name="iso6392" xpath="td[1]"></Column>
+    <Column name="iso6391" xpath="td[2]"></Column>
+    <Column name="nm" xpath="td[3]" />
+  </ScrapHtmlTable>
   <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">
     <ScrapHtmlTable xpath="//body/div[2]/table[1]" url="@{parentValue}">
       <Column name="iso31661a2" xpath=".//tr[2]/td[2]" isunique="true">
@@ -8,15 +13,21 @@
           <Trim />
         </Manipulate>
       </Column>
-      <Column name="iso6391" xpath=".//tr[8]/td[2]" cardinal="*" isunique="true">
+      <Column name="iso6392" xpath=".//tr[8]/td[2]" cardinal="*" isunique="true">
         <Manipulate>
           <Split data="," index="*"></Split>
           <Regex pattern="(?&lt;=\()(.*?)(?=\))" index="last">
           </Regex>
           <Split data="-" index="0" />
           <Trim />
+          <Purge isemptyornull="true"/>
+          <Dbchange>
+            <Exists table="lang" col="iso6391">
+              <Select table="lang" col="iso6392" />
+            </Exists>
+          </Dbchange>
+          <Validate table="lang" col="iso6392" />
         </Manipulate>
-        <Validate table="lang" col="iso6391" />
       </Column>
     </ScrapHtmlTable>
   </ScrapHtmlTable>

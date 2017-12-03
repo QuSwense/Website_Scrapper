@@ -25,7 +25,7 @@ namespace ScrapEngine.Model
         /// The url
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.UrlAttributeName)]
-        public string Url { get; set; }
+        public string UrlOriginal { get; set; }
 
         /// <summary>
         /// The type of the scrap node
@@ -99,6 +99,17 @@ namespace ScrapEngine.Model
                 }
 
                 return string.Empty;
+            }
+        }
+
+        public string UrlCalculated { get; set; }
+
+        public string Url
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(UrlCalculated)) return UrlCalculated;
+                else return UrlOriginal;
             }
         }
 

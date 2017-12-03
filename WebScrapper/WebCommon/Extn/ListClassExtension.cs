@@ -16,5 +16,15 @@ namespace WebCommon.Extn
 
             return listObj[index];
         }
+
+        /// <summary>
+        /// Format the string from the list of data in string
+        /// </summary>
+        /// <param name="paramArgs"></param>
+        /// <param name="format"></param>
+        public static string Format(this List<string> paramArgs, string format)
+        {
+            return string.Format(format, paramArgs.ToArray());
+        }
     }
 }

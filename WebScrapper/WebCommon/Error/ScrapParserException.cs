@@ -24,6 +24,7 @@ namespace WebCommon.Error
             MANIPULATE_REPLACE_INSTRING_EMPTY,
             SCRAP_INDEX_INVALID,
             NOT_IMPLEMENTED,
+            VALIDATION_FAILED,
         }
 
         /// <summary>
@@ -94,6 +95,8 @@ namespace WebCommon.Error
                     return string.Format("The index of the Scrap elelemtn is invalid");
                 case EErrorType.NOT_IMPLEMENTED:
                     return string.Format("The Config element type is not implemented");
+                case EErrorType.VALIDATION_FAILED:
+                    return dataList.Format("The value '{0}' is not found in table '{1}' and '{2}'");
                 default:
                     return "Unknwon Web Scrap Parser error";
             }

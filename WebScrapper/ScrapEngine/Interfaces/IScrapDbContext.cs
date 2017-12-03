@@ -19,6 +19,9 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         IScrapEngineContext ParentEngine { get; }
 
+        string SelectSingle(string tableExists, string columnExists, string innerjoincriteria,
+            string table, string column, string result);
+
         /// <summary>
         /// Read the Database configuration
         /// </summary>
@@ -28,6 +31,8 @@ namespace ScrapEngine.Interfaces
         /// The configuration for web scrapping
         /// </summary>
         DatabaseContext WebScrapDb { get; }
+
+        int ValidateExists(string table, string column, string value);
 
         #endregion Properties
 

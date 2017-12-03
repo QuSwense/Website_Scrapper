@@ -17,7 +17,8 @@ namespace WebCommon.Error
             MANDATORY_ATTRIBUTE_NOT_FOUND,
             UNKNOWN_NODE,
             NODE_ATTRIBUTE_VALUE_NOT_FOUND,
-            CHILD_NODE_PER_NODE_COUNT
+            CHILD_NODE_PER_NODE_COUNT,
+            MANIPULATE_NODE_ONLY_ONE
         }
 
         /// <summary>
@@ -78,6 +79,8 @@ namespace WebCommon.Error
                     return string.Format("The {0} node must have {1} attribute", dataList);
                 case EErrorType.CHILD_NODE_PER_NODE_COUNT:
                     return string.Format("Currently only {0} child {1} node per {2} node is supported", dataList);
+                case EErrorType.MANIPULATE_NODE_ONLY_ONE:
+                    return string.Format("Currently only 1 {2} node is supported", dataList);
                 default:
                     return "Unknwon Web Scrap Parser error";
             }

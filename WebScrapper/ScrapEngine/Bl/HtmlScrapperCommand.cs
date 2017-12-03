@@ -65,7 +65,8 @@ namespace ScrapEngine.Bl
         private T Load<T>(string url, Func<Stream, T> fManipulateWebStream)
             where T: class
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 |
+                SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             ServicePointManager.ServerCertificateValidationCallback +=
                 (sender, cert, chain, error) =>
                 {

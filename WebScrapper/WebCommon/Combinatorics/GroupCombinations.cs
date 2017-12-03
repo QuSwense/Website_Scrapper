@@ -69,7 +69,7 @@ namespace WebCommon.Combinatorics
                 resultSet = new List<List<T>>();
                 for(int i = 0; i < OriginalGroupSets[rowindex].Count; ++i)
                 {
-                    List<T> newList = new List<T>
+                    var newList = new List<T>
                     {
                         OriginalGroupSets[rowindex][i]
                     };
@@ -87,13 +87,13 @@ namespace WebCommon.Combinatorics
 
         private List<List<T>> Combine(List<List<T>> inputSet, List<T> list)
         {
-            List<List<T>> resultSet = new List<List<T>>();
+            var resultSet = new List<List<T>>();
 
             for (int j = 0; j < list.Count; ++j)
             {
                 for (int i = 0; i < inputSet.Count; ++i)
                 {
-                    List<T> newList = new List<T>();
+                    var newList = new List<T>();
                     newList.AddRange(inputSet[i]);
                     newList.Add(list[j]);
                     resultSet.Add(newList);

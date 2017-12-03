@@ -8,7 +8,7 @@ namespace ScrapEngine.Bl.Parser
     public class AppTopicConfigParser : IInnerBaseParser
     {
         /// <summary>
-        /// The config parser
+        /// The reference to the config parser engine
         /// </summary>
         protected WebScrapConfigParser configParser;
 
@@ -19,12 +19,6 @@ namespace ScrapEngine.Bl.Parser
         public AppTopicConfigParser(WebScrapConfigParser configParser)
         {
             this.configParser = configParser;
-        }
-
-        protected string Normalize(string htmlValue)
-        {
-            if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
-            return htmlValue.Replace("\\n", "\n").Replace("\\t", "\t");
         }
 
         public virtual void Reset() { }

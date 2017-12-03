@@ -18,6 +18,9 @@ namespace WebReader.Csv
     /// </summary>
     public class CSVReader : DynamicReader
     {
+        /// <summary>
+        /// The regex to split CSV comma delimited data
+        /// </summary>
         protected Regex regex = new Regex("(?<=^|,)(\"(?:[^\"]|\"\")*\"|[^,]*)");
 
         /// <summary>
@@ -70,9 +73,9 @@ namespace WebReader.Csv
         private void SetValueToClass(object objStore, List<string> splits, int keyIndx)
         {
             PropertyInfo[] props = objStore.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (PropertyInfo propOfObjValue in props)
+            foreach (var propOfObjValue in props)
             {
-                SplitIndexAttribute splitIndex = propOfObjValue.GetCustomAttribute<SplitIndexAttribute>();
+                var splitIndex = propOfObjValue.GetCustomAttribute<SplitIndexAttribute>();
                 if (propOfObjValue.PropertyType == typeof(IDictionary))
                     SetValues(propOfObjValue.PropertyType, splits, splitIndex.Index);
                 else
@@ -126,7 +129,7 @@ namespace WebReader.Csv
 
             if (objValueStore != null)
             {
-                SplitIndexAttribute splitIndex = dictObjStoreType.GetCustomAttribute<SplitIndexAttribute>();
+                var splitIndex = dictObjStoreType.GetCustomAttribute<SplitIndexAttribute>();
                 int childkeyIndx = (splitIndex != null) ? splitIndex.Index : keyIndx + 1;
 
                 SetValues(objValueStore, splits, childkeyIndx);

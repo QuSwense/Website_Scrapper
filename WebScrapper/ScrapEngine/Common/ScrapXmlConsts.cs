@@ -21,6 +21,10 @@ namespace ScrapEngine.Common
         public const string ValidateNodeName = "Validate";
         public const string ReplaceNodeName = "Replace";
         public const string RegexReplaceNodeName = "RegexReplace";
+        public const string PurgeNodeName = "Purge";
+        public const string DbchangeNodeName = "Dbchange";
+        public const string DbchangeExistsNodeName = "Exists";
+        public const string DbchangeSelectNodeName = "Select";
 
         #endregion Node Names
 
@@ -42,6 +46,8 @@ namespace ScrapEngine.Common
         public const string DelimiterAttributeName = "delimiter";
         public const string SkipFirstAttributeName = "skipfirst";
         public const string DoUpdateOnlyAttributeName = "doupdateonly";
+        public const string IsEmptyOrNullAttributeName = "isemptyornull";
+        public const string InnerJoinCriteriaAttributeName = "innerjoincriteria";
 
         #endregion Attributes
 

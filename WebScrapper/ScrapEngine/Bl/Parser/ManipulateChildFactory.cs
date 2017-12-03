@@ -26,7 +26,22 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         private ScrapRegexConfigParser scrapRegexConfigParser;
 
+        /// <summary>
+        /// Regex Replace Manipulate parser
+        /// </summary>
         private ScrapRegexReplaceParser scrapRegexReplaceParser;
+
+        /// <summary>
+        /// Regex Replace Manipulate parser
+        /// </summary>
+        private ScrapPurgeConfigParser scrapPurgeConfigParser;
+
+        /// <summary>
+        /// Regex Replace Manipulate parser
+        /// </summary>
+        private ScrapValidateConfigParser scrapValidateConfigParser;
+
+        private ScrapDbChangeConfigParser scrapDbChangeConfigParser;
 
         /// <summary>
         /// Parameterized constructor
@@ -39,6 +54,9 @@ namespace ScrapEngine.Bl.Parser
             scrapReplaceConfigParser = new ScrapReplaceConfigParser(configParser);
             scrapRegexConfigParser = new ScrapRegexConfigParser(configParser);
             scrapRegexReplaceParser = new ScrapRegexReplaceParser(configParser);
+            scrapPurgeConfigParser = new ScrapPurgeConfigParser(configParser);
+            scrapValidateConfigParser = new ScrapValidateConfigParser(configParser);
+            scrapDbChangeConfigParser = new ScrapDbChangeConfigParser(configParser);
         }
 
         /// <summary>
@@ -58,40 +76,14 @@ namespace ScrapEngine.Bl.Parser
                 return scrapRegexConfigParser;
             else if (manipulateChild is RegexReplaceElement)
                 return scrapRegexReplaceParser;
+            else if (manipulateChild is PurgeElement)
+                return scrapPurgeConfigParser;
+            else if (manipulateChild is ValidateElement)
+                return scrapValidateConfigParser;
+            else if (manipulateChild is DbchangeElement)
+                return scrapDbChangeConfigParser;
             else
                 throw new ScrapParserException(ScrapParserException.EErrorType.UNKNOWN_MANIPULATE_CHILD_TYPE);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public ScrapManipulateChildConfigParser GetParser(string name)
-        {
-            if (name == "Split") return scrapSplitConfigParser;
-            else if (name == "Trim") return scrapTrimConfigParser;
-            else if (name == "Regex") return scrapRegexConfigParser;
-            else if (name == "Replace") return scrapReplaceConfigParser;
-            else if (name == "RegexReplace") return scrapRegexReplaceParser;
-            else
-                throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
-        }
-
-        /// <summary>
-        /// Create an instance of Manipulate child
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public ManipulateChildElement Create(string name)
-        {
-            if (name == "Split") return new SplitElement();
-            else if (name == "Trim") return new TrimElement();
-            else if (name == "Regex") return new RegexElement();
-            else if (name == "Replace") return new ReplaceElement();
-            else if (name == "RegexReplace") return new RegexReplaceElement();
-            else
-                throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
         }
     }
 }

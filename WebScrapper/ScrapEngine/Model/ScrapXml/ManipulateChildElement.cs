@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using WebCommon.Error;
 using WebReader.Model;
 
@@ -8,7 +9,7 @@ namespace ScrapEngine.Model.ScrapXml
     /// The base class for Manipulate child items
     /// This class is required to store the type of Child node information
     /// </summary>
-    public class ManipulateChildElement
+    public class ManipulateChildElement : IColumnChild
     {
         #region References
 

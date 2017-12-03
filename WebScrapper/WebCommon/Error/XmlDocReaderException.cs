@@ -9,7 +9,7 @@ namespace WebCommon.Error
         /// </summary>
         public enum EErrorType
         {
-            ATRRIBUTE_VALUE_NULL,
+            ATTRIBUTE_VALUE_NULL,
             XML_ATTRIBUTE_NOT_MAPPED
         }
 
@@ -17,12 +17,7 @@ namespace WebCommon.Error
         /// The type of error
         /// </summary>
         public EErrorType ErrorType { get; protected set; }
-
-        /// <summary>
-        /// The path that has error
-        /// </summary>
-        public string AttributeName { get; protected set; }
-
+        
         /// <summary>
         /// Default
         /// </summary>
@@ -33,23 +28,22 @@ namespace WebCommon.Error
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public XmlDocReaderException(string attrName, EErrorType type) : base(Initialize(attrName, type))
+        public XmlDocReaderException(EErrorType type, params string [] args) : base(Initialize(args, type))
         {
-            AttributeName = attrName;
             ErrorType = type;
         }
 
         /// <summary>
         /// Initialize message
         /// </summary>
-        private static string Initialize(string attrName, EErrorType type)
+        private static string Initialize(string [] args, EErrorType type)
         {
             switch (type)
             {
-                case EErrorType.ATRRIBUTE_VALUE_NULL:
-                    return string.Format("The value for the attribute '{0}' cannot be null", attrName);
+                case EErrorType.ATTRIBUTE_VALUE_NULL:
+                    return string.Format("The value for the attribute '{0}' cannot be null", args);
                 case EErrorType.XML_ATTRIBUTE_NOT_MAPPED:
-                    return string.Format("The xml attribute '{0}' is not mapped", attrName);
+                    return string.Format("The xml attribute '{0}' is not mapped", args);
                 default:
                     return "Unknwon Xml document reader exception error";
             }

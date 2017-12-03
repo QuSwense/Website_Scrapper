@@ -35,14 +35,25 @@ namespace ScrapEngine.Model.Parser
 
         public void AddNewScrap(ScrapIteratorArgs scrapIteratorArgs)
         {
+            scrapIteratorArgs.Parent = CurrentScrapIteratorArgs;
             CurrentScrapIteratorArgs.Child.Add(scrapIteratorArgs);
             CurrentScrapIteratorArgs = scrapIteratorArgs;
+        }
+
+        public void RestoreScrap()
+        {
+            CurrentScrapIteratorArgs = CurrentScrapIteratorArgs.Parent;
         }
 
         public void AddNewColumn(ColumnScrapIteratorArgs columnScrapIteratorArgs)
         {
             CurrentScrapIteratorArgs.Columns.Add(columnScrapIteratorArgs);
             CurrentColumnScrapIteratorArgs = columnScrapIteratorArgs;
+        }
+
+        public void RestoreColumn()
+        {
+            CurrentColumnScrapIteratorArgs = null;
         }
 
         public bool IsColumnMetadataUpdated

@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model.ScrapXml;
 using System;
 using System.Collections.Generic;
@@ -67,11 +68,29 @@ namespace ScrapEngine.Model
 
         #region References
 
+        //public enum EChildType
+        //{
+        //    Manipulate,
+        //    Validate,
+        //    Purge
+        //}
+
         /// <summary>
         /// The manipulate tag
         /// </summary>
         [DXmlElement(ScrapXmlConsts.ManipulateNodeName)]
         public List<ManipulateChildElement> Manipulations { get; set; }
+
+        ///// <summary>
+        ///// The validation tags
+        ///// </summary>
+        //[DXmlElement(ScrapXmlConsts.ValidateNodeName)]
+        //public List<ValidateElement> Validations { get; set; }
+
+        //[DXmlElement(ScrapXmlConsts.PurgeNodeName)]
+        //public PurgeElement Purge { get; set; }
+
+        //public List<EChildType> ChildOrders { get; set; }
 
         /// <summary>
         /// The parent node

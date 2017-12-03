@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using SqliteDatabase.Model;
 
@@ -62,6 +63,29 @@ namespace SqliteDatabase.Command
 
             SQL = string.Format("SELECT * FROM {0} WHERE {1}", name,
                 string.Join(" AND ", pkCols));
+        }
+
+        internal void GenerateValidation(string table, string column, string value)
+        {
+            SQL = string.Format("SELECT COUNT(*) FROM {0} WHERE {1} = {2}", table, column,
+                DataTypeContextHelper.GetQueryFormat(value, EConfigDbDataType.STRING));
+        }
+
+        internal void GenerateSingle(string tableExists, string columnExists, string innerjoincriteria,
+            string table, string column, string result)
+        {
+            if(string.IsNullOrEmpty(innerjoincriteria))
+            {
+                SQL = string.Format("SELECT {0} FROM {1} WHERE {2} = {3}", column, table, columnExists,
+                DataTypeContextHelper.GetQueryFormat(result, EConfigDbDataType.STRING));
+            }
+            else
+            {
+                SQL = string.Format("SELECT {0} FROM {1}, {2} INNER JOIN {3} WHERE {2} = {3}", 
+                    column, tableExists, table, innerjoincriteria, columnExists,
+                DataTypeContextHelper.GetQueryFormat(result, EConfigDbDataType.STRING));
+            }
+            
         }
 
         #endregion Generate

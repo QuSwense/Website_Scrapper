@@ -21,7 +21,13 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Current Csv iterator scrap
         /// </summary>
-        private ScrapIteratorCsvArgs currentscrapIteratorCsvArgs;
+        private ScrapIteratorCsvArgs currentscrapIteratorCsvArgs
+        {
+            get
+            {
+                return (ScrapIteratorCsvArgs)configParser.StateModel.CurrentScrapIteratorArgs;
+            }
+        }
 
         /// <summary>
         /// Constructor (no default constructor)
@@ -34,11 +40,11 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public override void Process(ScrapIteratorArgs scrapIteratorArgs)
+        public override void Process()
         {
             logger.Info("Parsing Config ScrapCsv node");
-
-            currentscrapIteratorCsvArgs = scrapIteratorArgs as ScrapIteratorCsvArgs;
+            
+            ParseUrlValue(currentscrapIteratorCsvArgs);
 
             // This finally scraps the html webpage data
             using (StringReader reader = FetchFileReader(currentscrapIteratorCsvArgs))
@@ -47,36 +53,29 @@ namespace ScrapEngine.Bl.Parser
                 string fileLine = "";
                 while ((fileLine = reader.ReadLine()) != null)
                 {
-                    ScrapIteratorCsvArgs childScrapIteratorCsvArgs = new ScrapIteratorCsvArgs();
-                    childScrapIteratorCsvArgs.CloneData(scrapIteratorArgs);
-
-                    childScrapIteratorCsvArgs.NodeIndex++;
-                    if (((ScrapCsvElement)childScrapIteratorCsvArgs.ScrapConfigObj).SkipFirstLines >
-                        childScrapIteratorCsvArgs.NodeIndex) continue;
-
-                    childScrapIteratorCsvArgs.Parent = scrapIteratorArgs;
-
-                    childScrapIteratorCsvArgs.ScrapConfigObj.Url = ParseUrlValue(childScrapIteratorCsvArgs);
-
+                    currentscrapIteratorCsvArgs.NodeIndex++;
+                    if (((ScrapCsvElement)currentscrapIteratorCsvArgs.ScrapConfigObj).SkipFirstLines >
+                        currentscrapIteratorCsvArgs.NodeIndex) continue;
+                    
                     logger.DebugFormat("Parsing Config ScrapCsv {0}th node with data '{1}'",
-                        childScrapIteratorCsvArgs.NodeIndex, fileLine);
-
-                    // Set current state
-                    configParser.StateModel.AddNewScrap(childScrapIteratorCsvArgs);
-
+                        currentscrapIteratorCsvArgs.NodeIndex, fileLine);
+                    
                     // Read the child Scraps nodes which are the individual reader config nodes
-                    configParser.ParseChildScrapNodes(childScrapIteratorCsvArgs);
+                    configParser.ParseChildScrapNodes();
 
                     // Process column values for this scrapped node
                     configParser.StateModel.AddNewColumn(new ColumnScrapIteratorFileArgs()
                     {
-                        NodeIndexId = childScrapIteratorCsvArgs.NodeIndexId,
+                        NodeIndexId = currentscrapIteratorCsvArgs.NodeIndexId,
                         FileLine = fileLine,
-                        Parent = childScrapIteratorCsvArgs.ScrapConfigObj
+                        Parent = currentscrapIteratorCsvArgs.ScrapConfigObj
                     });
-                    ProcessColumnParser(configParser.StateModel.CurrentColumnScrapIteratorArgs);
+                    ProcessColumnParser();
+                    configParser.StateModel.RestoreColumn();
                 }
             }
+
+            currentscrapIteratorCsvArgs.ScrapConfigObj.UrlCalculated = null;
         }
 
         /// <summary>
@@ -90,16 +89,12 @@ namespace ScrapEngine.Bl.Parser
 
             logger.DebugFormat("Fetch File from Url '{0}'", scrapIteratorCsvArgs.ScrapConfigObj.Url);
 
-            StringReader stringReader = new StringReader(configParser.ScrapperCommand.LoadFile(scrapIteratorCsvArgs.ScrapConfigObj.Url));
+            StringReader stringReader = new StringReader(
+                configParser.ScrapperCommand.LoadFile(scrapIteratorCsvArgs.ScrapConfigObj.Url));
 
             configParser.Performance.FinalHtmlLoad(scrapIteratorCsvArgs.ScrapConfigObj.Url);
 
             return stringReader;
-        }
-
-        public override void Reset()
-        {
-            currentscrapIteratorCsvArgs = null;
         }
     }
 }

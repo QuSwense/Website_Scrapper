@@ -48,7 +48,7 @@ namespace WebReader
         /// <param name="fullfile"></param>
         public DynamicReader(string fullfile, object store)
         {
-            FileInfo fi = new FileInfo(fullfile);
+            var fi = new FileInfo(fullfile);
             FullPath = fi.Directory.FullName;
             FileName = fi.Name;
             Store = store;

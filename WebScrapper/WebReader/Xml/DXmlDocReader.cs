@@ -60,7 +60,7 @@ namespace WebReader.Xml
         /// <returns></returns>
         public static DXmlDocReader Create(string filePath)
         {
-            DXmlDocReader xmlReader = new DXmlDocReader();
+            var xmlReader = new DXmlDocReader();
             xmlReader.Initialize(filePath);
             return xmlReader;
         }
@@ -108,12 +108,13 @@ namespace WebReader.Xml
 
             foreach (var item in properties)
             {
-                DXmlAttributeAttribute attrAttributeObj = item.GetCustomAttribute<DXmlAttributeAttribute>();
+                var attrAttributeObj = item.GetCustomAttribute<DXmlAttributeAttribute>();
                 if(attrAttributeObj != null)
                 {
                     XmlAttribute attribute = currentElement.Attributes[attrAttributeObj.Name];
                     if (attrAttributeObj.IsMandatory && attribute == null)
-                        throw new XmlDocReaderException(attrAttributeObj.Name, XmlDocReaderException.EErrorType.ATRRIBUTE_VALUE_NULL);
+                        throw new XmlDocReaderException(XmlDocReaderException.EErrorType.ATTRIBUTE_VALUE_NULL,
+                            attrAttributeObj.Name);
                     if(attribute != null) item.SetValue(obj, item.PropertyType.ChangeType(attribute.Value));
                 }
             }

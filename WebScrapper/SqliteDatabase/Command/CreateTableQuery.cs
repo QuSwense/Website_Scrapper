@@ -11,27 +11,10 @@ namespace SqliteDatabase.Command
         #region Properties
         
         /// <summary>
-        /// Column definition list
-        /// </summary>
-        private List<string> columnDefinitions;
-
-        /// <summary>
-        /// List of unique Keys
-        /// </summary>
-        private List<string> primaryKeys;
-
-        /// <summary>
         /// The SQL statement
         /// </summary>
         public List<string> SQLs { get; protected set; }
-
-        /// <summary>
-        /// Get the format for the column definition line
-        /// </summary>
-        /// <returns></returns>
-        public virtual string ColumnDefinitionString
-        { get { return "{Name} {DataType} {ConstraintNotNull} {ConstraintUnique}"; } }
-
+        
         #endregion Properties
 
         #region Constructor
@@ -41,8 +24,6 @@ namespace SqliteDatabase.Command
         /// </summary>
         public CreateTableQuery()
         {
-            columnDefinitions = new List<string>();
-            primaryKeys = new List<string>();
             SQLs = new List<string>();
         }
 

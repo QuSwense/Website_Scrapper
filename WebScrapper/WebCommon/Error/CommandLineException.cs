@@ -32,7 +32,7 @@ namespace WebCommon.Error
         /// </summary>
         /// <param name="path"></param>
         /// <param name="type"></param>
-        public CommandLineException(string[] args, EErrorType type) : base(Initialize(args, type))
+        public CommandLineException(EErrorType type, params string[] args) : base(Initialize(args, type))
         {
             Args = args;
             ErrorType = type;
@@ -46,7 +46,7 @@ namespace WebCommon.Error
             switch (type)
             {
                 case EErrorType.PARSE_ERROR:
-                    return string.Format("The arguments {0} to the program are not proper", string.Join(" ", args));
+                    return string.Format("The arguments '{0}' to the program are not proper", string.Join(" ", args));
                 default:
                     return "Unknwon Command line error";
             }

@@ -33,15 +33,15 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Start Processing from the Scrap Html node
         /// </summary>
-        public virtual void Process(ScrapIteratorArgs args) { }
+        public virtual void Process() { }
 
         /// <summary>
         /// Check the maximum level of Scrap nodes allowed is 4
         /// </summary>
         /// <param name="webScrapConfigObj">The last child Scrap node</param>
-        protected void AssertLevelConstraint(ScrapElement webScrapConfigObj)
+        protected void AssertLevelConstraint()
         {
-            ScrapElement tmpObj = webScrapConfigObj;
+            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent;
             int level = 0;
             for (; tmpObj != null && level <= configParser.AppConfig.ScrapMaxLevel();
                 level++, tmpObj = tmpObj.Parent) ;
@@ -56,11 +56,11 @@ namespace ScrapEngine.Bl.Parser
         /// attribute
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
-        protected void AssertScrapNameAttribute(ScrapElement webScrapConfigObj)
+        protected void AssertScrapNameAttribute()
         {
             bool isTableNameFound = false;
             string NameValue = null;
-            ScrapElement tmpObj = webScrapConfigObj;
+            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent;
 
             while (tmpObj != null)
             {
@@ -85,23 +85,22 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="urlValue"></param>
         /// <param name="scrapNode"></param>
         /// <returns></returns>
-        protected string ParseUrlValue(ScrapIteratorArgs childScrapIteratorArgs)
+        protected void ParseUrlValue(ScrapIteratorArgs childScrapIteratorArgs)
         {
             string urlValue = childScrapIteratorArgs.ScrapConfigObj.Url;
 
             if (string.IsNullOrEmpty(urlValue) ||
                 childScrapIteratorArgs.ScrapConfigObj.Parent == null ||
-                string.IsNullOrEmpty(childScrapIteratorArgs.ScrapConfigObj.Parent.Url)) return urlValue;
-            if (!urlValue.StartsWith("@")) return urlValue;
-            if (childScrapIteratorArgs.WebHtmlNode == null) return urlValue;
+                string.IsNullOrEmpty(childScrapIteratorArgs.ScrapConfigObj.Parent.Url)) return;
+            if (!urlValue.StartsWith("@")) return;
 
             if (urlValue.Contains("{parentValue}"))
             {
                 urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
-                    childScrapIteratorArgs.WebHtmlNode.Value).AbsoluteUri;
+                    childScrapIteratorArgs.Parent.WebHtmlNode.Value).AbsoluteUri;
             }
 
-            return urlValue;
+            childScrapIteratorArgs.ScrapConfigObj.UrlCalculated = urlValue;
         }
 
         /// <summary>
@@ -109,17 +108,17 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="args"></param>
-        protected void ProcessColumnParser(ColumnScrapIteratorArgs args)
+        protected void ProcessColumnParser()
         {
             // Check the constraints on the Scrap nodes
             // 1. Only maximum 4 levels is allowed
             // 2. Only one "name" tag should be present from the top level to bottom Scrap
             //    If multiple "name" tag is present throw error
-            AssertLevelConstraint(args.Parent);
-            AssertScrapNameAttribute(args.Parent);
+            AssertLevelConstraint();
+            AssertScrapNameAttribute();
 
             // Read the Column nodes which are the individual reader config nodes
-            scrapColumnConfigParser.Process(args);
+            scrapColumnConfigParser.Process();
         }
     }
 }

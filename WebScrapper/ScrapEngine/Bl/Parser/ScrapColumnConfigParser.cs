@@ -4,6 +4,7 @@ using ScrapEngine.Model.Parser;
 using SqliteDatabase.Model;
 using System.Collections.Generic;
 using System.Xml;
+using System;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -19,7 +20,17 @@ namespace ScrapEngine.Bl.Parser
         /// Split Manipulate tag
         /// </summary>
         private ManipulateChildFactory manipulateChildFactory;
-        
+
+        /// <summary>
+        /// Column scrap iterator args
+        /// </summary>
+        public ColumnScrapIteratorArgs currentColumnScrapIteratorArgs
+        {
+            get
+            {
+                return configParser.StateModel.CurrentColumnScrapIteratorArgs;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -34,29 +45,23 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Process Column element tag for scrapping data from csv file
         /// </summary>
-        /// <param name="nodeIndex"></param>
-        /// <param name="scrapNode"></param>
-        /// <param name="configScrap"></param>
-        /// <param name="htmlNode"></param>
-        /// <param name="fileLine"></param>
-        public void Process(ColumnScrapIteratorArgs columnScrapIteratorArgs)
+        public void Process()
         {
             logger.DebugFormat("Scrapping data from online text file");
-            ParseColumnsConfig(columnScrapIteratorArgs);
-            ColumnScrapIterator(columnScrapIteratorArgs);
+            ParseColumnsConfig();
+            ColumnScrapIterator();
         }
 
         /// <summary>
         /// Parses Column element tags
         /// </summary>
-        /// <param name="scrapNode"></param>
-        /// <param name="configScrap"></param>
-        private void ParseColumnsConfig(ColumnScrapIteratorArgs columnScrapIteratorArgs)
+        private void ParseColumnsConfig()
         {
-            if (configParser.StateModel.IsColumnMetadataUpdated)
+            if (!configParser.StateModel.IsColumnMetadataUpdated)
             {
                 // Load the table with partial columns in memory
-                configParser.WebDbContext.AddMetadata(columnScrapIteratorArgs.Parent);
+                configParser.WebDbContext.AddMetadata(
+                    currentColumnScrapIteratorArgs.Parent);
                 configParser.StateModel.SetColumnMetadataFlag();
             }
         }
@@ -67,53 +72,70 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="count"></param>
         /// <param name="scrapConfig"></param>
         /// <param name="webnodeNavigator"></param>
-        private void ColumnScrapIterator(ColumnScrapIteratorArgs scrapArgs)
+        private void ColumnScrapIterator()
         {
-            List<List<DynamicTableDataInsertModel>> rows = new List<List<DynamicTableDataInsertModel>>();
+            var rows = new List<List<DynamicTableDataInsertModel>>();
             bool doSkipDbAddUpdate = false;
-            scrapArgs.PreProcess();
-            for (int indx = 0; indx < scrapArgs.Parent.Columns.Count; ++indx)
+            currentColumnScrapIteratorArgs.PreProcess();
+            for (int indx = 0; indx < currentColumnScrapIteratorArgs.Parent.Columns.Count; ++indx)
             {
-                // A list to store multiple column values for >1 cardinal values
-                List<DynamicTableDataInsertModel> colValues = new List<DynamicTableDataInsertModel>();
+                var columnConfig = currentColumnScrapIteratorArgs.Parent.Columns[indx];
 
-                ColumnElement columnConfig = scrapArgs.Parent.Columns[indx];
-                ManipulateHtmlData manipulateHtml = null;
-                
-                manipulateHtml = Manipulate(columnConfig, scrapArgs.GetDataIterator(columnConfig));
+                var manipulateHtml = new ManipulateHtmlData();
+                manipulateHtml.OriginalValue = currentColumnScrapIteratorArgs.GetDataIterator(columnConfig);
+                manipulateHtml.Results.Add(manipulateHtml.OriginalValue);
+                manipulateHtml.Cardinality = columnConfig.Cardinal;
+
+                manipulateHtml = Manipulate(columnConfig, manipulateHtml);
 
                 if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0))
                 {
                     doSkipDbAddUpdate = true;
                     break;
                 }
-
-                foreach (var result in manipulateHtml.Results)
-                {
-                    DynamicTableDataInsertModel tableDataColumn = new DynamicTableDataInsertModel();
-
-                    tableDataColumn.Name = columnConfig.Name;
-                    tableDataColumn.IsPk = columnConfig.IsUnique;
-                    tableDataColumn.Value = result;
-                    tableDataColumn.DataType =
-                        configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[scrapArgs.Parent.TableName][columnConfig.Name].DataType;
-
-                    if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
-                        continue;
-                    colValues.Add(tableDataColumn);
-                }
-
-                rows.Add(colValues);
+                
+                rows.Add(DbTableDataMapper(manipulateHtml, columnConfig));
             }
 
-            if (!doSkipDbAddUpdate && scrapArgs.Parent.Columns.Count > 0)
+            if (!doSkipDbAddUpdate && currentColumnScrapIteratorArgs.Parent.Columns.Count > 0)
             {
-                configParser.Performance.NewDbUpdate(rows, scrapArgs);
+                configParser.Performance.NewDbUpdate(rows, currentColumnScrapIteratorArgs);
 
-                configParser.WebDbContext.AddOrUpdate(scrapArgs.Parent, rows);
+                configParser.WebDbContext.AddOrUpdate(currentColumnScrapIteratorArgs.Parent, rows);
 
-                configParser.Performance.FinalDbUpdate(rows, scrapArgs);
+                configParser.Performance.FinalDbUpdate(rows, currentColumnScrapIteratorArgs);
             }
+        }
+
+        /// <summary>
+        /// For each data scrapped from the reference link
+        /// </summary>
+        /// <param name="manipulateHtml"></param>
+        /// <param name="columnConfig"></param>
+        /// <returns></returns>
+        private List<DynamicTableDataInsertModel> DbTableDataMapper(ManipulateHtmlData manipulateHtml,
+            ColumnElement columnConfig)
+        {
+            // A list to store multiple column values for >1 cardinal values
+            var colValues = new List<DynamicTableDataInsertModel>();
+
+            foreach (var result in manipulateHtml.Results)
+            {
+                var tableDataColumn = new DynamicTableDataInsertModel();
+
+                tableDataColumn.Name = columnConfig.Name;
+                tableDataColumn.IsPk = columnConfig.IsUnique;
+                tableDataColumn.Value = result;
+                tableDataColumn.DataType =
+                    configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[
+                        currentColumnScrapIteratorArgs.Parent.TableName][columnConfig.Name].DataType;
+
+                if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
+                    continue;
+                colValues.Add(tableDataColumn);
+            }
+
+            return colValues;
         }
 
         /// <summary>
@@ -123,27 +145,22 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="manipulateNodeList"></param>
         /// <param name="dataNode"></param>
         /// <returns></returns>
-        private ManipulateHtmlData Manipulate(ColumnElement columnConfig, string scrappedData)
+        private ManipulateHtmlData Manipulate(ColumnElement columnConfig, ManipulateHtmlData manipulateHtml)
         {
-            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", columnConfig.Name, scrappedData);
-
-            ManipulateHtmlData result = new ManipulateHtmlData();
-            result.OriginalValue = scrappedData;
-            result.Results.Add(scrappedData);
-            result.Cardinality = columnConfig.Cardinal;
-
+            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", columnConfig.Name, manipulateHtml.OriginalValue);
+            
             // Even if Scrapped data is null send to manipulation tag. As there can be a default
             if (columnConfig.Manipulations != null && columnConfig.Manipulations.Count > 0)
             {
                 foreach (var manipulateChild in columnConfig.Manipulations)
                 {
-                    manipulateChildFactory.GetParser(manipulateChild).Process(result, manipulateChild);
+                    manipulateChildFactory.GetParser(manipulateChild).Process(manipulateHtml, manipulateChild);
                 }
             }
             
-            logger.DebugFormat("For Column '{0}' Final manipulated data '{1}'", columnConfig.Name, result.OriginalValue);
+            logger.DebugFormat("For Column '{0}' Final manipulated data '{1}'", columnConfig.Name, manipulateHtml.OriginalValue);
 
-            return result;
+            return manipulateHtml;
         }   
     }
 }

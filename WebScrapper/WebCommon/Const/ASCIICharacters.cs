@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace WebCommon.Const
 {
+    /// <summary>
+    /// ASCII character constants both escaped and unescaped
+    /// </summary>
     public class ASCIICharacters
     {
         public static string TabString { get { return "\\t"; } }
