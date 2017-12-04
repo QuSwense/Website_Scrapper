@@ -8,6 +8,9 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
 {
+    /// <summary>
+    /// The Exists database change node
+    /// </summary>
     public class DbchangeExistsElement
     {
         /// <summary>
@@ -22,6 +25,9 @@ namespace ScrapEngine.Model.ScrapXml
         [DXmlAttribute(ScrapXmlConsts.ColAttributeName)]
         public string Column { get; set; }
 
+        /// <summary>
+        /// Select database change node
+        /// </summary>
         [DXmlElement(ScrapXmlConsts.DbchangeSelectNodeName)]
         public DbchangeSelectElement Select { get; set; }
     }

@@ -8,6 +8,9 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
 {
+    /// <summary>
+    /// This manipulate node uses "Regex.Replace"
+    /// </summary>
     public class RegexReplaceElement : ManipulateChildElement
     {
         /// <summary>

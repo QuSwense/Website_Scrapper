@@ -8,6 +8,9 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
 {
+    /// <summary>
+    /// The Select node which selects data from the database and replaces the previous data
+    /// </summary>
     public class DbchangeSelectElement
     {
         /// <summary>
@@ -28,6 +31,9 @@ namespace ScrapEngine.Model.ScrapXml
         [DXmlAttribute(ScrapXmlConsts.InnerJoinCriteriaAttributeName)]
         public string InnerJoinCriteria { get; set; }
 
+        /// <summary>
+        /// Parent
+        /// </summary>
         public DbchangeExistsElement Parent { get; set; }
     }
 }

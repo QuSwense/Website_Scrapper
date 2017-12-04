@@ -362,6 +362,11 @@ namespace ScrapEngine.Bl.Parser
             }
         }
 
+        /// <summary>
+        /// Parse the Db change select node
+        /// </summary>
+        /// <param name="existsElement"></param>
+        /// <param name="xmlNode"></param>
         private void ParseSelectElement(DbchangeExistsElement existsElement, XmlNode xmlNode)
         {
             if (xmlNode.ChildNodes != null && xmlNode.ChildNodes.Count == 1)
@@ -373,6 +378,11 @@ namespace ScrapEngine.Bl.Parser
             }
         }
 
+        /// <summary>
+        /// Standard html value normalization
+        /// </summary>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         protected string Normalize(string htmlValue)
         {
             if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
