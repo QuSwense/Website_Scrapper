@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace ScrapEngine.Bl.Parser
 {
+    /// <summary>
+    /// A parser class to purge the data as per the Purge element rules
+    /// </summary>
     public class ScrapPurgeConfigParser : ScrapManipulateChildConfigParser
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configParser"></param>
         public ScrapPurgeConfigParser(WebScrapConfigParser configParser) 
             : base(configParser) { }
 
@@ -24,7 +31,7 @@ namespace ScrapEngine.Bl.Parser
 
             foreach (string value in manipulateHtml.Results)
             {
-                if (purgeElement.IsEmptyOrNull && string.IsNullOrEmpty(value)) ;
+                if (purgeElement.IsEmptyOrNull && string.IsNullOrEmpty(value)) ;//skip
                 else finalList.Add(value);
             }
 

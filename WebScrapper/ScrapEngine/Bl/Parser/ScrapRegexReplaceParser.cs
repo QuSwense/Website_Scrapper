@@ -24,23 +24,23 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Process multiple results
         /// </summary>
-        /// <param name="result"></param>
+        /// <param name="manipulateHtml"></param>
         /// <param name="manipulateChild"></param>
-        public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
+        public override void Process(ManipulateHtmlData manipulateHtml, ManipulateChildElement manipulateChild)
         {
-            if (string.IsNullOrEmpty(result.OriginalValue)) return;
+            if (string.IsNullOrEmpty(manipulateHtml.OriginalValue)) return;
 
             RegexReplaceElement regexConfig = (RegexReplaceElement)manipulateChild;
 
             List<string> finalResults = new List<string>();
             Regex regexPattern = new Regex(regexConfig.Pattern);
 
-            for (int i = 0; i < result.Results.Count; ++i)
+            for (int i = 0; i < manipulateHtml.Results.Count; ++i)
             {
-                finalResults.Add(Regex.Replace(result.Results[i], regexConfig.Pattern, regexConfig.Replace));
+                finalResults.Add(Regex.Replace(manipulateHtml.Results[i], regexConfig.Pattern, regexConfig.Replace));
             }
 
-            result.Results = new List<string>(finalResults);
+            manipulateHtml.Results = new List<string>(finalResults);
         }
 
         /// <summary>

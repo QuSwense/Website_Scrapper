@@ -28,6 +28,9 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         private DXmlDocReader xmlDocReader;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public WebDataScrapConfigXmlParser()
         {
             RootScrapNodes = new List<ScrapElement>();
@@ -83,8 +86,13 @@ namespace ScrapEngine.Bl.Parser
                     throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
                         ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.NameAttributeName);
 
+                if (currentScrap is ScrapHtmlTableElement &&
+                string.IsNullOrEmpty(currentScrap.UrlOriginal))
+                    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
+                            ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName);3 
+
                 RootScrapNodes.Add(currentScrap);
-                ParseScrapNode(scrapNode, currentScrap);
+                ParseScrapChildNode(scrapNode, currentScrap);
             }
         }
 
@@ -93,26 +101,20 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <param name="webDataNode"></param>
         /// <param name="parentScrap"></param>
-        protected void ParseScrapNode(XmlNode webDataNode, ScrapElement parentScrap)
+        protected void ParseScrapChildNode(XmlNode webDataNode, ScrapElement parentScrap)
         {
             foreach (XmlNode scrapNode in xmlDocReader.GetChildNodes(webDataNode))
             {
                 ScrapElement currentScrap = null;
                 if (scrapNode.LocalName == ScrapXmlConsts.ScrapHtmlTableNodeName)
                 {
-                    currentScrap = xmlDocReader.ReadElement<ScrapHtmlTableElement>(scrapNode);
-                    currentScrap.Parent = parentScrap;
-                    parentScrap.Scraps.Add(currentScrap);
-                    ParseScrapNode(scrapNode, currentScrap);
+                    currentScrap = ParseScrapNode<ScrapHtmlTableElement>(scrapNode, parentScrap);
                 }
                 else if (scrapNode.LocalName == ScrapXmlConsts.ScrapCsvNodeName)
                 {
-                    ScrapCsvElement currentCsvScrap = xmlDocReader.ReadElement<ScrapCsvElement>(scrapNode);
-                    currentCsvScrap.Delimiter = Normalize(currentCsvScrap.Delimiter);
-                    currentScrap = currentCsvScrap;
-                    currentScrap.Parent = parentScrap;
-                    parentScrap.Scraps.Add(currentScrap);
-                    ParseScrapNode(scrapNode, currentScrap);
+                    currentScrap = ParseScrapNode<ScrapCsvElement>(scrapNode, parentScrap);
+                    ((ScrapCsvElement)currentScrap).Delimiter = 
+                        Normalize(((ScrapCsvElement)currentScrap).Delimiter);
                 }
                 else if(scrapNode.LocalName == ScrapXmlConsts.ColumnNodeName)
                     ParseColumnNode(scrapNode, parentScrap);
@@ -120,6 +122,27 @@ namespace ScrapEngine.Bl.Parser
                     throw new ScrapXmlException(ScrapXmlException.EErrorType.UNKNOWN_NODE,
                                 scrapNode.LocalName);
             }
+        }
+
+        /// <summary>
+        /// Parser the recursive Scrap type nodes
+        /// </summary>
+        /// <param name="webDataNode"></param>
+        /// <param name="parentScrap"></param>
+        private ScrapElement ParseScrapNode<T>(XmlNode scrapNode, ScrapElement parentScrap)
+            where T : ScrapElement, new()
+        {
+            ScrapElement currentScrap = xmlDocReader.ReadElement<T>(scrapNode);
+            currentScrap.Parent = parentScrap;
+            parentScrap.Scraps.Add(currentScrap);
+            ParseScrapChildNode(scrapNode, currentScrap);
+
+            if(currentScrap is ScrapHtmlTableElement &&
+                string.IsNullOrEmpty(currentScrap.UrlOriginal))
+                throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
+                        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName);
+
+            return currentScrap;
         }
 
         /// <summary>
@@ -175,12 +198,9 @@ namespace ScrapEngine.Bl.Parser
                         XmlNodeList manipulateChildNodeList = xmlDocReader.GetChildNodes(columnChildNode);
 
                         if(manipulateChildNodeList != null && manipulateChildNodeList.Count > 0)
-                        {
-                            foreach (XmlNode manipulateChildNode in xmlDocReader.GetChildNodes(columnChildNode))
-                            {
+                            foreach (XmlNode manipulateChildNode in
+                                xmlDocReader.GetChildNodes(columnChildNode))
                                 ParseManipulateNode(manipulateChildNode, columnScrap);
-                            }
-                        }
                     }
                     else
                         throw new ScrapXmlException(ScrapXmlException.EErrorType.UNKNOWN_NODE,
@@ -189,62 +209,31 @@ namespace ScrapEngine.Bl.Parser
             }
         }
 
+        /// <summary>
+        /// Parse and interpret the Manipulate child nodes
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
         private void ParseManipulateNode(XmlNode manipulateNode, ColumnElement columnScrap)
         {
             ManipulateChildElement manipulateScrap = null;
 
             if (manipulateNode.LocalName == ScrapXmlConsts.SplitNodeName)
-            {
-                SplitElement splitElement = xmlDocReader.ReadElement<SplitElement>(manipulateNode);
-                splitElement.Data = Normalize(splitElement.Data);
-                manipulateScrap = splitElement;
-            }
+                ParseManipulateSplitNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.TrimNodeName)
-            {
-                TrimElement trimElement = xmlDocReader.ReadElement<TrimElement>(manipulateNode);
-                trimElement.Data = Normalize(trimElement.Data);
-                manipulateScrap = trimElement;
-            }
+                ParseManipulateTrimNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.RegexNodeName)
-            {
-                RegexElement regexElement = xmlDocReader.ReadElement<RegexElement>(manipulateNode);
-                regexElement.Pattern = Normalize(regexElement.Pattern);
-                manipulateScrap = regexElement;
-            }
+                ParseManipulateRegexNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.ReplaceNodeName)
-            {
-                ReplaceElement replaceElement = xmlDocReader.ReadElement<ReplaceElement>(manipulateNode);
-                replaceElement.InString = Normalize(replaceElement.InString);
-                replaceElement.OutString = Normalize(replaceElement.OutString);
-                manipulateScrap = replaceElement;
-            }
+                ParseManipulateReplaceNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.RegexReplaceNodeName)
-            {
-                RegexReplaceElement regexReplaceElement = xmlDocReader.ReadElement<RegexReplaceElement>(manipulateNode);
-                regexReplaceElement.Pattern = Normalize(regexReplaceElement.Pattern);
-                regexReplaceElement.Replace = Normalize(regexReplaceElement.Replace);
-                manipulateScrap = regexReplaceElement;
-            }
+                ParseManipulateRegexReplaceNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.ValidateNodeName)
-            {
-                ValidateElement validateElement = xmlDocReader.ReadElement<ValidateElement>(manipulateNode);
-                validateElement.Parent = columnScrap;
-                manipulateScrap = validateElement;
-            }
+                ParseManipulateValidateNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.PurgeNodeName)
-            {
-                PurgeElement purgeElement = xmlDocReader.ReadElement<PurgeElement>(manipulateNode);
-                purgeElement.Parent = columnScrap;
-                manipulateScrap = purgeElement;
-            }
+                ParseManipulatePurgeNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.DbchangeNodeName)
-            {
-                DbchangeElement dbchangeElement = xmlDocReader.ReadElement<DbchangeElement>(manipulateNode);
-                dbchangeElement.Parent = columnScrap;
-
-                ParseDbChangeElement(dbchangeElement, manipulateNode);
-                manipulateScrap = dbchangeElement;
-            }
+                ParseManipulateDbchangeNode(manipulateNode, columnScrap);
             else
                 throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
 
@@ -252,6 +241,116 @@ namespace ScrapEngine.Bl.Parser
             columnScrap.Manipulations.Add(manipulateScrap);
         }
 
+        /// <summary>
+        /// Parse the Manipulate SPlit node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateSplitNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            SplitElement splitElement = xmlDocReader.ReadElement<SplitElement>(manipulateNode);
+            splitElement.Data = Normalize(splitElement.Data);
+            splitElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(splitElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Trim node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateTrimNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            TrimElement trimElement = xmlDocReader.ReadElement<TrimElement>(manipulateNode);
+            trimElement.Data = Normalize(trimElement.Data);
+            trimElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(trimElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Regex node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateRegexNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            RegexElement regexElement = xmlDocReader.ReadElement<RegexElement>(manipulateNode);
+            regexElement.Pattern = Normalize(regexElement.Pattern);
+            regexElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(regexElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Replace node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateReplaceNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            ReplaceElement replaceElement = xmlDocReader.ReadElement<ReplaceElement>(manipulateNode);
+            replaceElement.InString = Normalize(replaceElement.InString);
+            replaceElement.OutString = Normalize(replaceElement.OutString);
+            replaceElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(replaceElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Regex Replace node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateRegexReplaceNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            RegexReplaceElement regexReplaceElement = xmlDocReader.ReadElement<RegexReplaceElement>(manipulateNode);
+            regexReplaceElement.Pattern = Normalize(regexReplaceElement.Pattern);
+            regexReplaceElement.Replace = Normalize(regexReplaceElement.Replace);
+            regexReplaceElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(regexReplaceElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Validate node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateValidateNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            ValidateElement validateElement = xmlDocReader.ReadElement<ValidateElement>(manipulateNode);
+            validateElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(validateElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Purge node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulatePurgeNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            PurgeElement purgeElement = xmlDocReader.ReadElement<PurgeElement>(manipulateNode);
+            purgeElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(purgeElement);
+        }
+
+        /// <summary>
+        /// Parse the Manipulate Dbchange node tag
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateDbchangeNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            DbchangeElement dbchangeElement = xmlDocReader.ReadElement<DbchangeElement>(manipulateNode);
+            dbchangeElement.Parent = columnScrap;
+
+            ParseDbChangeElement(dbchangeElement, manipulateNode);
+            columnScrap.Manipulations.Add(dbchangeElement);
+        }
+
+        /// <summary>
+        /// Parse and process the Dbchange element
+        /// </summary>
+        /// <param name="dbchangeElement"></param>
+        /// <param name="manipulateNode"></param>
         private void ParseDbChangeElement(DbchangeElement dbchangeElement, XmlNode manipulateNode)
         {
             if(manipulateNode.ChildNodes != null && manipulateNode.ChildNodes.Count == 1)

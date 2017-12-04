@@ -25,7 +25,8 @@ namespace ScrapEngine.Bl.Parser
         {
             get
             {
-                return (ScrapIteratorCsvArgs)configParser.StateModel.CurrentScrapIteratorArgs;
+                return (ScrapIteratorCsvArgs)
+                    configParser.StateModel.CurrentScrapIteratorArgs;
             }
         }
 

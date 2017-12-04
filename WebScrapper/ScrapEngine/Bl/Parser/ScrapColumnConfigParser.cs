@@ -10,19 +10,23 @@ namespace ScrapEngine.Bl.Parser
 {
     /// <summary>
     /// The business logic to parse the "Columns" Xml node and execute web scrapping
-    /// process
+    /// process. This class uses the scrapped data to save it into the table column specified
+    /// after the manipulations
     /// </summary>
     public class ScrapColumnConfigParser : AppTopicConfigParser
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
         public static ILog logger = LogManager.GetLogger(typeof(ScrapColumnConfigParser));
 
         /// <summary>
-        /// Split Manipulate tag
+        /// The factory class to get the type of Manipulate child
         /// </summary>
         private ManipulateChildFactory manipulateChildFactory;
 
         /// <summary>
-        /// Column scrap iterator args
+        /// Reference to column scrap iterator args
         /// </summary>
         public ColumnScrapIteratorArgs currentColumnScrapIteratorArgs
         {
@@ -76,17 +80,21 @@ namespace ScrapEngine.Bl.Parser
         {
             var rows = new List<List<DynamicTableDataInsertModel>>();
             bool doSkipDbAddUpdate = false;
+
             currentColumnScrapIteratorArgs.PreProcess();
+
             for (int indx = 0; indx < currentColumnScrapIteratorArgs.Parent.Columns.Count; ++indx)
             {
                 var columnConfig = currentColumnScrapIteratorArgs.Parent.Columns[indx];
 
-                var manipulateHtml = new ManipulateHtmlData();
-                manipulateHtml.OriginalValue = currentColumnScrapIteratorArgs.GetDataIterator(columnConfig);
+                var manipulateHtml = new ManipulateHtmlData()
+                {
+                    Cardinality = columnConfig.Cardinal,
+                    OriginalValue = currentColumnScrapIteratorArgs.GetDataIterator(columnConfig)
+                };
                 manipulateHtml.Results.Add(manipulateHtml.OriginalValue);
-                manipulateHtml.Cardinality = columnConfig.Cardinal;
 
-                manipulateHtml = Manipulate(columnConfig, manipulateHtml);
+                Manipulate(columnConfig, manipulateHtml);
 
                 if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0))
                 {
@@ -121,14 +129,15 @@ namespace ScrapEngine.Bl.Parser
 
             foreach (var result in manipulateHtml.Results)
             {
-                var tableDataColumn = new DynamicTableDataInsertModel();
-
-                tableDataColumn.Name = columnConfig.Name;
-                tableDataColumn.IsPk = columnConfig.IsUnique;
-                tableDataColumn.Value = result;
-                tableDataColumn.DataType =
+                var tableDataColumn = new DynamicTableDataInsertModel()
+                {
+                    Name = columnConfig.Name,
+                    IsPk = columnConfig.IsUnique,
+                    Value = result,
+                    DataType =
                     configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[
-                        currentColumnScrapIteratorArgs.Parent.TableName][columnConfig.Name].DataType;
+                        currentColumnScrapIteratorArgs.Parent.TableName][columnConfig.Name].DataType
+                };
 
                 if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
                     continue;
@@ -145,9 +154,10 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="manipulateNodeList"></param>
         /// <param name="dataNode"></param>
         /// <returns></returns>
-        private ManipulateHtmlData Manipulate(ColumnElement columnConfig, ManipulateHtmlData manipulateHtml)
+        private void Manipulate(ColumnElement columnConfig, ManipulateHtmlData manipulateHtml)
         {
-            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", columnConfig.Name, manipulateHtml.OriginalValue);
+            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", 
+                columnConfig.Name, manipulateHtml.OriginalValue);
             
             // Even if Scrapped data is null send to manipulation tag. As there can be a default
             if (columnConfig.Manipulations != null && columnConfig.Manipulations.Count > 0)
@@ -157,10 +167,6 @@ namespace ScrapEngine.Bl.Parser
                     manipulateChildFactory.GetParser(manipulateChild).Process(manipulateHtml, manipulateChild);
                 }
             }
-            
-            logger.DebugFormat("For Column '{0}' Final manipulated data '{1}'", columnConfig.Name, manipulateHtml.OriginalValue);
-
-            return manipulateHtml;
         }   
     }
 }

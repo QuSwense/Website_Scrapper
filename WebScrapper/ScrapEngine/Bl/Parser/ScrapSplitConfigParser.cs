@@ -51,7 +51,7 @@ namespace ScrapEngine.Bl.Parser
         }
 
         /// <summary>
-        /// 
+        /// Assert the split element data
         /// </summary>
         /// <param name="splitElement"></param>
         private void Assert(SplitElement splitElement)

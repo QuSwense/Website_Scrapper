@@ -6,22 +6,34 @@ using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
+    /// <summary>
+    /// The scrap replace config parser which manipulates the data with the regex option
+    /// </summary>
     public class ScrapReplaceConfigParser : ScrapManipulateChildConfigParser
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configParser"></param>
         public ScrapReplaceConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
         
-        public override void Process(ManipulateHtmlData result, ManipulateChildElement manipulateChild)
+        /// <summary>
+        /// The main method to process the data
+        /// </summary>
+        /// <param name="manipulateHtml"></param>
+        /// <param name="manipulateChild"></param>
+        public override void Process(ManipulateHtmlData manipulateHtml, ManipulateChildElement manipulateChild)
         {
-            if (string.IsNullOrEmpty(result.OriginalValue)) return;
+            if (string.IsNullOrEmpty(manipulateHtml.OriginalValue)) return;
 
             ReplaceElement replaceConfig = (ReplaceElement)manipulateChild;
 
             List<string> finalResults = new List<string>();
-            for (int i = 0; i < result.Results.Count; ++i)
-                finalResults.Add(result.Results[i].Replace(replaceConfig.InString, replaceConfig.OutString));
+            for (int i = 0; i < manipulateHtml.Results.Count; ++i)
+                finalResults.Add(manipulateHtml.Results[i].Replace(replaceConfig.InString, replaceConfig.OutString));
 
-            result.Results = new List<string>(finalResults);
+            manipulateHtml.Results = new List<string>(finalResults);
         }
 
         private void Assert(ReplaceElement replaceElement)
