@@ -90,6 +90,11 @@ namespace SqliteDatabase
             Connection.Close();
         }
 
+        /// <summary>
+        /// Create a table from the Table metadata information
+        /// This method is used to create a table dynamically
+        /// </summary>
+        /// <param name="tableColumnConfigs"></param>
         public void Create(DbTablesDefinitionModel tableColumnConfigs)
         {
             CreateTableQuery createTableQueryObj = new CreateTableQuery();
@@ -101,6 +106,12 @@ namespace SqliteDatabase
             }
         }
         
+        /// <summary>
+        /// Add or Update a row of data into a given table
+        /// </summary>
+        /// <param name="name">The name of the table</param>
+        /// <param name="row"></param>
+        /// <param name="doUpdateOnly">If this is true then only update and no insert</param>
         public void AddOrUpdate(string name, List<DynamicTableDataInsertModel> row, bool doUpdateOnly = false)
         {
             SelectTableQuery selectUniqueRowObj = new SelectTableQuery();
@@ -238,21 +249,19 @@ namespace SqliteDatabase
             return -1;
         }
 
-        public string SelectSingle(string tableExists, string columnExists, string innerjoincriteria,
-            string table, string column, string result)
+        public string SelectSingle(string selectQueryFormat, string result)
         {
-            SelectTableQuery selectUidObj = new SelectTableQuery();
-            selectUidObj.GenerateSingle(tableExists, columnExists, columnExists,
-                table, column, result);
+            SelectTableQuery selectObj = new SelectTableQuery();
+            selectObj.GenerateQueryFromFormat(selectQueryFormat, result);
 
-            SQLiteDataReader selectReader = ExecuteDML(selectUidObj.SQL);
+            SQLiteDataReader selectReader = ExecuteDML(selectObj.SQL);
 
             if (selectReader.Read())
             {
-                return selectReader.GetInt32(0);
+                return selectReader.GetString(0);
             }
 
-            return -1;
+            return string.Empty;
         }
     }
 }

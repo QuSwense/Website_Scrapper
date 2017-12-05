@@ -16,7 +16,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// The Dbchange exists parser
         /// </summary>
-        private ScrapDbChangeExistsConfigParser scrapDbChangeExistsConfigParser;
+        private ScrapDbChangeSelectConfigParser scrapDbChangesSelectConfigParser;
 
         /// <summary>
         /// Constructor
@@ -25,7 +25,7 @@ namespace ScrapEngine.Bl.Parser
         public ScrapDbChangeConfigParser(WebScrapConfigParser configParser)
             : base(configParser)
         {
-            scrapDbChangeExistsConfigParser = new ScrapDbChangeExistsConfigParser(configParser);
+            scrapDbChangesSelectConfigParser = new ScrapDbChangeSelectConfigParser(configParser);
         }
 
         /// <summary>
@@ -35,8 +35,27 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="manipulateChild"></param>
         public override void Process(ManipulateHtmlData manipulateHtml, ManipulateChildElement manipulateChild)
         {
-            scrapDbChangeExistsConfigParser.Process(manipulateHtml,
-                ((DbchangeElement)manipulateChild).Exists);
+            DbchangeElement dbChangeElement = (DbchangeElement)manipulateChild;
+
+            if(string.IsNullOrEmpty(dbChangeElement.IsExistsQuery))
+                scrapDbChangesSelectConfigParser.Process(manipulateHtml,
+                    ((DbchangeElement)manipulateChild).Select);
+            else
+            {
+                List<string> finalResults = new List<string>();
+
+                for (int i = 0; i < manipulateHtml.Results.Count; i++)
+                {
+                    string result = manipulateHtml.Results[i];
+                    string validatedata = configParser.WebDbContext.ValidateExists(dbChangeElement.IsExistsQuery, result);
+
+                    result = scrapDbChangesSelectConfigParser.Process(validatedata, result, ((DbchangeElement)manipulateChild).Select);
+
+                    finalResults.Add(result);
+                }
+
+                manipulateHtml.Results = new List<string>(finalResults);
+            }
         }
     }
 }

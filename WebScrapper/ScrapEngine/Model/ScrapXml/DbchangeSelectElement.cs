@@ -16,24 +16,18 @@ namespace ScrapEngine.Model.ScrapXml
         /// <summary>
         /// The name of the table from which the data to be validated
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.TableAttributeName)]
-        public string Table { get; set; }
+        [DXmlAttribute(ScrapXmlConsts.QueryAttributeName)]
+        public string Query { get; set; }
 
         /// <summary>
-        /// Column name in the table to validate from 
+        /// It is a check that if the data is empty or null then remove it from to be used
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.ColAttributeName)]
-        public string Column { get; set; }
-
-        /// <summary>
-        /// Column name in the table to validate from 
-        /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.InnerJoinCriteriaAttributeName)]
-        public string InnerJoinCriteria { get; set; }
+        [DXmlAttribute(ScrapXmlConsts.IsEmptyOrNullAttributeName)]
+        public bool IsEmptyOrNull { get; set; }
 
         /// <summary>
         /// Parent
         /// </summary>
-        public DbchangeExistsElement Parent { get; set; }
+        public DbchangeElement Parent { get; set; }
     }
 }

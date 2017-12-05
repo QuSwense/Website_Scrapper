@@ -19,9 +19,6 @@ namespace ScrapEngine.Interfaces
         /// </summary>
         IScrapEngineContext ParentEngine { get; }
 
-        string SelectSingle(string tableExists, string columnExists, string innerjoincriteria,
-            string table, string column, string result);
-
         /// <summary>
         /// Read the Database configuration
         /// </summary>
@@ -31,8 +28,6 @@ namespace ScrapEngine.Interfaces
         /// The configuration for web scrapping
         /// </summary>
         DatabaseContext WebScrapDb { get; }
-
-        int ValidateExists(string table, string column, string value);
 
         #endregion Properties
 
@@ -72,5 +67,30 @@ namespace ScrapEngine.Interfaces
         //void Add(PerformanceMeasure performance);
 
         void AddMetadata(string id, PerformanceMeasure performanceMeasure);
+
+        /// <summary>
+        /// Validate if the data exists in the table column
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        int ValidateExists(string table, string column, string value);
+
+        /// <summary>
+        /// Validate if the data exists using the custom database query
+        /// </summary>
+        /// <param name="queryFormat"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        string ValidateExists(string queryFormat, string value);
+
+        /// <summary>
+        /// Select a single value from the database using the query format
+        /// </summary>
+        /// <param name="queryFormat"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        string SelectSingle(string queryFormat, string result);
     }
 }

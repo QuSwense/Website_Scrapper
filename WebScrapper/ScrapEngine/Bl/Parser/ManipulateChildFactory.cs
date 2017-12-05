@@ -42,6 +42,7 @@ namespace ScrapEngine.Bl.Parser
         private ScrapValidateConfigParser scrapValidateConfigParser;
 
         private ScrapDbChangeConfigParser scrapDbChangeConfigParser;
+        private ScrapHtmlDecodeConfigParser scrapHtmlDecodeConfigParser;
 
         /// <summary>
         /// Parameterized constructor
@@ -57,6 +58,7 @@ namespace ScrapEngine.Bl.Parser
             scrapPurgeConfigParser = new ScrapPurgeConfigParser(configParser);
             scrapValidateConfigParser = new ScrapValidateConfigParser(configParser);
             scrapDbChangeConfigParser = new ScrapDbChangeConfigParser(configParser);
+            scrapHtmlDecodeConfigParser = new ScrapHtmlDecodeConfigParser(configParser);
         }
 
         /// <summary>
@@ -82,6 +84,8 @@ namespace ScrapEngine.Bl.Parser
                 return scrapValidateConfigParser;
             else if (manipulateChild is DbchangeElement)
                 return scrapDbChangeConfigParser;
+            else if (manipulateChild is HtmlDecodeElement)
+                return scrapHtmlDecodeConfigParser;
             else
                 throw new ScrapParserException(ScrapParserException.EErrorType.UNKNOWN_MANIPULATE_CHILD_TYPE);
         }

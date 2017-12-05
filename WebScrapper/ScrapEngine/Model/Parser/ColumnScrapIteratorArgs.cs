@@ -16,10 +16,10 @@ namespace ScrapEngine.Model.Parser
         /// <summary>
         /// The parent Scrap node
         /// </summary>
-        public ScrapElement Parent { get; set; }
+        public ScrapIteratorArgs Parent { get; set; }
 
         public virtual void PreProcess() { }
-        public virtual string GetDataIterator(ColumnElement columnConfig) { return null;  }
+        public virtual string GetDataIterator(int index) { return null;  }
 
         public static T ConvertValue<T>(string value)
         {

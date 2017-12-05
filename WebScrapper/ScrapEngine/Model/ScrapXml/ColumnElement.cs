@@ -39,6 +39,16 @@ namespace ScrapEngine.Model
         public string XPath { get; set; }
 
         /// <summary>
+        /// The xpath
+        /// </summary>
+        [DXmlAttribute(ScrapXmlConsts.ValueAsInnerHtmlAttributeName)]
+        public bool ValueAsInnerHtml { get; set; }
+
+        [DXmlAttribute(ScrapXmlConsts.SkipIfValueAttributeName)]
+        public string SkipIfValueString { get; set; }
+        public List<string> SkipIfValues { get; set; }
+
+        /// <summary>
         /// Defines the cardinality of a relationship with other columns
         /// If a column is defined to be greater than 1 then it can have multiple values for combinations with other columns
         /// e.g, (col, col21), (col1, col22), etc. for col2.Cardinality = 2
@@ -46,6 +56,9 @@ namespace ScrapEngine.Model
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.CardinalAttributeName)]
         public string CardinalString { get; set; }
+
+        [DXmlAttribute(ScrapXmlConsts.LevelAttributeName)]
+        public int Level { get; set; }
 
         #endregion Xml Attributes
 
@@ -109,7 +122,9 @@ namespace ScrapEngine.Model
             Manipulations = new List<ManipulateChildElement>();
             CardinalString = "1";
             Index = -1;
+            Level = -1;
             IsUnique = false;
+            SkipIfValues = new List<string>();
         }
 
         #endregion Constructor

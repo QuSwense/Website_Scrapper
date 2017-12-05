@@ -23,8 +23,8 @@ namespace ScrapEngine.Common
         public const string RegexReplaceNodeName = "RegexReplace";
         public const string PurgeNodeName = "Purge";
         public const string DbchangeNodeName = "Dbchange";
-        public const string DbchangeExistsNodeName = "Exists";
         public const string DbchangeSelectNodeName = "Select";
+        public const string HtmlDecodeNodeName = "HtmlDecode";
 
         #endregion Node Names
 
@@ -48,6 +48,14 @@ namespace ScrapEngine.Common
         public const string DoUpdateOnlyAttributeName = "doupdateonly";
         public const string IsEmptyOrNullAttributeName = "isemptyornull";
         public const string InnerJoinCriteriaAttributeName = "innerjoincriteria";
+        public const string QueryAttributeName = "query";
+        public const string IsExistsAttributeName = "isexists";
+        public const string ValueAsInnerHtmlAttributeName = "valueasinnerhtml";
+        public const string ReplaceAttributeName = "replace";
+        public const string SplitAsStringAttributeName = "splitasstring";
+        public const string IsWhitespaceAttributeName = "iswhitespace";
+        public const string SkipIfValueAttributeName = "skipifvalue";
+        public const string LevelAttributeName = "level";
 
         #endregion Attributes
 

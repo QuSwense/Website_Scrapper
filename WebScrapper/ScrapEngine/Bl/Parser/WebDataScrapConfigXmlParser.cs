@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml;
 using WebCommon.Const;
 using WebCommon.Error;
@@ -89,7 +90,7 @@ namespace ScrapEngine.Bl.Parser
                 if (currentScrap is ScrapHtmlTableElement &&
                 string.IsNullOrEmpty(currentScrap.UrlOriginal))
                     throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
-                            ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName);3 
+                            ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName); 
 
                 RootScrapNodes.Add(currentScrap);
                 ParseScrapChildNode(scrapNode, currentScrap);
@@ -136,12 +137,7 @@ namespace ScrapEngine.Bl.Parser
             currentScrap.Parent = parentScrap;
             parentScrap.Scraps.Add(currentScrap);
             ParseScrapChildNode(scrapNode, currentScrap);
-
-            if(currentScrap is ScrapHtmlTableElement &&
-                string.IsNullOrEmpty(currentScrap.UrlOriginal))
-                throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
-                        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName);
-
+            
             return currentScrap;
         }
 
@@ -153,6 +149,11 @@ namespace ScrapEngine.Bl.Parser
         private void ParseColumnNode(XmlNode columnNode, ScrapElement parentScrap)
         {
             var columnScrap = xmlDocReader.ReadElement<ColumnElement>(columnNode);
+
+            if(!string.IsNullOrEmpty(columnScrap.SkipIfValueString))
+            {
+                columnScrap.SkipIfValues = columnScrap.SkipIfValueString.Split(new char[] { ';' }).ToList();
+            }
 
             columnScrap.Parent = parentScrap;
             parentScrap.Columns.Add(columnScrap);
@@ -216,8 +217,6 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="columnScrap"></param>
         private void ParseManipulateNode(XmlNode manipulateNode, ColumnElement columnScrap)
         {
-            ManipulateChildElement manipulateScrap = null;
-
             if (manipulateNode.LocalName == ScrapXmlConsts.SplitNodeName)
                 ParseManipulateSplitNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.TrimNodeName)
@@ -234,11 +233,10 @@ namespace ScrapEngine.Bl.Parser
                 ParseManipulatePurgeNode(manipulateNode, columnScrap);
             else if (manipulateNode.LocalName == ScrapXmlConsts.DbchangeNodeName)
                 ParseManipulateDbchangeNode(manipulateNode, columnScrap);
+            else if (manipulateNode.LocalName == ScrapXmlConsts.HtmlDecodeNodeName)
+                ParseManipulateHtmlDecodeNode(manipulateNode, columnScrap);
             else
                 throw new ScrapXmlException(ScrapXmlException.EErrorType.INVALID_MANIPULATE_CHILD_ITEM);
-
-            manipulateScrap.Parent = columnScrap;
-            columnScrap.Manipulations.Add(manipulateScrap);
         }
 
         /// <summary>
@@ -333,6 +331,18 @@ namespace ScrapEngine.Bl.Parser
         }
 
         /// <summary>
+        /// Parse the HtmlDecode node
+        /// </summary>
+        /// <param name="manipulateNode"></param>
+        /// <param name="columnScrap"></param>
+        private void ParseManipulateHtmlDecodeNode(XmlNode manipulateNode, ColumnElement columnScrap)
+        {
+            HtmlDecodeElement htmlDecodeElement = xmlDocReader.ReadElement<HtmlDecodeElement>(manipulateNode);
+            htmlDecodeElement.Parent = columnScrap;
+            columnScrap.Manipulations.Add(htmlDecodeElement);
+        }
+
+        /// <summary>
         /// Parse the Manipulate Dbchange node tag
         /// </summary>
         /// <param name="manipulateNode"></param>
@@ -342,7 +352,7 @@ namespace ScrapEngine.Bl.Parser
             DbchangeElement dbchangeElement = xmlDocReader.ReadElement<DbchangeElement>(manipulateNode);
             dbchangeElement.Parent = columnScrap;
 
-            ParseDbChangeElement(dbchangeElement, manipulateNode);
+            ParseSelectElement(dbchangeElement, manipulateNode);
             columnScrap.Manipulations.Add(dbchangeElement);
         }
 
@@ -351,30 +361,14 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <param name="dbchangeElement"></param>
         /// <param name="manipulateNode"></param>
-        private void ParseDbChangeElement(DbchangeElement dbchangeElement, XmlNode manipulateNode)
+        private void ParseSelectElement(DbchangeElement dbchangeElement, XmlNode manipulateNode)
         {
             if(manipulateNode.ChildNodes != null && manipulateNode.ChildNodes.Count == 1)
             {
-                DbchangeExistsElement existsElement =
-                    xmlDocReader.ReadElement<DbchangeExistsElement>(manipulateNode.ChildNodes[0]);
-                dbchangeElement.Exists = existsElement;
-                ParseSelectElement(existsElement, manipulateNode.ChildNodes[0]);
-            }
-        }
-
-        /// <summary>
-        /// Parse the Db change select node
-        /// </summary>
-        /// <param name="existsElement"></param>
-        /// <param name="xmlNode"></param>
-        private void ParseSelectElement(DbchangeExistsElement existsElement, XmlNode xmlNode)
-        {
-            if (xmlNode.ChildNodes != null && xmlNode.ChildNodes.Count == 1)
-            {
                 DbchangeSelectElement selectElement =
-                    xmlDocReader.ReadElement<DbchangeSelectElement>(xmlNode.ChildNodes[0]);
-                selectElement.Parent = existsElement;
-                existsElement.Select = selectElement;
+                     xmlDocReader.ReadElement<DbchangeSelectElement>(manipulateNode.ChildNodes[0]);
+                selectElement.Parent = dbchangeElement;
+                dbchangeElement.Select = selectElement;
             }
         }
 
@@ -386,6 +380,8 @@ namespace ScrapEngine.Bl.Parser
         protected string Normalize(string htmlValue)
         {
             if (string.IsNullOrEmpty(htmlValue)) return htmlValue;
+            htmlValue = HttpUtility.HtmlDecode(htmlValue);
+
             return htmlValue.Replace(ASCIICharacters.NewLineString, ASCIICharacters.NewLine)
                 .Replace(ASCIICharacters.TabString, ASCIICharacters.Tab);
         }

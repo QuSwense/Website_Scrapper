@@ -22,7 +22,7 @@ namespace ScrapEngine.Model.ScrapXml
         /// <summary>
         /// The data node
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.ReplaceNodeName)]
+        [DXmlAttribute(ScrapXmlConsts.ReplaceAttributeName)]
         public string Replace { get; set; }
 
         /// <summary>

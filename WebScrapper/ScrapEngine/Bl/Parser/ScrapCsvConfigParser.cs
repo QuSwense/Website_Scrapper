@@ -69,7 +69,7 @@ namespace ScrapEngine.Bl.Parser
                     {
                         NodeIndexId = currentscrapIteratorCsvArgs.NodeIndexId,
                         FileLine = fileLine,
-                        Parent = currentscrapIteratorCsvArgs.ScrapConfigObj
+                        Parent = currentscrapIteratorCsvArgs
                     });
                     ProcessColumnParser();
                     configParser.StateModel.RestoreColumn();

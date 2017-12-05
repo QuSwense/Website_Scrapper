@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Xml.XPath;
 using WebCommon.Error;
 
@@ -62,7 +63,7 @@ namespace ScrapEngine.Bl
         /// <param name="url"></param>
         /// <param name="fManipulateWebStream"></param>
         /// <returns></returns>
-        private T Load<T>(string url, Func<Stream, T> fManipulateWebStream)
+        private T Load<T>(string url, Func<WebResponse, T> fManipulateWebStream)
             where T: class
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 |
@@ -93,7 +94,7 @@ namespace ScrapEngine.Bl
                 }
             }
 
-            return fManipulateWebStream(webResponseObj.GetResponseStream());
+            return fManipulateWebStream(webResponseObj);
         }
 
         /// <summary>
@@ -101,10 +102,13 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        private HtmlNode ManipulateWebStreamForPage(Stream stream)
+        private HtmlNode ManipulateWebStreamForPage(WebResponse webResponseObj)
         {
+            Stream stream = webResponseObj.GetResponseStream();
+            HttpWebResponse htmlWebResponse = (HttpWebResponse)webResponseObj;
+            Encoding encoding = Encoding.GetEncoding(htmlWebResponse.CharacterSet);
             string htmlText = "";
-            using (StreamReader reader = new StreamReader(stream))
+            using (StreamReader reader = new StreamReader(stream, encoding))
                 htmlText = reader.ReadToEnd();
 
             HtmlDocument document = new HtmlDocument();
@@ -118,8 +122,9 @@ namespace ScrapEngine.Bl
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public string ManipulateWebStreamForFile(Stream stream)
+        public string ManipulateWebStreamForFile(WebResponse webResponseObj)
         {
+            Stream stream = webResponseObj.GetResponseStream();
             using (StreamReader reader = new StreamReader(stream))
                 return reader.ReadToEnd();
         }

@@ -8,16 +8,16 @@
 
         public override void PreProcess()
         {
-            ScrapCsvElement ScrapConfigCsv = Parent as ScrapCsvElement;
+            ScrapCsvElement ScrapConfigCsv = Parent.ScrapConfigObj as ScrapCsvElement;
             if (ScrapConfigCsv != null)
             {
                 splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });
             }
         }
 
-        public override string GetDataIterator(ColumnElement columnConfig)
+        public override string GetDataIterator(int index)
         {
-            return splitData[columnConfig.Index];
+            return splitData[index];
         }
     }
 }

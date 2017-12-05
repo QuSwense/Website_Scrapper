@@ -7,11 +7,41 @@ namespace ScrapEngine.Model.Parser
     {
         public HtmlNodeNavigator WebHtmlNode { get; set; }
         
-        public override string GetDataIterator(ColumnElement columnConfig)
+        public override string GetDataIterator(int index)
         {
-            XPathNavigator htmlPathNav = WebHtmlNode.SelectSingleNode(columnConfig.XPath);
-            if (htmlPathNav != null) return htmlPathNav.Value;
-            else return null;
+            var columnConfig = Parent.ScrapConfigObj.Columns[index];
+
+            if (columnConfig.Level < 0)
+            {
+                XPathNavigator htmlPathNav = WebHtmlNode.SelectSingleNode(columnConfig.XPath);
+                if (htmlPathNav != null)
+                {
+                    if (columnConfig.ValueAsInnerHtml) return htmlPathNav.InnerXml;
+                    else return htmlPathNav.Value;
+                }
+                else return null;
+            }
+            else
+            {
+                ScrapIteratorArgs scrapIteratorArgs = Parent;
+
+                while (scrapIteratorArgs.ScrapConfigObj != null &&
+                    scrapIteratorArgs.ScrapConfigObj.Level != columnConfig.Level)
+                    scrapIteratorArgs = scrapIteratorArgs.Parent;
+
+                if (scrapIteratorArgs == null || scrapIteratorArgs.ScrapConfigObj == null) return null;
+                else
+                {
+                    XPathNavigator htmlPathNav = scrapIteratorArgs.WebHtmlNode.SelectSingleNode(columnConfig.XPath);
+                    if (htmlPathNav != null)
+                    {
+                        if (columnConfig.ValueAsInnerHtml) return htmlPathNav.InnerXml;
+                        else return htmlPathNav.Value;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

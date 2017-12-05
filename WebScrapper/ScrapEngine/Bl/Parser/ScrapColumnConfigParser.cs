@@ -65,7 +65,7 @@ namespace ScrapEngine.Bl.Parser
             {
                 // Load the table with partial columns in memory
                 configParser.WebDbContext.AddMetadata(
-                    currentColumnScrapIteratorArgs.Parent);
+                    currentColumnScrapIteratorArgs.Parent.ScrapConfigObj);
                 configParser.StateModel.SetColumnMetadataFlag();
             }
         }
@@ -79,40 +79,46 @@ namespace ScrapEngine.Bl.Parser
         private void ColumnScrapIterator()
         {
             var rows = new List<List<DynamicTableDataInsertModel>>();
-            bool doSkipDbAddUpdate = false;
 
             currentColumnScrapIteratorArgs.PreProcess();
 
-            for (int indx = 0; indx < currentColumnScrapIteratorArgs.Parent.Columns.Count; ++indx)
+            for (int indx = 0; indx < currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Columns.Count; ++indx)
             {
-                var columnConfig = currentColumnScrapIteratorArgs.Parent.Columns[indx];
-
+                var columnConfig = currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Columns[indx];
                 var manipulateHtml = new ManipulateHtmlData()
                 {
                     Cardinality = columnConfig.Cardinal,
-                    OriginalValue = currentColumnScrapIteratorArgs.GetDataIterator(columnConfig)
+                    OriginalValue = currentColumnScrapIteratorArgs.GetDataIterator(indx)
                 };
                 manipulateHtml.Results.Add(manipulateHtml.OriginalValue);
 
                 Manipulate(columnConfig, manipulateHtml);
 
-                if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0))
-                {
-                    doSkipDbAddUpdate = true;
-                    break;
-                }
-                
+                if (CheckSkipUpdate(manipulateHtml, columnConfig)) return;
                 rows.Add(DbTableDataMapper(manipulateHtml, columnConfig));
             }
 
-            if (!doSkipDbAddUpdate && currentColumnScrapIteratorArgs.Parent.Columns.Count > 0)
+            if (currentColumnScrapIteratorArgs.Parent.Columns.Count > 0 && rows.Count > 0)
             {
                 configParser.Performance.NewDbUpdate(rows, currentColumnScrapIteratorArgs);
-
-                configParser.WebDbContext.AddOrUpdate(currentColumnScrapIteratorArgs.Parent, rows);
-
+                configParser.WebDbContext.AddOrUpdate(currentColumnScrapIteratorArgs.Parent.ScrapConfigObj, rows);
                 configParser.Performance.FinalDbUpdate(rows, currentColumnScrapIteratorArgs);
             }
+        }
+
+        private bool CheckSkipUpdate(ManipulateHtmlData manipulateHtml, ColumnElement columnConfig)
+        {
+            if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0)) return true;
+
+            if(columnConfig.SkipIfValues.Count > 0)
+            {
+                foreach (var result in manipulateHtml.Results)
+                {
+                    if (columnConfig.SkipIfValues.Contains(result)) return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -136,7 +142,7 @@ namespace ScrapEngine.Bl.Parser
                     Value = result,
                     DataType =
                     configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[
-                        currentColumnScrapIteratorArgs.Parent.TableName][columnConfig.Name].DataType
+                        currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.TableName][columnConfig.Name].DataType
                 };
 
                 if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))

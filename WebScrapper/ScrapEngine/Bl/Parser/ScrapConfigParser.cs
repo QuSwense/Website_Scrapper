@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
+using System.Xml.XPath;
 using WebCommon.Error;
 using WebReader.Model;
 
@@ -41,7 +42,7 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="webScrapConfigObj">The last child Scrap node</param>
         protected void AssertLevelConstraint()
         {
-            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent;
+            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
             int level = 0;
             for (; tmpObj != null && level <= configParser.AppConfig.ScrapMaxLevel();
                 level++, tmpObj = tmpObj.Parent) ;
@@ -60,7 +61,7 @@ namespace ScrapEngine.Bl.Parser
         {
             bool isTableNameFound = false;
             string NameValue = null;
-            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent;
+            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
 
             while (tmpObj != null)
             {
@@ -89,15 +90,23 @@ namespace ScrapEngine.Bl.Parser
         {
             string urlValue = childScrapIteratorArgs.ScrapConfigObj.Url;
 
-            if (string.IsNullOrEmpty(urlValue) ||
-                childScrapIteratorArgs.ScrapConfigObj.Parent == null ||
+            if (childScrapIteratorArgs.ScrapConfigObj.Parent == null ||
                 string.IsNullOrEmpty(childScrapIteratorArgs.ScrapConfigObj.Parent.Url)) return;
-            if (!urlValue.StartsWith("@")) return;
+            if (urlValue != null && !urlValue.Contains("{parentValue}")) return;
 
-            if (urlValue.Contains("{parentValue}"))
+            urlValue = urlValue.Replace("{parentValue}", "");
+
+            if (string.IsNullOrEmpty(urlValue))
             {
                 urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
-                    childScrapIteratorArgs.Parent.WebHtmlNode.Value).AbsoluteUri;
+                childScrapIteratorArgs.Parent.WebHtmlNode.Value).AbsoluteUri;
+            }
+            else
+            {
+                XPathNavigator htmlNode =
+                    childScrapIteratorArgs.Parent.WebHtmlNode.SelectSingleNode(urlValue);
+                urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
+                htmlNode.Value).AbsoluteUri;
             }
 
             childScrapIteratorArgs.ScrapConfigObj.UrlCalculated = urlValue;

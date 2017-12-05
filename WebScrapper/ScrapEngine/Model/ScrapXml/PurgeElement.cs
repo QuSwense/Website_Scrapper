@@ -21,8 +21,18 @@ namespace ScrapEngine.Model.ScrapXml
         public bool IsEmptyOrNull { get; set; }
 
         /// <summary>
-        /// Parent column element
+        /// It is a check that if the data is empty or null then remove it from to be used
         /// </summary>
-        public ColumnElement Parent { get; set; }
+        [DXmlAttribute(ScrapXmlConsts.IsWhitespaceAttributeName)]
+        public bool IsWhitespace { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public PurgeElement()
+        {
+            IsEmptyOrNull = false;
+            IsWhitespace = false;
+        }
     }
 }

@@ -32,6 +32,7 @@ namespace ScrapEngine.Bl.Parser
             foreach (string value in manipulateHtml.Results)
             {
                 if (purgeElement.IsEmptyOrNull && string.IsNullOrEmpty(value)) ;//skip
+                if (purgeElement.IsWhitespace && string.IsNullOrWhiteSpace(value)) ;//skip
                 else finalList.Add(value);
             }
 

@@ -15,9 +15,15 @@ namespace ScrapEngine.Model.ScrapXml
     public class DbchangeElement : ManipulateChildElement
     {
         /// <summary>
+        /// The Existence query clase
+        /// </summary>
+        [DXmlAttribute(ScrapXmlConsts.IsExistsAttributeName)]
+        public string IsExistsQuery { get; set; }
+
+        /// <summary>
         /// The Exists node which checks the existence of node
         /// </summary>
-        [DXmlElement(ScrapXmlConsts.DbchangeExistsNodeName)]
-        public DbchangeExistsElement Exists { get; set; }
+        [DXmlElement(ScrapXmlConsts.DbchangeSelectNodeName)]
+        public DbchangeSelectElement Select { get; set; }
     }
 }

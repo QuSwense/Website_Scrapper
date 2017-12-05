@@ -60,22 +60,22 @@ namespace ScrapEngine.Model.Parser
         {
             get
             {
-                if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.Id)) return false;
+                if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id)) return false;
                 else
                 {
-                    return ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.Id];
+                    return ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id];
                 }
             }
         }
 
         public void SetColumnMetadataFlag()
         {
-            if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.Id))
+            if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id))
             {
-                ColumnMetadataUpdateFlags.Add(CurrentColumnScrapIteratorArgs.Parent.Id, true);
+                ColumnMetadataUpdateFlags.Add(CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id, true);
             }
             else
-                ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.Id] = true;
+                ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id] = true;
         }
     }
 }

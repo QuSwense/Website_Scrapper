@@ -5,6 +5,7 @@ using SqliteDatabase;
 using SqliteDatabase.Model;
 using WebCommon.Combinatorics;
 using ScrapEngine.Bl;
+using WebCommon.Extn;
 
 namespace ScrapEngine.Db
 {
@@ -221,9 +222,26 @@ namespace ScrapEngine.Db
             return WebScrapDb.ValidateExists(table, column, value);
         }
 
-        public string SelectSingle(string tableExists, string columnExists, string table, string column, string result)
+        /// <summary>
+        /// Validate if the data exists using the custom database query
+        /// </summary>
+        /// <param name="queryFormat"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string ValidateExists(string queryFormat, string value)
         {
-            return WebScrapDb.SelectSingle(tableExists, columnExists, table, column, result);
+            return WebScrapDb.SelectSingle(queryFormat, value);
+        }
+
+        /// <summary>
+        /// Select a single value from the database using the query format
+        /// </summary>
+        /// <param name="queryFormat"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public string SelectSingle(string queryFormat, string result)
+        {
+            return WebScrapDb.SelectSingle(queryFormat, result);
         }
 
         #endregion Validate

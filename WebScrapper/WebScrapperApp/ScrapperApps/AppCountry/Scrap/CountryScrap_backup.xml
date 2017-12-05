@@ -61,15 +61,21 @@
       </Manipulate>
     </Column>
   </ScrapHtmlTable>
-  <ScrapHtmlTable id="all_languages" name="lang" url="http://www.mathguide.de/info/tools/languagecode.html" xpath="//body/p[4]/table//table//tr[position() > 1]">
-    <Column name="nm" xpath="td[1]">
+  <ScrapHtmlTable id="all_languages" name="lang" url="http://www.loc.gov/standards/iso639-2/php/code_list.php" xpath="//body//table//table[1]//tr[position() > 1]">
+    <Column name="iso6392" xpath="td[1]" valueasinnerhtml="true" skipifvalue="zxx">
       <Manipulate>
-          <RegexReplace pattern=" ?\(.*?\)" replace="" />
-          <Split data="," index="*"></Split>
-          <Trim />
-        </Manipulate>
+        <Split data="&lt;br&gt;" index="*" splitasstring="true"></Split>
+        <Split data="&lt;br /&gt;" index="*" splitasstring="true"></Split>
+        <RegexReplace pattern="\s+\(.*\)" replace="" />
+      </Manipulate>
     </Column>
-    <Column name="iso6391" xpath="td[2]"></Column>
+    <Column name="iso6391" xpath="td[2]">
+      <Manipulate>
+        <HtmlDecode />
+        <Purge isemptyornull="true" iswhitespace="true"/>
+      </Manipulate>
+    </Column>
+    <Column name="nm" xpath="td[3]"></Column>
   </ScrapHtmlTable>
   <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">
     <ScrapHtmlTable xpath="//body/div[2]/table[1]" url="@{parentValue}">
@@ -79,15 +85,19 @@
           <Trim />
         </Manipulate>
       </Column>
-      <Column name="iso6391" xpath=".//tr[8]/td[2]" cardinal="*" isunique="true">
+      <Column name="iso6392" xpath=".//tr[8]/td[2]" cardinal="*" isunique="true">
         <Manipulate>
           <Split data="," index="*"></Split>
           <Regex pattern="(?&lt;=\()(.*?)(?=\))" index="last">
           </Regex>
           <Split data="-" index="0" />
           <Trim />
+          <Purge isemptyornull="true"/>
+          <Dbchange isexists="SELECT iso6392 FROM lang WHERE iso6391 = {data}">
+            <Select isemptyornull="false"/>
+          </Dbchange>
+          <Validate table="lang" col="iso6392" />
         </Manipulate>
-        <Validate table="lang" col="iso6391" />
       </Column>
     </ScrapHtmlTable>
   </ScrapHtmlTable>

@@ -23,14 +23,40 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Process the individual result to modify the data from the database
         /// </summary>
-        /// <param name="result"></param>
+        /// <param name="manipulateHtml"></param>
         /// <param name="selectElement"></param>
         /// <returns></returns>
-        public string Process(string result, DbchangeSelectElement selectElement)
+        public void Process(ManipulateHtmlData manipulateHtml, DbchangeSelectElement selectElement)
         {
-            return configParser.WebDbContext.SelectSingle(selectElement.Parent.Table,
-                selectElement.Parent.Column, selectElement.Table, selectElement.InnerJoinCriteria,
-                        selectElement.Column, result);
+            List<string> finalResults = new List<string>();
+
+            for (int i = 0; i < manipulateHtml.Results.Count; i++)
+            {
+                string result = manipulateHtml.Results[i];
+                result = configParser.WebDbContext.SelectSingle(selectElement.Query, result);
+                finalResults.Add(result);
+            }
+
+            manipulateHtml.Results = new List<string>(finalResults);
+        }
+
+        /// <summary>
+        /// Process the individual result to modify the data from the database
+        /// </summary>
+        /// <param name="manipulateHtml"></param>
+        /// <param name="selectElement"></param>
+        /// <returns></returns>
+        public string Process(string validatedata, string result, DbchangeSelectElement selectElement)
+        {
+            if(!string.IsNullOrEmpty(selectElement.Query))
+                return configParser.WebDbContext.SelectSingle(selectElement.Query, result);
+            else
+            {
+                if (!selectElement.IsEmptyOrNull && !string.IsNullOrEmpty(result))
+                    return validatedata;
+            }
+
+            return result;
         }
     }
 }

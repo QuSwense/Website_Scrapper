@@ -19,6 +19,13 @@ namespace ScrapEngine.Model
         public string Data { get; set; }
 
         /// <summary>
+        /// This flag is related with the <see cref="Data"/> property which if true Split the string
+        /// using the whole Data string, if false, split using the Character array
+        /// </summary>
+        [DXmlAttribute(ScrapXmlConsts.SplitAsStringAttributeName)]
+        public bool SplitAsString { get; set; }
+
+        /// <summary>
         /// The data node
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
@@ -45,6 +52,7 @@ namespace ScrapEngine.Model
         public SplitElement()
         {
             IndexString = "0";
+            SplitAsString = false;
         }
     }
 }

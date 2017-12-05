@@ -103,9 +103,9 @@ namespace ScrapEngine.Bl
             stopwatchTemp = new Stopwatch();
             stopwatchTemp.Start();
 
-            string id = scrapArgs.Parent.Id;
+            string id = scrapArgs.Parent.ScrapConfigObj.Id;
 
-            StorePerformances[scrapArgs.Parent.Id].ElapsedDbUpdates
+            StorePerformances[scrapArgs.Parent.ScrapConfigObj.Id].ElapsedDbUpdates
                 .Add(scrapArgs.NodeIndexId, TimeSpan.MinValue);
         }
 
@@ -118,7 +118,7 @@ namespace ScrapEngine.Bl
             stopwatchTemp.Stop();
             //string key = GetColumnKey(colValues, keyIndex);
 
-            StorePerformances[scrapArgs.Parent.Id].ElapsedDbUpdates[scrapArgs.NodeIndexId] =
+            StorePerformances[scrapArgs.Parent.ScrapConfigObj.Id].ElapsedDbUpdates[scrapArgs.NodeIndexId] =
                 stopwatchTemp.Elapsed;
         }
 

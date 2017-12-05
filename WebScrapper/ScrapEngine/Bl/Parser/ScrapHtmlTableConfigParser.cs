@@ -76,7 +76,7 @@ namespace ScrapEngine.Bl.Parser
                     configParser.StateModel.AddNewColumn(new ColumnScrapIteratorHtmlArgs()
                     {
                         NodeIndexId = currentscrapIteratorHtmlArgs.NodeIndexId,
-                        Parent = currentscrapIteratorHtmlArgs.ScrapConfigObj,
+                        Parent = currentscrapIteratorHtmlArgs,
                         WebHtmlNode = currentscrapIteratorHtmlArgs.WebHtmlNode
                     });
 

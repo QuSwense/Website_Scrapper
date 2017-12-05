@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using ScrapEngine.Model.ScrapXml;
 using WebCommon.Error;
+using System;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -33,7 +34,12 @@ namespace ScrapEngine.Bl.Parser
             {
                 if (!string.IsNullOrEmpty(result.Results[i]))
                 {
-                    string[] split = result.Results[i].Split(splitElement.Data.ToArray());
+                    string[] split = null;
+
+                    if(splitElement.SplitAsString)
+                        split = result.Results[i].Split(new string[] { splitElement.Data }, StringSplitOptions.None);
+                    else
+                        split = result.Results[i].Split(splitElement.Data.ToArray());
 
                     if (splitElement.Index >= 0 && splitElement.Index < split.Length)
                         finalResults.Add(split[splitElement.Index]);
