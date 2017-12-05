@@ -156,6 +156,7 @@
     <Compile Include="Model\ScrapXml\SplitElement.cs" />
     <Compile Include="Model\ScrapXml\TrimElement.cs" />
     <Compile Include="Model\ScrapXml\ValidateElement.cs" />
+    <Compile Include="Model\ScrapXml\WebDataElement.cs" />
     <Compile Include="Model\WebScrapParserColumnCsvStateModel.cs" />
     <Compile Include="Model\WebScrapParserColumnHtmlStateModel.cs" />
     <Compile Include="Model\WebScrapParserStateModel.cs" />

@@ -85,6 +85,7 @@
     <Compile Include="Csv\CSVReader.cs" />
     <Compile Include="Csv\Meta\SplitIndexAttribute.cs" />
     <Compile Include="Xml\DXmlDocReader.cs" />
+    <Compile Include="Xml\DXmlReader.cs" />
     <Compile Include="Xml\DXmlSerializeReader.cs" />
   </ItemGroup>
   <ItemGroup>

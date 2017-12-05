@@ -122,6 +122,37 @@ namespace WebReader.Xml
             return obj;
         }
 
+        /// <summary>
+        /// Parse and Read the attributes on the element and store it in the type object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public object ReadElement(XmlNode currentElement, Type typeNode)
+        {
+            logger.DebugFormat("Read the current Xml node element tag <{0}> and its attributes into type '{1}'",
+                currentElement.LocalName, typeNode);
+
+            object obj = Activator.CreateInstance(typeNode);
+            Type objType = typeNode;
+
+            PropertyInfo[] properties = objType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (var item in properties)
+            {
+                var attrAttributeObj = item.GetCustomAttribute<DXmlAttributeAttribute>();
+                if (attrAttributeObj != null)
+                {
+                    XmlAttribute attribute = currentElement.Attributes[attrAttributeObj.Name];
+                    if (attrAttributeObj.IsMandatory && attribute == null)
+                        throw new XmlDocReaderException(XmlDocReaderException.EErrorType.ATTRIBUTE_VALUE_NULL,
+                            attrAttributeObj.Name);
+                    if (attribute != null) item.SetValue(obj, item.PropertyType.ChangeType(attribute.Value));
+                }
+            }
+
+            return obj;
+        }
+
         #endregion Read
     }
 }

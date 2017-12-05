@@ -4,12 +4,14 @@ using ScrapEngine.Model.ScrapXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 using WebCommon.Const;
 using WebCommon.Error;
+using WebReader.Model;
 using WebReader.Xml;
 
 namespace ScrapEngine.Bl.Parser
@@ -22,7 +24,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Stores the Scrap xml file data. This is the main Data to be used after parsing xml
         /// </summary>
-        public List<ScrapElement> RootScrapNodes { get; set; }
+        public WebDataElement WebDataRoot { get; set; }
 
         /// <summary>
         /// An intermediate reader instance
@@ -34,7 +36,7 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         public WebDataScrapConfigXmlParser()
         {
-            RootScrapNodes = new List<ScrapElement>();
+            WebDataRoot = new WebDataElement();
         }
 
         /// <summary>
@@ -45,14 +47,24 @@ namespace ScrapEngine.Bl.Parser
             xmlDocReader = new DXmlDocReader();
             xmlDocReader.Initialize(configFile);
 
+            mapProperties = new Dictionary<string, XmlPropertyMap>();
+            mapElementProperties = new Dictionary<string, XmlElementPropertyMap>();
+
+            Type typeNode = typeof(WebDataElement);
+            List<DXmlElementAttribute> elementAttributes = typeNode.GetCustomAttributes<DXmlElementAttribute>().ToList();
+
+            if (elementAttributes == null || elementAttributes.Count <= 0)
+                throw new Exception();
+
             foreach (XmlNode webDataNode in xmlDocReader.GetChildNodes())
             {
                 if (webDataNode is XmlDeclaration) continue;
 
-                if (webDataNode.LocalName != ScrapXmlConsts.WebDataNodeName)
+                DXmlElementAttribute elementAttribute = elementAttributes.Where(p => p.Name == webDataNode.LocalName).First();
+                if (elementAttribute == null)
                     throw new ScrapXmlException(ScrapXmlException.EErrorType.NODE_NOT_FOUND,
                         ScrapXmlConsts.WebDataNodeName);
-                ParseRootScrapNode(webDataNode);
+                ParseRootScrapNode(webDataNode, WebDataRoot);
             }
 
             xmlDocReader = null;
@@ -62,39 +74,124 @@ namespace ScrapEngine.Bl.Parser
         /// Parse the topmost root node
         /// </summary>
         /// <param name="webDataNode"></param>
-        protected void ParseRootScrapNode(XmlNode webDataNode)
+        protected void ParseRootScrapNode(XmlNode webDataNode, WebDataElement webDataRoot)
         {
+            webDataRoot = xmlDocReader.ReadElement<WebDataElement>(webDataNode);
+            CreatePropertyMap(webDataRoot);
+
             foreach (XmlNode scrapNode in xmlDocReader.GetChildNodes(webDataNode))
             {
                 ScrapElement currentScrap = null;
-                if (scrapNode.LocalName == ScrapXmlConsts.ScrapHtmlTableNodeName)
-                    currentScrap = xmlDocReader.ReadElement<ScrapHtmlTableElement>(scrapNode);
-                else if (scrapNode.LocalName == ScrapXmlConsts.ScrapCsvNodeName)
-                    currentScrap = xmlDocReader.ReadElement<ScrapCsvElement>(scrapNode);
-                else
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.UNKNOWN_NODE,
-                            scrapNode.LocalName);
 
-                // id and name attribute is mnadatory in the root scrap node
-                if (currentScrap == null)
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.PARSE_NODE_ERROR);
+                if (mapProperties.ContainsKey(scrapNode.LocalName))
+                {
 
-                if (string.IsNullOrEmpty(currentScrap.IdString))
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
-                        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.IdAttributeName);
+                }
+                else if(mapElementProperties.ContainsKey(scrapNode.LocalName))
+                {
+                    currentScrap = (ScrapElement)xmlDocReader.ReadElement(scrapNode, 
+                        mapElementProperties[scrapNode.LocalName].ElementAttriibute.DerivedType);
+                    SetElementValue(scrapNode.LocalName, currentScrap);
 
-                if (string.IsNullOrEmpty(currentScrap.Name))
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
-                        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.NameAttributeName);
+                    ParseScrapChildNode(scrapNode, currentScrap);
+                }
 
-                if (currentScrap is ScrapHtmlTableElement &&
-                string.IsNullOrEmpty(currentScrap.UrlOriginal))
-                    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
-                            ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName); 
+                //    if (scrapNode.LocalName == ScrapXmlConsts.ScrapHtmlTableNodeName)
+                //    currentScrap = xmlDocReader.ReadElement<ScrapHtmlTableElement>(scrapNode);
+                //else if (scrapNode.LocalName == ScrapXmlConsts.ScrapCsvNodeName)
+                //    currentScrap = xmlDocReader.ReadElement<ScrapCsvElement>(scrapNode);
+                //else
+                //    throw new ScrapXmlException(ScrapXmlException.EErrorType.UNKNOWN_NODE,
+                //            scrapNode.LocalName);
 
-                RootScrapNodes.Add(currentScrap);
-                ParseScrapChildNode(scrapNode, currentScrap);
+                //// id and name attribute is mnadatory in the root scrap node
+                //if (currentScrap == null)
+                //    throw new ScrapXmlException(ScrapXmlException.EErrorType.PARSE_NODE_ERROR);
+
+                //if (string.IsNullOrEmpty(currentScrap.IdString))
+                //    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
+                //        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.IdAttributeName);
+
+                //if (string.IsNullOrEmpty(currentScrap.Name))
+                //    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
+                //        ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.NameAttributeName);
+
+                //if (currentScrap is ScrapHtmlTableElement &&
+                //string.IsNullOrEmpty(currentScrap.UrlOriginal))
+                //    throw new ScrapXmlException(ScrapXmlException.EErrorType.MANDATORY_ATTRIBUTE_NOT_FOUND,
+                //            ScrapXmlConsts.ScrapHtmlTableNodeName, ScrapXmlConsts.UrlAttributeName);
+
+                //webDataRoot.Scraps.Add(currentScrap);
+                //ParseScrapChildNode(scrapNode, currentScrap);
             }
+        }
+
+        private void SetElementValue(string localName, ScrapElement currentScrap)
+        {
+            XmlElementPropertyMap elementPropMap = mapElementProperties[localName];
+
+            if(elementPropMap.PropInfo.PropertyType == typeof(List<>))
+            {
+                object listObj = elementPropMap.PropInfo.GetValue(elementPropMap.webDataRoot, null);
+                elementPropMap.PropInfo.PropertyType.GetMethod("Add").Invoke(listObj, new[] { currentScrap });
+            }
+        }
+
+        Dictionary<string, XmlPropertyMap> mapProperties;
+        Dictionary<string, XmlElementPropertyMap> mapElementProperties;
+
+        private void CreatePropertyMap(WebDataElement webDataRoot)
+        {
+            Type typeNode = webDataRoot.GetType();
+            PropertyInfo[] PropInfos = typeNode.GetProperties(BindingFlags.Instance);
+            List<PropertyInfo> reqPropInfos = new List<PropertyInfo>();
+
+            foreach (var item in PropInfos)
+            {
+                List<DXmlAttributeAttribute> attrAttributes = item.GetCustomAttributes<DXmlAttributeAttribute>().ToList();
+                if (attrAttributes != null)
+                {
+                    foreach (var attrAttribute in attrAttributes)
+                    {
+                        mapProperties.Add(attrAttribute.Name, new XmlPropertyMap()
+                        {
+                            AttrAttriibute = attrAttribute,
+                            PropInfo = item,
+                            webDataRoot = webDataRoot
+                        });
+                    }
+                }
+
+                List<DXmlElementAttribute> elementAttributes = item.GetCustomAttributes<DXmlElementAttribute>().ToList();
+                if (elementAttributes != null)
+                {
+                    foreach (var elementAttribute in elementAttributes)
+                    {
+                        mapElementProperties.Add(elementAttribute.Name, new XmlElementPropertyMap()
+                        {
+                            ElementAttriibute = elementAttribute,
+                            PropInfo = item,
+                            webDataRoot = webDataRoot
+                        });
+                    }
+                }
+            }
+        }
+
+        internal class XmlPropertyMap
+        {
+            public PropertyInfo PropInfo { get; set; }
+            public DXmlAttributeAttribute AttrAttriibute { get; set; }
+
+            public WebDataElement webDataRoot;
+        }
+
+        internal class XmlElementPropertyMap
+        {
+            public PropertyInfo PropInfo { get; set; }
+            public DXmlElementAttribute ElementAttriibute { get; set; }
+
+            public WebDataElement webDataRoot;
         }
 
         /// <summary>

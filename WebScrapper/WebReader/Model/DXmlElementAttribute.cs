@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebReader.Model
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = true)]
     public class DXmlElementAttribute : Attribute
     {
         /// <summary>

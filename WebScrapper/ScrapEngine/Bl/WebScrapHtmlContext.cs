@@ -54,7 +54,7 @@ namespace ScrapEngine.Bl
 
         public List<ScrapElement> RootScrapNodes
         {
-            get { return configXmlParser.RootScrapNodes; }
+            get { return configXmlParser.WebDataRoot.Scraps; }
         }
 
         #endregion Properties Helper

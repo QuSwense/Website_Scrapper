@@ -3,6 +3,7 @@ using log4net;
 using ScrapEngine;
 using ScrapEngine.Db;
 using ScrapEngine.Model;
+using ScrapEngine.Model.ScrapXml;
 using System;
 using WebCommon.Error;
 using WebCommon.PathHelp;
@@ -21,6 +22,9 @@ namespace WebScrapper
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            DXmlReader<WebDataElement> test = new DXmlReader<WebDataElement>();
+            test.Read(@"ScrapperApps\AppCountry\Scrap\CountryScrap.xml");
+
             logger.Info("Start of the Application Data Scrapper");
 
             // Parse arguments
