@@ -6,6 +6,8 @@ namespace ScrapEngine.Model
 {
     public class ReplaceElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The data node
         /// </summary>
@@ -18,9 +20,6 @@ namespace ScrapEngine.Model
         [DXmlAttribute(ScrapXmlConsts.OutAttributeName, IsMandatory = true)]
         public string OutString { get; set; }
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public ReplaceElement() { }
+        #endregion Xml Attributes
     }
 }

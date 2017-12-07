@@ -13,6 +13,8 @@ namespace ScrapEngine.Model.ScrapXml
     /// </summary>
     public class RegexReplaceElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The data node
         /// </summary>
@@ -25,12 +27,6 @@ namespace ScrapEngine.Model.ScrapXml
         [DXmlAttribute(ScrapXmlConsts.ReplaceAttributeName)]
         public string Replace { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public RegexReplaceElement()
-        {
-            Replace = string.Empty;
-        }
+        #endregion Xml Attributes
     }
 }

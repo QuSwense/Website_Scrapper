@@ -16,7 +16,7 @@ namespace ScrapEngine.Model.ScrapXml
         /// <summary>
         /// The name of the table from which the data to be validated
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.QueryAttributeName)]
+        [DXmlAttribute(ScrapXmlConsts.QueryAttributeName, IsMandatory = true)]
         public string Query { get; set; }
 
         /// <summary>

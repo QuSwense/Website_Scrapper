@@ -9,15 +9,14 @@ namespace ScrapEngine.Model
     /// </summary>
     public class TrimElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The data
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.DataAttributeName)]
         public string Data { get; set; }
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public TrimElement() { }
+        #endregion Xml Attributes
     }
 }

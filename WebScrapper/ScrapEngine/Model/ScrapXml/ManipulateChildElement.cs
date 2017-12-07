@@ -9,7 +9,7 @@ namespace ScrapEngine.Model.ScrapXml
     /// The base class for Manipulate child items
     /// This class is required to store the type of Child node information
     /// </summary>
-    public class ManipulateChildElement : IColumnChild
+    public class ManipulateChildElement
     {
         #region References
 
@@ -19,14 +19,5 @@ namespace ScrapEngine.Model.ScrapXml
         public ColumnElement Parent { get; set; }
 
         #endregion References
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public ManipulateChildElement() { }
-
-        #endregion Constructor
     }
 }

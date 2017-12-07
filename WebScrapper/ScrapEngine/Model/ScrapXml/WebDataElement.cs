@@ -15,13 +15,16 @@ namespace ScrapEngine.Model.ScrapXml
     [DXmlElement(ScrapXmlConsts.WebDataNodeName)]
     public class WebDataElement
     {
+        #region References
+
+        /// <summary>
+        /// A Root node may contain different type of Scrap class elements which has same base type
+        /// <see cref="ScrapElement"/>
+        /// </summary>
         [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, DerivedType = typeof(ScrapCsvElement))]
         [DXmlElement(ScrapXmlConsts.ScrapHtmlTableNodeName, DerivedType = typeof(ScrapHtmlTableElement))]
         public List<ScrapElement> Scraps { get; set; }
 
-        public WebDataElement()
-        {
-            Scraps = new List<ScrapElement>();
-        }
+        #endregion References
     }
 }

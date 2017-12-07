@@ -146,6 +146,7 @@
     <Compile Include="Model\Parser\ColumnScrapIteratorFileArgs.cs" />
     <Compile Include="Model\Parser\ColumnScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\ScrapXml\ColumnElement.cs" />
+    <Compile Include="Model\ScrapXml\ManipulateElement.cs" />
     <Compile Include="Model\ScrapXml\PurgeElement.cs" />
     <Compile Include="Model\ScrapXml\RegexElement.cs" />
     <Compile Include="Model\ScrapXml\RegexReplaceElement.cs" />

@@ -10,6 +10,8 @@ namespace ScrapEngine.Model
     /// </summary>
     public class RegexElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The data node
         /// </summary>
@@ -21,7 +23,11 @@ namespace ScrapEngine.Model
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
         public string IndexString { get; set; }
-        
+
+        #endregion Xml Attributes
+
+        #region Calculated
+
         /// <summary>
         /// The index of the regex matched groups. '*'(-1) for all of them 
         /// The index of the last elelment is represented by -2.
@@ -37,6 +43,10 @@ namespace ScrapEngine.Model
             }
         }
 
+        #endregion Calculated
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -44,5 +54,7 @@ namespace ScrapEngine.Model
         {
             IndexString = "0";
         }
+
+        #endregion Constructor
     }
 }

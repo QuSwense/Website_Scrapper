@@ -12,6 +12,8 @@ namespace ScrapEngine.Model
     /// </summary>
     public class SplitElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The split string by which the scrapped data needs to be splitted
         /// </summary>
@@ -31,6 +33,10 @@ namespace ScrapEngine.Model
         [DXmlAttribute(ScrapXmlConsts.IndexAttributeName)]
         public string IndexString { get; set; }
 
+        #endregion Xml Attributes
+
+        #region Calculated
+
         /// <summary>
         /// The index of the split groups. '*'(-1) for all of them.
         /// The index of the last elelment is represented by -2.
@@ -46,6 +52,10 @@ namespace ScrapEngine.Model
             }
         }
 
+        #endregion Calculated
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -54,5 +64,7 @@ namespace ScrapEngine.Model
             IndexString = "0";
             SplitAsString = false;
         }
+
+        #endregion Constructor
     }
 }

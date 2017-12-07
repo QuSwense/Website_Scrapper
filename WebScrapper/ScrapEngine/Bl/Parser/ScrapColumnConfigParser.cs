@@ -164,11 +164,11 @@ namespace ScrapEngine.Bl.Parser
         {
             logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", 
                 columnConfig.Name, manipulateHtml.OriginalValue);
-            
+
             // Even if Scrapped data is null send to manipulation tag. As there can be a default
-            if (columnConfig.Manipulations != null && columnConfig.Manipulations.Count > 0)
+            if (columnConfig.Manipulation != null && columnConfig.Manipulation.Manipulations.Count > 0)
             {
-                foreach (var manipulateChild in columnConfig.Manipulations)
+                foreach (var manipulateChild in columnConfig.Manipulation.Manipulations)
                 {
                     manipulateChildFactory.GetParser(manipulateChild).Process(manipulateHtml, manipulateChild);
                 }

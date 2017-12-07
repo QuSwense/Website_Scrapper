@@ -346,7 +346,7 @@ namespace ScrapEngine.Bl.Parser
             SplitElement splitElement = xmlDocReader.ReadElement<SplitElement>(manipulateNode);
             splitElement.Data = Normalize(splitElement.Data);
             splitElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(splitElement);
+            columnScrap.Manipulation.Manipulations.Add(splitElement);
         }
 
         /// <summary>
@@ -359,7 +359,7 @@ namespace ScrapEngine.Bl.Parser
             TrimElement trimElement = xmlDocReader.ReadElement<TrimElement>(manipulateNode);
             trimElement.Data = Normalize(trimElement.Data);
             trimElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(trimElement);
+            columnScrap.Manipulation.Manipulations.Add(trimElement);
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace ScrapEngine.Bl.Parser
             RegexElement regexElement = xmlDocReader.ReadElement<RegexElement>(manipulateNode);
             regexElement.Pattern = Normalize(regexElement.Pattern);
             regexElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(regexElement);
+            columnScrap.Manipulation.Manipulations.Add(regexElement);
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace ScrapEngine.Bl.Parser
             replaceElement.InString = Normalize(replaceElement.InString);
             replaceElement.OutString = Normalize(replaceElement.OutString);
             replaceElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(replaceElement);
+            columnScrap.Manipulation.Manipulations.Add(replaceElement);
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace ScrapEngine.Bl.Parser
             regexReplaceElement.Pattern = Normalize(regexReplaceElement.Pattern);
             regexReplaceElement.Replace = Normalize(regexReplaceElement.Replace);
             regexReplaceElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(regexReplaceElement);
+            columnScrap.Manipulation.Manipulations.Add(regexReplaceElement);
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace ScrapEngine.Bl.Parser
         {
             ValidateElement validateElement = xmlDocReader.ReadElement<ValidateElement>(manipulateNode);
             validateElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(validateElement);
+            //columnScrap.Manipulation.Manipulations.Add(validateElement);
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace ScrapEngine.Bl.Parser
         {
             PurgeElement purgeElement = xmlDocReader.ReadElement<PurgeElement>(manipulateNode);
             purgeElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(purgeElement);
+            columnScrap.Manipulation.Manipulations.Add(purgeElement);
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace ScrapEngine.Bl.Parser
         {
             HtmlDecodeElement htmlDecodeElement = xmlDocReader.ReadElement<HtmlDecodeElement>(manipulateNode);
             htmlDecodeElement.Parent = columnScrap;
-            columnScrap.Manipulations.Add(htmlDecodeElement);
+            columnScrap.Manipulation.Manipulations.Add(htmlDecodeElement);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace ScrapEngine.Bl.Parser
             dbchangeElement.Parent = columnScrap;
 
             ParseSelectElement(dbchangeElement, manipulateNode);
-            columnScrap.Manipulations.Add(dbchangeElement);
+            columnScrap.Manipulation.Manipulations.Add(dbchangeElement);
         }
 
         /// <summary>

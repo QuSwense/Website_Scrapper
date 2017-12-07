@@ -5,6 +5,9 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
+    /// <summary>
+    /// Base class for any Scrap type element
+    /// </summary>
     public abstract class ScrapElement
     {
         #region Xml Attributes
@@ -22,7 +25,7 @@ namespace ScrapEngine.Model
         public string Name { get; set; }
 
         /// <summary>
-        /// The url
+        /// The url value present in the xml config
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.UrlAttributeName)]
         public string UrlOriginal { get; set; }
@@ -38,7 +41,9 @@ namespace ScrapEngine.Model
         #region Calculated
 
         /// <summary>
-        /// Get the level with respect to the parent Scrap node
+        /// Get the level of the node wrt the parent scrap nodes.
+        /// It does not get the actual level of the node in the xml config.
+        /// It gets the level of the Scrap node under other scrap nodes.
         /// </summary>
         public int Level
         {
@@ -57,59 +62,55 @@ namespace ScrapEngine.Model
         }
 
         /// <summary>
-        /// The name of the table
+        /// Get The name of the table defined at any level. It returns the
+        /// first name encountered in the scrap
         /// </summary>
         public string TableName
         {
             get
             {
                 ScrapElement tmpObj = this;
-
                 while (tmpObj != null)
                 {
-                    if (!string.IsNullOrEmpty(tmpObj.Name))
-                    {
-                        return tmpObj.Name;
-                    }
-
+                    if (!string.IsNullOrEmpty(tmpObj.Name)) return tmpObj.Name;
                     tmpObj = tmpObj.Parent;
                 }
-
                 return string.Empty;
             }
         }
 
         /// <summary>
-        /// The id of the node
+        /// The id of the scrap nodes. There is only one id attribute defined at
+        /// the parent level of a scrap node
         /// </summary>
         public string Id
         {
             get
             {
                 ScrapElement tmpObj = this;
-
                 while (tmpObj != null)
                 {
-                    if (!string.IsNullOrEmpty(tmpObj.IdString))
-                    {
-                        return tmpObj.IdString;
-                    }
-
+                    if (!string.IsNullOrEmpty(tmpObj.IdString)) return tmpObj.IdString;
                     tmpObj = tmpObj.Parent;
                 }
-
                 return string.Empty;
             }
         }
 
+        /// <summary>
+        /// Stores the actual value of the Url. The original url contains the value stored in 
+        /// xml config file which might have parameters.
+        /// </summary>
         public string UrlCalculated { get; set; }
 
+        /// <summary>
+        /// Get the Url value
+        /// </summary>
         public string Url
         {
             get
             {
-                if (!string.IsNullOrEmpty(UrlCalculated)) return UrlCalculated;
-                else return UrlOriginal;
+                return (!string.IsNullOrEmpty(UrlCalculated))? UrlCalculated: UrlOriginal;
             }
         }
 
@@ -133,13 +134,12 @@ namespace ScrapEngine.Model
         [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, typeof(ScrapCsvElement))]
         public List<ScrapElement> Scraps { get; set; }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public ScrapElement()
         {
-            Scraps = new List<ScrapElement>();
-            Columns = new List<ColumnElement>();
             DoUpdateOnly = false;
         }
-
-        
     }
 }

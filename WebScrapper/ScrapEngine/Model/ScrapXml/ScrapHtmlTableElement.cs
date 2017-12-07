@@ -4,19 +4,18 @@ using WebReader.Model;
 namespace ScrapEngine.Model
 {
     /// <summary>
-    /// The root element of the scrap xml config
+    /// The element of the scrap html table xml config
     /// </summary>
     public class ScrapHtmlTableElement : ScrapElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The Xpath
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.XPathAttributeName, IsMandatory = true)]
         public string XPath { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public ScrapHtmlTableElement() { }
+        #endregion Xml Attributes
     }
 }

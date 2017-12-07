@@ -14,6 +14,8 @@ namespace ScrapEngine.Model.ScrapXml
     /// </summary>
     public class PurgeElement : ManipulateChildElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// It is a check that if the data is empty or null then remove it from to be used
         /// </summary>
@@ -26,6 +28,10 @@ namespace ScrapEngine.Model.ScrapXml
         [DXmlAttribute(ScrapXmlConsts.IsWhitespaceAttributeName)]
         public bool IsWhitespace { get; set; }
 
+        #endregion Xml Attributes
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -34,5 +40,7 @@ namespace ScrapEngine.Model.ScrapXml
             IsEmptyOrNull = false;
             IsWhitespace = false;
         }
+
+        #endregion Constructor
     }
 }

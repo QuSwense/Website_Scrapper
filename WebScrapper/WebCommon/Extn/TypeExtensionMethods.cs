@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -30,6 +31,19 @@ namespace WebCommon.Extn
         public static T GetCustomAttribute<T>(this PropertyInfo prop)
         {
             return (T)prop.GetCustomAttributes(typeof(T), false).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// This extension method checks if there are any Custom attributes presetn foir a Property type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        public static bool HasCustomAttributes<T>(this PropertyInfo prop)
+            where T: Attribute
+        {
+            List<T> attrAttributes = prop.GetCustomAttributes<T>().ToList();
+            return attrAttributes != null && attrAttributes.Count > 0;
         }
 
         /// <summary>

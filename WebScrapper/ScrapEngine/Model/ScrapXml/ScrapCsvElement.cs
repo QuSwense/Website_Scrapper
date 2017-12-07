@@ -4,8 +4,13 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model
 {
+    /// <summary>
+    /// Used to fetch a csv/text file from html page and scrap the data
+    /// </summary>
     public class ScrapCsvElement : ScrapElement
     {
+        #region Xml Attributes
+
         /// <summary>
         /// The Xpath
         /// </summary>
@@ -18,10 +23,19 @@ namespace ScrapEngine.Model
         [DXmlAttribute(ScrapXmlConsts.SkipFirstAttributeName)]
         public int SkipFirstLines { get; set; }
 
+        #endregion Xml Attributes
+
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public ScrapCsvElement()
         {
             SkipFirstLines = 0;
             Delimiter = ASCIICharacters.TabString;
         }
+
+        #endregion Constructor
     }
 }

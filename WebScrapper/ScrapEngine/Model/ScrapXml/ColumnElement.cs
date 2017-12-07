@@ -8,7 +8,7 @@ using WebReader.Model;
 namespace ScrapEngine.Model
 {
     /// <summary>
-    /// REafs to a column of the table to store the data scrapped
+    /// The class for a column of the table to store the data scrapped
     /// </summary>
     public class ColumnElement
     {
@@ -46,7 +46,6 @@ namespace ScrapEngine.Model
 
         [DXmlAttribute(ScrapXmlConsts.SkipIfValueAttributeName)]
         public string SkipIfValueString { get; set; }
-        public List<string> SkipIfValues { get; set; }
 
         /// <summary>
         /// Defines the cardinality of a relationship with other columns
@@ -57,12 +56,20 @@ namespace ScrapEngine.Model
         [DXmlAttribute(ScrapXmlConsts.CardinalAttributeName)]
         public string CardinalString { get; set; }
 
+        /// <summary>
+        /// States the level of the scrap node to pick the value from
+        /// </summary>
         [DXmlAttribute(ScrapXmlConsts.LevelAttributeName)]
         public int Level { get; set; }
 
         #endregion Xml Attributes
 
         #region Calculated
+
+        /// <summary>
+        /// A list of values which if matches with the scrapped data then skip the whole row and do not store
+        /// </summary>
+        public List<string> SkipIfValues { get; set; }
 
         /// <summary>
         /// The integer value for the Cardinal type
@@ -80,30 +87,19 @@ namespace ScrapEngine.Model
         #endregion Calculated
 
         #region References
-
-        //public enum EChildType
-        //{
-        //    Manipulate,
-        //    Validate,
-        //    Purge
-        //}
-
+        
         /// <summary>
         /// The manipulate tag
         /// </summary>
         [DXmlElement(ScrapXmlConsts.ManipulateNodeName)]
-        public List<ManipulateChildElement> Manipulations { get; set; }
+        public ManipulateElement Manipulation { get; set; }
 
-        ///// <summary>
-        ///// The validation tags
-        ///// </summary>
-        //[DXmlElement(ScrapXmlConsts.ValidateNodeName)]
-        //public List<ValidateElement> Validations { get; set; }
-
-        //[DXmlElement(ScrapXmlConsts.PurgeNodeName)]
-        //public PurgeElement Purge { get; set; }
-
-        //public List<EChildType> ChildOrders { get; set; }
+        /// <summary>
+        /// The validation tag to validate the column data just scrapped
+        /// It is generally better to use it after all manipulations are done.
+        /// </summary>
+        [DXmlElement(ScrapXmlConsts.ValidateNodeName)]
+        public ValidateElement Validate { get; set; }
 
         /// <summary>
         /// The parent node
@@ -119,12 +115,10 @@ namespace ScrapEngine.Model
         /// </summary>
         public ColumnElement()
         {
-            Manipulations = new List<ManipulateChildElement>();
             CardinalString = "1";
             Index = -1;
             Level = -1;
             IsUnique = false;
-            SkipIfValues = new List<string>();
         }
 
         #endregion Constructor
