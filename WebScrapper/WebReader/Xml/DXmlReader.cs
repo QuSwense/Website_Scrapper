@@ -26,7 +26,7 @@ namespace WebReader.Xml
         /// The xml reader object which is used for parsing
         /// </summary>
         private XmlReader xmlReader;
-        
+
         /// <summary>
         /// The root class object instance.
         /// Access this object after the parsing of the xml file completed
@@ -38,9 +38,11 @@ namespace WebReader.Xml
         /// </summary>
         public class State
         {
-            public DXmlElementAttribute elemAttribute;
+            public DXmlElementAttribute elemPropertyAttribute;
             public Type instanceType;
             public object instanceObj;
+            public PropertyInfo propInfo;
+            public int Accessed = 0;
         }
 
         /// <summary>
@@ -62,15 +64,19 @@ namespace WebReader.Xml
             // This value signifies the child / parent / sibling nodes
             int currentDepth = xmlReader.Depth;
 
+            if (Root == null) Root = new T();
+
             // Stack the starting root node
             stackStates.Push(new State()
             {
                 instanceType = typeof(T),
-                instanceObj = Root
+                instanceObj = Root,
+                Accessed = 1
             });
 
             // Main loop
             while (xmlReader.Read())
+            {
                 if (xmlReader.IsStartElement())
                 {
                     // Signifies child node
@@ -78,13 +84,7 @@ namespace WebReader.Xml
                     {
                         // One of the child element of the current instance 
                         // should be initialized
-                        FetchChildElementInstance(xmlReader);
-                    }
-                    // Signifies parent node
-                    else if(currentDepth > xmlReader.Depth)
-                    {
-                        //instanceObj = stackInstanceObj.Pop();
-                        //instanceObj = FetchChildElementInstance(instanceObj, xmlReader);
+                        stackStates.Push(FetchChildElementInstance(xmlReader, stackStates.Peek()));
                     }
                     // Signifies sibling node
                     else
@@ -94,8 +94,85 @@ namespace WebReader.Xml
                     ParseAttributes();
                     currentDepth = xmlReader.Depth;
                 }
-                else if(xmlReader.NodeType == XmlNodeType.EndElement)
+                else if (xmlReader.NodeType == XmlNodeType.EndElement)
+                {
                     stackStates.Pop();
+                    currentDepth--;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fetch and process the sibling node
+        /// At this time the current object should be initialized
+        /// </summary>
+        /// <param name="xmlReader"></param>
+        public void FetchElementInstance(XmlReader xmlReader)
+        {
+            // Fetch the current state in the stack
+            // This is actually the previous processed state
+            State previousState = stackStates.Peek();
+
+            Type type = previousState.instanceObj.GetType();
+
+            // Check if the type is not list but is accessed multiple times
+            if (previousState.Accessed > 1 &&
+                !(type.IsGenericType &&
+                    (type.GetGenericTypeDefinition() == typeof(List<>))))
+                throw new Exception();
+
+            if (previousState.propInfo != null)
+            {
+                DXmlElementAttribute elemAttribute = GetElementAttribute(previousState.propInfo, xmlReader.Name);
+
+                if (elemAttribute == null)
+                {
+                    // It might be another sibling of parent object
+                    State parentState = stackStates.ElementAt(1);
+                    object actualParentInstanceObj = GetActualInstance(parentState);
+                    PropertyInfo[] propInfos = GetAllPropertiesForElement(actualParentInstanceObj.GetType());
+
+                    if (propInfos != null && propInfos.Length > 0)
+                    {
+                        foreach (PropertyInfo propInfo in propInfos)
+                        {
+                            elemAttribute = GetElementAttribute(propInfo, xmlReader.Name);
+                            if (elemAttribute != null)
+                            {
+                                CreateAndInitializeProperty(propInfo, actualParentInstanceObj, elemAttribute);
+
+                                previousState.elemPropertyAttribute = elemAttribute;
+                                previousState.instanceObj = propInfo.GetValue(actualParentInstanceObj);
+                                previousState.instanceType = propInfo.PropertyType;
+                                previousState.Accessed++;
+                                previousState.propInfo = propInfo;
+                            }
+                        }
+                    }
+                    else
+                        throw new Exception();
+                }
+
+                if (type.IsGenericType &&
+                        (type.GetGenericTypeDefinition() == typeof(List<>)))
+                {
+                    previousState.Accessed++;
+                    Type[] genericType = type.GetGenericArguments();
+
+                    if (genericType != null && genericType.Length > 0)
+                    {
+                        object valueObj = null;
+                        if (elemAttribute.DerivedType != null)
+                            valueObj = Activator.CreateInstance(elemAttribute.DerivedType);
+                        else
+                            valueObj = Activator.CreateInstance(genericType[0]);
+
+                        if (type.IsGenericType &&
+                            (type.GetGenericTypeDefinition() == typeof(List<>)))
+                            ((IList)previousState.instanceObj).Add(valueObj);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -103,13 +180,9 @@ namespace WebReader.Xml
         /// This method uses the Stack to get the current state
         /// </summary>
         /// <param name="xmlReader"></param>
-        private void FetchChildElementInstance(XmlReader xmlReader)
+        private State FetchChildElementInstance(XmlReader xmlReader, State previousState)
         {
-            // Fetch the current state in the stack
-            // This is actually the previous processed state
-            State currentState = stackStates.Peek();
-
-            object actualParentInstanceObj = GetActualInstance(currentState);
+            object actualParentInstanceObj = GetActualInstance(previousState);
             PropertyInfo[] propInfos = GetAllPropertiesForElement(actualParentInstanceObj.GetType());
 
             if (propInfos != null && propInfos.Length > 0)
@@ -119,24 +192,16 @@ namespace WebReader.Xml
                     DXmlElementAttribute elemAttribute = GetElementAttribute(propInfo, xmlReader.Name);
                     if (elemAttribute != null)
                     {
-                        //object value = propInfo.GetValue(actualParentInstanceObj);
-                        //if (value == null)
-                        //{
-                        //    value = Activator.CreateInstance(propInfo.PropertyType);
-                        //    propInfo.SetValue(actualParentInstanceObj, value);
-                        //}
+                        CreateAndInitializeProperty(propInfo, actualParentInstanceObj, elemAttribute);
 
-                        State childState = new State()
+                        return new State()
                         {
-                            elemAttribute = elemAttribute,
+                            elemPropertyAttribute = elemAttribute,
                             instanceObj = propInfo.GetValue(actualParentInstanceObj),
-                            instanceType = propInfo.PropertyType
+                            instanceType = propInfo.PropertyType,
+                            Accessed = 1,
+                            propInfo = propInfo
                         };
-
-                        GetNewInstance(childState);
-
-                        stackStates.Push(childState);
-                        return;
                     }
                 }
             }
@@ -145,28 +210,42 @@ namespace WebReader.Xml
         }
 
         /// <summary>
-        /// Fetch and process the sibling node
+        /// Create the property if its null.
+        /// It also creates a list type. In case of object it may use Derived type
         /// </summary>
-        /// <param name="xmlReader"></param>
-        public void FetchElementInstance(XmlReader xmlReader)
+        /// <param name="propInfo"></param>
+        /// <param name="actualParentInstanceObj"></param>
+        /// <param name="elemAttribute"></param>
+        private void CreateAndInitializeProperty(PropertyInfo propInfo, object actualParentInstanceObj,
+            DXmlElementAttribute elemAttribute)
         {
-            State currentState = stackStates.Peek();
+            object value = propInfo.GetValue(actualParentInstanceObj);
 
-            if (!(currentState.instanceObj == null || currentState.instanceObj is IList))
-                throw new Exception();
-            if (currentState.instanceType == null)
-                throw new Exception();
-
-            if(currentState.elemAttribute == null)
+            // If the property is null create a new instance
+            if (value == null)
             {
-                List<DXmlElementAttribute> elemAttributes = 
-                    currentState.instanceType.GetCustomAttributes<DXmlElementAttribute>().ToList();
-                currentState.elemAttribute = elemAttributes.Where(p => p.Name == xmlReader.Name).FirstOrDefault();
+                propInfo.SetValue(actualParentInstanceObj,
+                        Activator.CreateInstance(
+                            (elemAttribute.DerivedType != null && !propInfo.PropertyType.IsGenericListType()) ?
+                            elemAttribute.DerivedType : propInfo.PropertyType));
+                value = propInfo.GetValue(actualParentInstanceObj);
             }
 
-            GetNewInstance(currentState);
+            // If the property is list type create a new instance and add it
+            if (propInfo.PropertyType.IsGenericListType())
+            {
+                Type[] genericType = propInfo.PropertyType.GetGenericArguments();
+
+                if (genericType != null && genericType.Length > 0)
+                {
+                    object valueObj = Activator.CreateInstance(
+                            (elemAttribute.DerivedType != null) ?
+                            elemAttribute.DerivedType : genericType[0]);
+                    ((IList)value).Add(valueObj);
+                }
+            }
         }
-        
+
         /// <summary>
         /// Fetch and parse the attributes of the node and assign the values to the instance object properties
         /// Assumed that the properties are public
@@ -199,33 +278,28 @@ namespace WebReader.Xml
         /// <returns></returns>
         private void GetNewInstance(State currentState)
         {
-            if (currentState.instanceType.IsGenericType && 
+            if (currentState.instanceType.IsGenericType &&
                 (currentState.instanceType.GetGenericTypeDefinition() == typeof(List<>)))
             {
-                if(currentState.instanceObj == null)
-                {
-                    currentState.instanceObj = Activator.CreateInstance(currentState.instanceType);
-                }
-
                 Type[] genericType = currentState.instanceType.GetGenericArguments();
 
                 if (genericType != null && genericType.Length > 0)
                 {
                     object valueObj = null;
-                    if (currentState.elemAttribute.DerivedType != null)
-                        valueObj = Activator.CreateInstance(currentState.elemAttribute.DerivedType);
+                    if (currentState.elemPropertyAttribute.DerivedType != null)
+                        valueObj = Activator.CreateInstance(currentState.elemPropertyAttribute.DerivedType);
                     else
                         valueObj = Activator.CreateInstance(genericType[0]);
                     ((IList)currentState.instanceObj).Add(valueObj);
                 }
             }
-            else
-            {
-                if (currentState.elemAttribute.DerivedType != null)
-                    currentState.instanceObj = Activator.CreateInstance(currentState.elemAttribute.DerivedType);
-                else
-                    currentState.instanceObj = Activator.CreateInstance(currentState.instanceType);
-            }
+            //else
+            //{
+            //    if (currentState.elemAttribute.DerivedType != null)
+            //        currentState.instanceObj = Activator.CreateInstance(currentState.elemAttribute.DerivedType);
+            //    else
+            //        currentState.instanceObj = Activator.CreateInstance(currentState.instanceType);
+            //}
         }
 
         /// <summary>

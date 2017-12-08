@@ -1,42 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
-  <ScrapHtmlTable id="all_currencies" name="crncy" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
-    <Column name="iso4217" xpath="td[1]" isunique="true"></Column>
-    <Column name="nm" xpath="td[2]">
-      <Manipulate>
-        <HtmlDecode />
-      </Manipulate>
-    </Column>
-  </ScrapHtmlTable>
-  <ScrapHtmlTable id="currrencies_details" name="crncy" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
-    <ScrapHtmlTable xpath="//div[@id='contentL']/div[3]" url="{parentValue}//td[1]/a/@href" type="table">
-      <Column name="iso4217" xpath="td[1]" isunique="true" level="0"></Column>
-      <Column name="symbl" xpath="./div[1]/p[2]/text()[2]"></Column>
-      <Column name="mnrunm" xpath="./div[1]/p[3]/text()[2]">
+  <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">
+    <ScrapHtmlTable xpath="//body/div[2]/table[1]" url="@{parentValue}">
+      <Column name="iso31661a2" xpath=".//tr[2]/td[2]" isunique="true">
         <Manipulate>
-          <Split data="=" index="1"></Split>
+          <Split data="," index="0"></Split>
+          <Trim />
         </Manipulate>
       </Column>
-      <Column name="cntrlbnk" xpath="./div[2]/p[4]/text()[2]"></Column>
-    </ScrapHtmlTable>
-  </ScrapHtmlTable>
-  <ScrapHtmlTable id="currency_country" name="crncycntry" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]/a/@href">
-    <ScrapHtmlTable xpath="//div[@id='contentL']/div[3]">
-      <Column name="iso4217" xpath="./div/div" isunique="true">
+      <Column name="iso6392" xpath=".//tr[8]/td[2]" cardinal="*" isunique="true">
         <Manipulate>
-          <Split data=" " index="0"></Split>
+          <Split data="," index="*"></Split>
+          <Regex pattern="(?&lt;=\()(.*?)(?=\))" index="last">
+          </Regex>
+          <Split data="-" index="0" />
+          <Trim />
+          <Purge isemptyornull="true"/>
+          <Dbchange isexists="SELECT iso6392 FROM lang WHERE iso6391 = {data}">
+            <Select isemptyornull="false"/>
+          </Dbchange>
         </Manipulate>
+        <Validate table="lang" col="iso6392" />
       </Column>
-      <Column name="iso31661a2" xpath="./div[2]/p[6]/text()[2]" isunique="1">
-      </Column>
-    </ScrapHtmlTable>
-  </ScrapHtmlTable>
-  <ScrapHtmlTable id="all_languages_country_names" name="cntrynm" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]//td[5]/@href">
-    <ScrapHtmlTable xpath="//body/div[2]/table[1]//tr[1]/td[2]/a/@href">
-      <ScrapHtmlTable xpath="(//table[@id='altnametable']//tr)[position()>1]">
-        <Column name="nm" xpath="td[1]" isunique="true"></Column>
-        <Column name="iso6391" xpath="td[3]" isunique="true"></Column>
-      </ScrapHtmlTable>
     </ScrapHtmlTable>
   </ScrapHtmlTable>
 </WebData>

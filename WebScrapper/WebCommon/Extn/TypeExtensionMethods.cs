@@ -58,6 +58,17 @@ namespace WebCommon.Extn
         }
 
         /// <summary>
+        /// Check if the type is a generic list
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsGenericListType(this Type type)
+        {
+            return type.IsGenericType &&
+                    (type.GetGenericTypeDefinition() == typeof(List<>));
+        }
+
+        /// <summary>
         /// Convert method to convert from one type to another for class <see cref="Type"/>
         /// </summary>
         /// <param name="type"></param>

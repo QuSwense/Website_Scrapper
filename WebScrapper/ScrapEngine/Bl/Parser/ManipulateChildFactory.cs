@@ -36,11 +36,6 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         private ScrapPurgeConfigParser scrapPurgeConfigParser;
 
-        /// <summary>
-        /// Regex Replace Manipulate parser
-        /// </summary>
-        private ScrapValidateConfigParser scrapValidateConfigParser;
-
         private ScrapDbChangeConfigParser scrapDbChangeConfigParser;
         private ScrapHtmlDecodeConfigParser scrapHtmlDecodeConfigParser;
 
@@ -56,7 +51,6 @@ namespace ScrapEngine.Bl.Parser
             scrapRegexConfigParser = new ScrapRegexConfigParser(configParser);
             scrapRegexReplaceParser = new ScrapRegexReplaceParser(configParser);
             scrapPurgeConfigParser = new ScrapPurgeConfigParser(configParser);
-            scrapValidateConfigParser = new ScrapValidateConfigParser(configParser);
             scrapDbChangeConfigParser = new ScrapDbChangeConfigParser(configParser);
             scrapHtmlDecodeConfigParser = new ScrapHtmlDecodeConfigParser(configParser);
         }
@@ -80,8 +74,6 @@ namespace ScrapEngine.Bl.Parser
                 return scrapRegexReplaceParser;
             else if (manipulateChild is PurgeElement)
                 return scrapPurgeConfigParser;
-            else if (manipulateChild is ValidateElement)
-                return scrapValidateConfigParser;
             else if (manipulateChild is DbchangeElement)
                 return scrapDbChangeConfigParser;
             else if (manipulateChild is HtmlDecodeElement)
