@@ -3,7 +3,6 @@ using log4net;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace ScrapEngine.Bl.Parser
 {

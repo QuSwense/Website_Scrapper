@@ -15,6 +15,7 @@ namespace ScrapEngine.Model
         /// The Xpath
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.DelimiterAttributeName, IsMandatory = true)]
+        [DXmlNormalize]
         public string Delimiter { get; set; }
 
         /// <summary>

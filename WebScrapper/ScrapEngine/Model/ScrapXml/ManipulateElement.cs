@@ -1,9 +1,5 @@
 ﻿using ScrapEngine.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
@@ -14,6 +10,8 @@ namespace ScrapEngine.Model.ScrapXml
     [DXmlElement(ScrapXmlConsts.ManipulateNodeName)]
     public class ManipulateElement
     {
+        #region References
+
         /// <summary>
         /// Child manipulation nodes
         /// </summary>
@@ -25,6 +23,14 @@ namespace ScrapEngine.Model.ScrapXml
         [DXmlElement(ScrapXmlConsts.ReplaceNodeName, typeof(ReplaceElement))]
         [DXmlElement(ScrapXmlConsts.SplitNodeName, typeof(SplitElement))]
         [DXmlElement(ScrapXmlConsts.TrimNodeName, typeof(TrimElement))]
-        public List<ManipulateChildElement> Manipulations { get; set; }
+        public List<ManipulateChildElement> ManipulateChilds { get; set; }
+
+        /// <summary>
+        /// Points to the parent scrap node
+        /// </summary>
+        [DXmlParent]
+        public ColumnElement Parent { get; set; }
+
+        #endregion References
     }
 }

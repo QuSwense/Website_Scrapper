@@ -1,5 +1,82 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
+  <ScrapHtmlTable id="unsd_countries" name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="(//table[@id='GeoGroupsENG']/tr)[position() > 1]" >
+    <Column name="m49" xpath="./@data-tt-id" isunique="1"></Column>
+    <Column name="nm" xpath="td[1]"></Column>
+    <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
+    <Column name="iso31661a3" xpath="td[3]"></Column>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="unsd_genc_link" name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="(//ul[@id='GetAppendix_D']/li//tr)[position() > 1]" doupdateonly="true">
+    <Column name="nm" xpath="td[1]/a" isunique="1">
+      <Manipulate>
+        <Trim data="\n"></Trim>
+        <Trim data="\t"></Trim>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="genc_2a" xpath="td[2]"></Column>
+    <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="iso3166_no" xpath="td[3]/table//tr[1]/td[3]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="stanag" xpath="td[4]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+      </Manipulate>
+    </Column>
+    <Column name="tld" xpath="td[5]">
+      <Manipulate>
+        <Trim data="-"></Trim>
+        <Split data="." index="1"></Split>
+      </Manipulate>
+    </Column>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="iso3166_countries" name="rgn" url="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2" xpath="(//div[@class='mw-parser-output']/table[3]//tr)[position()>1]" doupdateonly="true">
+    <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
+    <Column name="iso31661a2yrentr" xpath="td[3]"></Column>
+  </ScrapHtmlTable>
+  <ScrapCsv id="countries_genc" name="rgn" url="https://evs.nci.nih.gov/ftp1/FDA/GENC/NCIt-GENC_Terminology.txt" doupdateonly="true" delimiter="\t" skipfirst="1">
+    <Column name="genc_2a" index="3" isunique="1"></Column>
+    <Column name="genc_3a" index="4"></Column>
+    <Column name="genc_no" index="5"></Column>
+  </ScrapCsv>
+  <ScrapHtmlTable id="countries_geonames" name="rgn" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position() > 1]" doupdateonly="true">
+    <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
+    <Column name="iso3166_no" xpath="td[3]"></Column>
+    <Column name="fips" xpath="td[4]"></Column>
+    <Column name="ttlareakm2_geonm" xpath="td[7]">
+      <Manipulate>
+        <Replace in="," out=""></Replace>
+      </Manipulate>
+    </Column>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="all_languages" name="lang" url="http://www.loc.gov/standards/iso639-2/php/code_list.php" xpath="//body//table//table[1]//tr[position() > 1]">
+    <Column name="iso6392" xpath="td[1]" valueasinnerhtml="true" skipifvalue="zxx">
+      <Manipulate>
+        <Split data="&lt;br&gt;" index="*" splitasstring="true"></Split>
+        <Split data="&lt;br /&gt;" index="*" splitasstring="true"></Split>
+        <RegexReplace pattern="\s+\(.*\)" replace="" />
+      </Manipulate>
+    </Column>
+    <Column name="iso6391" xpath="td[2]">
+      <Manipulate>
+        <HtmlDecode />
+        <Purge isemptyornull="true" iswhitespace="true"/>
+      </Manipulate>
+    </Column>
+    <Column name="nm" xpath="td[3]"></Column>
+  </ScrapHtmlTable>
   <ScrapHtmlTable id="country_languages" name="cntrylang" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]/td[5]/a/@href">
     <ScrapHtmlTable xpath="//body/div[2]/table[1]" url="@{parentValue}">
       <Column name="iso31661a2" xpath=".//tr[2]/td[2]" isunique="true">
@@ -22,6 +99,45 @@
         </Manipulate>
         <Validate table="lang" col="iso6392" />
       </Column>
+    </ScrapHtmlTable>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="all_currencies" name="crncy" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
+    <Column name="iso4217" xpath="td[1]" isunique="true"></Column>
+    <Column name="nm" xpath="td[2]">
+      <Manipulate>
+        <HtmlDecode />
+      </Manipulate>
+    </Column>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="currrencies_details" name="crncy" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]">
+    <ScrapHtmlTable xpath="//div[@id='contentL']/div[3]" url="{parentValue}//td[1]/a/@href" type="table">
+      <Column name="iso4217" xpath="td[1]" isunique="true" level="0"></Column>
+      <Column name="symbl" xpath="./div[1]/p[2]/text()[2]"></Column>
+      <Column name="mnrunm" xpath="./div[1]/p[3]/text()[2]">
+        <Manipulate>
+          <Split data="=" index="1"></Split>
+        </Manipulate>
+      </Column>
+      <Column name="cntrlbnk" xpath="./div[2]/p[4]/text()[2]"></Column>
+    </ScrapHtmlTable>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="currency_country" name="crncycntry" url="http://www.xe.com/iso4217.php" xpath="(//table[@id='currencyTable']//tr)[position()>1]/a/@href">
+    <ScrapHtmlTable xpath="//div[@id='contentL']/div[3]">
+      <Column name="iso4217" xpath="./div/div" isunique="true">
+        <Manipulate>
+          <Split data=" " index="0"></Split>
+        </Manipulate>
+      </Column>
+      <Column name="iso31661a2" xpath="./div[2]/p[6]/text()[2]" isunique="1">
+      </Column>
+    </ScrapHtmlTable>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="all_languages_country_names" name="cntrynm" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position()>1]//td[5]/@href">
+    <ScrapHtmlTable xpath="//body/div[2]/table[1]//tr[1]/td[2]/a/@href">
+      <ScrapHtmlTable xpath="(//table[@id='altnametable']//tr)[position()>1]">
+        <Column name="nm" xpath="td[1]" isunique="true"></Column>
+        <Column name="iso6391" xpath="td[3]" isunique="true"></Column>
+      </ScrapHtmlTable>
     </ScrapHtmlTable>
   </ScrapHtmlTable>
 </WebData>

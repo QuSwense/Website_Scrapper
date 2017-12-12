@@ -1,5 +1,4 @@
 ﻿using ScrapEngine.Common;
-using ScrapEngine.Interfaces;
 using ScrapEngine.Model.ScrapXml;
 using System;
 using System.Collections.Generic;
@@ -104,6 +103,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The parent node
         /// </summary>
+        [DXmlParent]
         public ScrapElement Parent { get; set; }
 
         #endregion References

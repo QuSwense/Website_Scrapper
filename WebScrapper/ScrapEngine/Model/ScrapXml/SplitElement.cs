@@ -18,6 +18,7 @@ namespace ScrapEngine.Model
         /// The split string by which the scrapped data needs to be splitted
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.DataAttributeName, IsMandatory = true)]
+        [DXmlNormalize]
         public string Data { get; set; }
 
         /// <summary>

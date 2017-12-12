@@ -1,13 +1,8 @@
-﻿using HtmlAgilityPack;
-using ScrapEngine.Model;
+﻿using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml;
 using System.Xml.XPath;
 using WebCommon.Error;
-using WebReader.Model;
 
 namespace ScrapEngine.Bl.Parser
 {

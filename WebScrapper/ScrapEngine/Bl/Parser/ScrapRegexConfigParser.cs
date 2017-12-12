@@ -2,8 +2,6 @@
 using ScrapEngine.Model.ScrapXml;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Xml;
 using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser

@@ -20,7 +20,5 @@ namespace ScrapEngine.Bl.Parser
         {
             this.configParser = configParser;
         }
-
-        public virtual void Reset() { }
     }
 }

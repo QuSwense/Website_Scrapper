@@ -39,14 +39,7 @@ namespace ScrapEngine.Interfaces
         void Initialize(IScrapEngineContext parent);
 
         #endregion Constructor
-
-        /// <summary>
-        /// Add or update the data scrapped from the webpages including the metadata information
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="row"></param>
-        void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row);
-
+        
         /// <summary>
         /// To Add all combination of column values
         /// </summary>

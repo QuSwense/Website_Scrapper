@@ -4,12 +4,8 @@ using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System.Collections.Generic;
-using System.Xml;
 using WebCommon.PathHelp;
-using WebReader.Xml;
-using System;
 using ScrapEngine.Common;
-using WebCommon.Error;
 
 namespace ScrapEngine.Bl
 {
@@ -30,12 +26,7 @@ namespace ScrapEngine.Bl
         /// Reference to the parent Web context object
         /// </summary>
         public IScrapHtmlContext WebContext { get; protected set; }
-
-        /// <summary>
-        /// A xml configuration reader
-        /// </summary>
-        public DXmlDocReader XmlConfigReader { get; protected set; }
-
+        
         /// <summary>
         /// The Html helper command class
         /// </summary>
@@ -138,10 +129,11 @@ namespace ScrapEngine.Bl
                 logger.InfoFormat("Parsing Scrap xml node from {0} Xml config {1}",
                     AppTopicPath.AppTopic, AppTopicPath.AppTopicScrap.FullPath);
 
+                if (string.IsNullOrEmpty(rootScrapObj.IdString))
+                    throw new System.Exception();
+
                 Performance.NewChildNode(rootScrapObj.IdString);
-
-                Reset();
-
+                
                 StateModel.AddRootScrapArgsState(GetScrapIteratorArgs(rootScrapObj));
 
                 if (!ConfigScrapElementFactory()) return;
@@ -159,19 +151,16 @@ namespace ScrapEngine.Bl
         /// <param name="rootScrapNode"></param>
         public void ParseChildScrapNodes()
         {
-            // Check if there are any more Scrap Child nodes
-            foreach (ScrapElement scrapObj in StateModel.CurrentScrapIteratorArgs.ScrapConfigObj.Scraps)
+            if (StateModel.CurrentScrapIteratorArgs.ScrapConfigObj.Scraps != null)
             {
-                StateModel.AddNewScrap(GetScrapIteratorArgs(scrapObj));
-                if (!ConfigScrapElementFactory()) return;
-                StateModel.RestoreScrap();
+                // Check if there are any more Scrap Child nodes
+                foreach (ScrapElement scrapObj in StateModel.CurrentScrapIteratorArgs.ScrapConfigObj.Scraps)
+                {
+                    StateModel.AddNewScrap(GetScrapIteratorArgs(scrapObj));
+                    if (!ConfigScrapElementFactory()) return;
+                    StateModel.RestoreScrap();
+                }
             }
-        }
-
-        private void Reset()
-        {
-            foreach (var parserkv in scrapParsers)
-                parserkv.Value.Reset();
         }
 
         /// <summary>
@@ -195,6 +184,10 @@ namespace ScrapEngine.Bl
             return bProcessed;
         }
         
+        /// <summary>
+        /// Retrieve the current parser
+        /// </summary>
+        /// <returns></returns>
         private ScrapConfigParser GetCurrentParser()
         {
             if (StateModel.CurrentScrapIteratorArgs.ScrapConfigObj is ScrapHtmlTableElement)
@@ -205,6 +198,11 @@ namespace ScrapEngine.Bl
                 return null;
         }
 
+        /// <summary>
+        /// Get the Scrap interator for the Scrap element type
+        /// </summary>
+        /// <param name="scrapObj"></param>
+        /// <returns></returns>
         private ScrapIteratorArgs GetScrapIteratorArgs(ScrapElement scrapObj)
         {
             if (scrapObj is ScrapHtmlTableElement)

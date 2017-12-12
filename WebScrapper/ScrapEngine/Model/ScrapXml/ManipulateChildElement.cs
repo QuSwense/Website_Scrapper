@@ -1,7 +1,4 @@
-﻿using ScrapEngine.Common;
-using ScrapEngine.Interfaces;
-using WebCommon.Error;
-using WebReader.Model;
+﻿using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
 {
@@ -16,7 +13,8 @@ namespace ScrapEngine.Model.ScrapXml
         /// <summary>
         /// Points to the parent scrap node
         /// </summary>
-        public ColumnElement Parent { get; set; }
+        [DXmlParent]
+        public ManipulateElement Parent { get; set; }
 
         #endregion References
     }

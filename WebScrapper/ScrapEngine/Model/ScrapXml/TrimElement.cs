@@ -15,6 +15,7 @@ namespace ScrapEngine.Model
         /// The data
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.DataAttributeName)]
+        [DXmlNormalize]
         public string Data { get; set; }
 
         #endregion Xml Attributes

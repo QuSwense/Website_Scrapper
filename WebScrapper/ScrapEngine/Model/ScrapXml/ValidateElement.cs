@@ -1,10 +1,4 @@
 ﻿using ScrapEngine.Common;
-using ScrapEngine.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebReader.Model;
 
 namespace ScrapEngine.Model.ScrapXml
@@ -35,6 +29,7 @@ namespace ScrapEngine.Model.ScrapXml
         /// <summary>
         /// Parent column element
         /// </summary>
+        [DXmlParent]
         public ColumnElement Parent { get; set; }
 
         #endregion References

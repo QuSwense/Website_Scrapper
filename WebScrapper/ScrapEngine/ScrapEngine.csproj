@@ -112,7 +112,6 @@
     <Compile Include="Bl\Parser\ScrapSplitConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapTrimConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapValidateConfigParser.cs" />
-    <Compile Include="Bl\Parser\WebDataScrapConfigXmlParser.cs" />
     <Compile Include="Bl\PerformanceMeasure.cs" />
     <Compile Include="Bl\WebScrapConfigParser.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />

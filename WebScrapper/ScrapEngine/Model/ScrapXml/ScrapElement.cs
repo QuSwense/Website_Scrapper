@@ -1,5 +1,4 @@
 ﻿using ScrapEngine.Common;
-using System;
 using System.Collections.Generic;
 using WebReader.Model;
 
@@ -116,6 +115,8 @@ namespace ScrapEngine.Model
 
         #endregion Calculated
 
+        #region References
+
         /// <summary>
         /// The list of column nodes
         /// </summary>
@@ -125,6 +126,7 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The parent node
         /// </summary>
+        [DXmlParent]
         public ScrapElement Parent { get; set; }
 
         /// <summary>
@@ -134,6 +136,10 @@ namespace ScrapEngine.Model
         [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, typeof(ScrapCsvElement))]
         public List<ScrapElement> Scraps { get; set; }
 
+        #endregion References
+
+        #region Constructor
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -141,5 +147,7 @@ namespace ScrapEngine.Model
         {
             DoUpdateOnly = false;
         }
+
+        #endregion Constructor
     }
 }

@@ -2,7 +2,6 @@
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System.IO;
-using System.Xml;
 
 namespace ScrapEngine.Bl.Parser
 {

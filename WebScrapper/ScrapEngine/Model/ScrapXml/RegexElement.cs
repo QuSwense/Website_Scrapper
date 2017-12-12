@@ -16,6 +16,7 @@ namespace ScrapEngine.Model
         /// The data node
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.PatternAttributeName, IsMandatory = true)]
+        [DXmlNormalize]
         public string Pattern { get; set; }
 
         /// <summary>

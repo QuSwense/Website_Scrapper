@@ -91,7 +91,7 @@
     <Compile Include="Error\PathException.cs" />
     <Compile Include="Error\ScrapParserException.cs" />
     <Compile Include="Error\ScrapXmlException.cs" />
-    <Compile Include="Error\XmlDocReaderException.cs" />
+    <Compile Include="Error\XmlReaderException.cs" />
     <Compile Include="Extn\ListClassExtension.cs" />
     <Compile Include="Extn\StringInjectExtension.cs" />
     <Compile Include="PathHelp\AppTopicConfigPathHelper.cs" />

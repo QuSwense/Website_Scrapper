@@ -1,10 +1,9 @@
 ﻿using log4net;
+using ScrapEngine.Db;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using SqliteDatabase.Model;
 using System.Collections.Generic;
-using System.Xml;
-using System;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -15,15 +14,21 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapColumnConfigParser : AppTopicConfigParser
     {
+        #region Properties
+
         /// <summary>
         /// Logger
         /// </summary>
-        public static ILog logger = LogManager.GetLogger(typeof(ScrapColumnConfigParser));
+        private static ILog logger = LogManager.GetLogger(typeof(ScrapColumnConfigParser));
 
         /// <summary>
         /// The factory class to get the type of Manipulate child
         /// </summary>
         private ManipulateChildFactory manipulateChildFactory;
+
+        #endregion Properties
+
+        #region Helper Properties
 
         /// <summary>
         /// Reference to column scrap iterator args
@@ -37,6 +42,32 @@ namespace ScrapEngine.Bl.Parser
         }
 
         /// <summary>
+        /// Reference to the list column
+        /// </summary>
+        public ScrapElement ScrapConfig
+        {
+            get
+            {
+                return currentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
+            }
+        }
+
+        /// <summary>
+        /// The Meta database config object
+        /// </summary>
+        public DynamicAppDbConfig MetaDbConfig
+        {
+            get
+            {
+                return configParser.WebDbContext.MetaDbConfig;
+            }
+        }
+
+        #endregion Helper Properties
+
+        #region Constructor
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="configParser"></param>
@@ -45,6 +76,8 @@ namespace ScrapEngine.Bl.Parser
         {
             manipulateChildFactory = new ManipulateChildFactory(configParser);
         }
+
+        #endregion Constructor
 
         /// <summary>
         /// Process Column element tag for scrapping data from csv file
@@ -64,8 +97,7 @@ namespace ScrapEngine.Bl.Parser
             if (!configParser.StateModel.IsColumnMetadataUpdated)
             {
                 // Load the table with partial columns in memory
-                configParser.WebDbContext.AddMetadata(
-                    currentColumnScrapIteratorArgs.Parent.ScrapConfigObj);
+                configParser.WebDbContext.AddMetadata(ScrapConfig);
                 configParser.StateModel.SetColumnMetadataFlag();
             }
         }
@@ -82,9 +114,9 @@ namespace ScrapEngine.Bl.Parser
 
             currentColumnScrapIteratorArgs.PreProcess();
 
-            for (int indx = 0; indx < currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Columns.Count; ++indx)
+            for (int indx = 0; indx < ScrapConfig.Columns.Count; ++indx)
             {
-                var columnConfig = currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Columns[indx];
+                var columnConfig = ScrapConfig.Columns[indx];
                 var manipulateHtml = new ManipulateHtmlData()
                 {
                     Cardinality = columnConfig.Cardinal,
@@ -98,19 +130,34 @@ namespace ScrapEngine.Bl.Parser
                 rows.Add(DbTableDataMapper(manipulateHtml, columnConfig));
             }
 
-            if (currentColumnScrapIteratorArgs.Parent.Columns.Count > 0 && rows.Count > 0)
+            UpdateScrappedData(rows);
+        }
+
+        /// <summary>
+        /// Update the rows of scrapped data
+        /// </summary>
+        /// <param name="rows"></param>
+        private void UpdateScrappedData(List<List<DynamicTableDataInsertModel>> rows)
+        {
+            if (ScrapConfig.Columns.Count > 0 && rows.Count > 0)
             {
                 configParser.Performance.NewDbUpdate(rows, currentColumnScrapIteratorArgs);
-                configParser.WebDbContext.AddOrUpdate(currentColumnScrapIteratorArgs.Parent.ScrapConfigObj, rows);
+                configParser.WebDbContext.AddOrUpdate(ScrapConfig, rows);
                 configParser.Performance.FinalDbUpdate(rows, currentColumnScrapIteratorArgs);
             }
         }
 
+        /// <summary>
+        /// Process the logic to skip the storage of column values
+        /// </summary>
+        /// <param name="manipulateHtml"></param>
+        /// <param name="columnConfig"></param>
+        /// <returns></returns>
         private bool CheckSkipUpdate(ManipulateHtmlData manipulateHtml, ColumnElement columnConfig)
         {
             if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0)) return true;
 
-            if(columnConfig.SkipIfValues.Count > 0)
+            if(columnConfig.SkipIfValues != null && columnConfig.SkipIfValues.Count > 0)
             {
                 foreach (var result in manipulateHtml.Results)
                 {
@@ -141,8 +188,8 @@ namespace ScrapEngine.Bl.Parser
                     IsPk = columnConfig.IsUnique,
                     Value = result,
                     DataType =
-                    configParser.WebDbContext.MetaDbConfig.TableColumnConfigs[
-                        currentColumnScrapIteratorArgs.Parent.ScrapConfigObj.TableName][columnConfig.Name].DataType
+                    MetaDbConfig.TableColumnConfigs[
+                        ScrapConfig.TableName][columnConfig.Name].DataType
                 };
 
                 if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
@@ -166,9 +213,9 @@ namespace ScrapEngine.Bl.Parser
                 columnConfig.Name, manipulateHtml.OriginalValue);
 
             // Even if Scrapped data is null send to manipulation tag. As there can be a default
-            if (columnConfig.Manipulation != null && columnConfig.Manipulation.Manipulations.Count > 0)
+            if (columnConfig.Manipulation != null && columnConfig.Manipulation.ManipulateChilds.Count > 0)
             {
-                foreach (var manipulateChild in columnConfig.Manipulation.Manipulations)
+                foreach (var manipulateChild in columnConfig.Manipulation.ManipulateChilds)
                 {
                     manipulateChildFactory.GetParser(manipulateChild).Process(manipulateHtml, manipulateChild);
                 }

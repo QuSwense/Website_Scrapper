@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Text;
 using System.Linq;
 
 namespace SqliteDatabase
@@ -15,6 +14,8 @@ namespace SqliteDatabase
     /// </summary>
     public class DatabaseContext
     {
+        #region Properties
+
         /// <summary>
         /// The connection object to connect Sqlite database
         /// </summary>
@@ -30,10 +31,21 @@ namespace SqliteDatabase
         /// </summary>
         public string FullPath { get; protected set; }
 
+        #endregion Properties
+
+        #region Calculated
+
+        /// <summary>
+        /// Get the full path of the database file
+        /// </summary>
         public string DbFullPath
         {
             get { return Path.Combine(FullPath, AppTopic); }
         }
+
+        #endregion Calculated
+
+        #region Initialize
 
         /// <summary>
         /// Initialize the database connection
@@ -74,6 +86,10 @@ namespace SqliteDatabase
             File.Delete(DbFullPath);
         }
 
+        #endregion Initialize
+
+        #region Open
+
         /// <summary>
         /// Open a connection
         /// </summary>
@@ -90,6 +106,10 @@ namespace SqliteDatabase
             Connection.Close();
         }
 
+        #endregion Open
+
+        #region Create
+
         /// <summary>
         /// Create a table from the Table metadata information
         /// This method is used to create a table dynamically
@@ -105,7 +125,39 @@ namespace SqliteDatabase
                 ExecuteDML(sqlQuery);
             }
         }
-        
+
+        #endregion Create
+
+        #region Insert
+
+        public void Add(List<ColumnScrapMetadataModel> colScrapMdtModels)
+        {
+            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
+            commandQuery.Generate(colScrapMdtModels);
+            ExecuteDDL(commandQuery.SQL);
+        }
+
+        public int Add(TableScrapMetadataModel tblScrapMdtModel)
+        {
+            // Get the last UID
+            SelectTableQuery selectUidObj = new SelectTableQuery();
+            selectUidObj.GenerateTableScrapUid(tblScrapMdtModel.Name);
+
+            SQLiteDataReader selectUidReader = ExecuteDML(selectUidObj.SQL);
+            int lastUid = 0;
+            if (selectUidReader.Read())
+            {
+                if (!selectUidReader.IsDBNull(0))
+                    lastUid = selectUidReader.GetInt32(0);
+            }
+
+            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
+            commandQuery.Generate(tblScrapMdtModel, ++lastUid);
+            ExecuteDDL(commandQuery.SQL);
+
+            return lastUid;
+        }
+
         /// <summary>
         /// Add or Update a row of data into a given table
         /// </summary>
@@ -183,7 +235,11 @@ namespace SqliteDatabase
             commandQuery.Generate(tableMetadatas);
             ExecuteDDL(commandQuery.SQL);
         }
-        
+
+        #endregion Insert
+
+        #region Execute
+
         /// <summary>
         /// Execute Data Definiton Language
         /// </summary>
@@ -206,33 +262,7 @@ namespace SqliteDatabase
             }
         }
 
-        public void Add(List<ColumnScrapMetadataModel> colScrapMdtModels)
-        {
-            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
-            commandQuery.Generate(colScrapMdtModels);
-            ExecuteDDL(commandQuery.SQL);
-        }
-
-        public int Add(TableScrapMetadataModel tblScrapMdtModel)
-        {
-            // Get the last UID
-            SelectTableQuery selectUidObj = new SelectTableQuery();
-            selectUidObj.GenerateTableScrapUid(tblScrapMdtModel.Name);
-
-            SQLiteDataReader selectUidReader = ExecuteDML(selectUidObj.SQL);
-            int lastUid = 0;
-            if(selectUidReader.Read())
-            {
-                if(!selectUidReader.IsDBNull(0))
-                    lastUid = selectUidReader.GetInt32(0);
-            }
-
-            InsertOrUpdateIntoTableQuery commandQuery = new InsertOrUpdateIntoTableQuery();
-            commandQuery.Generate(tblScrapMdtModel, ++lastUid);
-            ExecuteDDL(commandQuery.SQL);
-
-            return lastUid;
-        }
+        #endregion Execute
 
         public int ValidateExists(string table, string column, string value)
         {

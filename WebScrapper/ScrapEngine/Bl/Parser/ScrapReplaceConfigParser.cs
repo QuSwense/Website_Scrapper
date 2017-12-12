@@ -1,7 +1,6 @@
 ﻿using ScrapEngine.Model;
 using ScrapEngine.Model.ScrapXml;
 using System.Collections.Generic;
-using System.Xml;
 using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser

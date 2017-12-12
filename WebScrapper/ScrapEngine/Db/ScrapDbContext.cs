@@ -5,12 +5,12 @@ using SqliteDatabase;
 using SqliteDatabase.Model;
 using WebCommon.Combinatorics;
 using ScrapEngine.Bl;
-using WebCommon.Extn;
 
 namespace ScrapEngine.Db
 {
     /// <summary>
     /// A class used to help in forming a wrapper between the actual Database activity and the 
+    /// Web scrapper data storage.
     /// </summary>
     public class ScrapDbContext : IScrapDbContext
     {
@@ -41,7 +41,7 @@ namespace ScrapEngine.Db
         public ScrapDbContext() { }
 
         /// <summary>
-        /// Initialize
+        /// Initialize the Web scrap database context object
         /// </summary>
         public void Initialize(IScrapEngineContext parent)
         {
@@ -86,30 +86,21 @@ namespace ScrapEngine.Db
             try
             {
                 // Create global metadata tables
-                //WebScrapDb.CreateMetadata();
                 WebScrapDb.Create(DynamicGenericDbConfig.I.TableMetadataConfigs);
                 WebScrapDb.Create(DynamicGenericDbConfig.I.TableScrapMetadataConfigs);
                 WebScrapDb.Create(DynamicGenericDbConfig.I.TablePerformanceMetadataConfigs);
                 WebScrapDb.Create(DynamicGenericDbConfig.I.TableColumnScrapMetadataConfigs);
 
+                // Add data to table metadata
                 WebScrapDb.AddTableMetadata(MetaDbConfig.TableMetadatas);
+
+                // CReate all the data tables
                 WebScrapDb.Create(MetaDbConfig.TableColumnConfigs);
             }
             finally
             {
                 WebScrapDb.Close();
             }
-        }
-
-        /// <summary>
-        /// Add or update the data scrapped from the webpages including the metadata information
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="row"></param>
-        public void AddOrUpdate(ScrapElement scrapConfig, List<DynamicTableDataInsertModel> row)
-        {
-            // Add data
-            WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
         }
 
         /// <summary>
@@ -132,7 +123,7 @@ namespace ScrapEngine.Db
         }
         
         /// <summary>
-        /// 
+        /// Add metadata performance information
         /// </summary>
         /// <param name="id"></param>
         /// <param name="performanceMeasure"></param>
@@ -147,7 +138,7 @@ namespace ScrapEngine.Db
         }
 
         /// <summary>
-        /// LOad table with partial columns
+        /// Add table column metadata information
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
         public void AddMetadata(ScrapElement webScrapConfigObj)
@@ -156,6 +147,11 @@ namespace ScrapEngine.Db
             AddColumnScrapMetadata(webScrapConfigObj, uid);
         }
 
+        /// <summary>
+        /// Add column metadata to database
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        /// <param name="uid"></param>
         private void AddColumnScrapMetadata(ScrapElement webScrapConfigObj, int uid)
         {
             List<ColumnScrapMetadataModel> colScrapMdtModels = new List<ColumnScrapMetadataModel>();
@@ -166,7 +162,8 @@ namespace ScrapEngine.Db
                 colScrapMdtModel.ColumnName = colConfig.Name;
                 if(!string.IsNullOrEmpty(webScrapConfigObj.TableName) &&
                     !string.IsNullOrEmpty(colConfig.Name))
-                    colScrapMdtModel.DisplayName = MetaDbConfig.TableColumnConfigs[webScrapConfigObj.TableName][colConfig.Name].Display;
+                    colScrapMdtModel.DisplayName = 
+                        MetaDbConfig.TableColumnConfigs[webScrapConfigObj.TableName][colConfig.Name].Display;
                 colScrapMdtModel.Index = colConfig.Index;
                 colScrapMdtModel.Uid = uid;
                 colScrapMdtModel.XPath = colConfig.XPath;
@@ -176,6 +173,11 @@ namespace ScrapEngine.Db
             WebScrapDb.Add(colScrapMdtModels);
         }
 
+        /// <summary>
+        /// Add data for table scrapping
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        /// <returns></returns>
         private int AddTableScrapMetadata(ScrapElement webScrapConfigObj)
         {
             TableScrapMetadataModel tblScrapMdtModel = new TableScrapMetadataModel();

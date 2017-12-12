@@ -1,7 +1,7 @@
-﻿using ScrapEngine.Bl.Parser;
-using ScrapEngine.Interfaces;
+﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System.Collections.Generic;
+using WebReader.Xml;
 
 namespace ScrapEngine.Bl
 {
@@ -30,7 +30,7 @@ namespace ScrapEngine.Bl
         /// <summary>
         /// Parse scrap config xml file
         /// </summary>
-        private WebDataScrapConfigXmlParser configXmlParser;
+        private DXmlReader<WebDataElement> configXmlParser;
 
         #endregion Properties
 
@@ -54,7 +54,8 @@ namespace ScrapEngine.Bl
 
         public List<ScrapElement> RootScrapNodes
         {
-            get { return configXmlParser.WebDataRoot.Scraps; }
+            get { return configXmlParser.Root.Scraps; 
+            }
         }
 
         #endregion Properties Helper
@@ -76,11 +77,11 @@ namespace ScrapEngine.Bl
 
             // Load the scrap xml config
             EngineContext.AppTopicPath.AppTopicScrap.AssertExists();
-            configXmlParser = new WebDataScrapConfigXmlParser();
-            configXmlParser.Parse(EngineContext.AppTopicPath.AppTopicScrap.FullPath);
+            configXmlParser = new DXmlReader<WebDataElement>();
+            configXmlParser.Read(EngineContext.AppTopicPath.AppTopicScrap.FullPath);
 
             WebScrapParser = new WebScrapConfigParser();
-            WebScrapParser.Initialize(this);
+                WebScrapParser.Initialize(this);
         }
         
         /// <summary>

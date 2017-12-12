@@ -1,6 +1,5 @@
 ﻿using ScrapEngine.Model;
 using System.Collections.Generic;
-using System.Xml;
 using ScrapEngine.Model.ScrapXml;
 
 namespace ScrapEngine.Bl.Parser

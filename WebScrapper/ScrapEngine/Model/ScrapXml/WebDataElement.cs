@@ -1,12 +1,8 @@
 ﻿using ScrapEngine.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebReader.Model;
 
-namespace ScrapEngine.Model.ScrapXml
+namespace ScrapEngine.Model
 {
     /// <summary>
     /// The root element of a Xml configuration file for scrapping web data from a website or
