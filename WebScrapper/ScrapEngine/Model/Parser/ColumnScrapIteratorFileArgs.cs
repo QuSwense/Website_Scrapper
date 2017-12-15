@@ -17,7 +17,8 @@
 
         public override string GetDataIterator(int index)
         {
-            return splitData[index];
+            ScrapCsvElement ScrapConfigCsv = Parent.ScrapConfigObj as ScrapCsvElement;
+            return splitData[ScrapConfigCsv.Columns[index].Index];
         }
     }
 }

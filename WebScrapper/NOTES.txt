@@ -1,0 +1,4 @@
+https://api.nsgreg.nga.mil/geo-political/GENC/3/ed1?xyzallow
+https://nsgreg.nga.mil/doc/view?i=2564&month=12&day=14&year=2017?xyzallow
+https://nsgreg.nga.mil/genc/discovery?xyzallow
+https://nsgreg.nga.mil/doc/view?i=2501?xyzallow - Schema

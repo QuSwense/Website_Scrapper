@@ -1,20 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <WebData>
   <ScrapHtmlTable id="unsd_countries" name="rgn" url="https://unstats.un.org/unsd/methodology/m49/" xpath="(//table[@id='GeoGroupsENG']/tr)[position() > 1]" >
-    <Column name="m49" xpath="./@data-tt-id" isunique="1"></Column>
+    <Column name="m49" xpath="./@data-tt-id" isunique="1">
+      <Manipulate>
+        <HtmlDecode />
+      </Manipulate>
+    </Column>
     <Column name="nm" xpath="td[1]"></Column>
     <Column name="m49p" xpath="./@data-tt-parent-id"></Column>
     <Column name="iso31661a3" xpath="td[3]"></Column>
   </ScrapHtmlTable>
-  <ScrapHtmlTable id="unsd_genc_link" name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="(//ul[@id='GetAppendix_D']/li//tr)[position() > 1]" doupdateonly="true">
-    <Column name="nm" xpath="td[1]/a" isunique="1">
+  <ScrapHtmlTable id="unsd_genc_link" name="rgn" url="https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html" xpath="//ul[@id='GetAppendix_D']/li/div/table/tr[1]" doupdateonly="true">
+    <Column name="gec_2a" xpath="td[2]">
       <Manipulate>
-        <Trim data="\n"></Trim>
-        <Trim data="\t"></Trim>
         <Trim data="-"></Trim>
       </Manipulate>
     </Column>
-    <Column name="genc_2a" xpath="td[2]"></Column>
     <Column name="iso31661a2" xpath="td[3]/table//tr[1]/td[1]">
       <Manipulate>
         <Trim data="-"></Trim>
@@ -25,7 +26,7 @@
         <Trim data="-"></Trim>
       </Manipulate>
     </Column>
-    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]">
+    <Column name="iso31661a3" xpath="td[3]/table//tr[1]/td[2]" isunique="1">
       <Manipulate>
         <Trim data="-"></Trim>
       </Manipulate>
@@ -46,14 +47,13 @@
     <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
     <Column name="iso31661a2yrentr" xpath="td[3]"></Column>
   </ScrapHtmlTable>
-  <ScrapCsv id="countries_genc" name="rgn" url="https://evs.nci.nih.gov/ftp1/FDA/GENC/NCIt-GENC_Terminology.txt" doupdateonly="true" delimiter="\t" skipfirst="1">
-    <Column name="genc_2a" index="3" isunique="1"></Column>
-    <Column name="genc_3a" index="4"></Column>
-    <Column name="genc_no" index="5"></Column>
-  </ScrapCsv>
+  <ScrapXml id="countries_genc" name="nsgreg_genc" url="https://api.nsgreg.nga.mil/geo-political/GENC/2/ed1" xpath="/genc:GENCStandardBaseline/genc:GeopoliticalEntityEntry">
+    <Column name="genc_2a" xpath="genc:encoding/genc-cmn:char2Code"></Column>
+    <Column name="genc_3a" xpath="genc:encoding/genc-cmn:char3Code"></Column>
+    <Column name="genc_no" xpath="genc:encoding/genc-cmn:numericCode"></Column>
+  </ScrapXml>
   <ScrapHtmlTable id="countries_geonames" name="rgn" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position() > 1]" doupdateonly="true">
     <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
-    <Column name="iso3166_no" xpath="td[3]"></Column>
     <Column name="fips" xpath="td[4]"></Column>
     <Column name="ttlareakm2_geonm" xpath="td[7]">
       <Manipulate>
