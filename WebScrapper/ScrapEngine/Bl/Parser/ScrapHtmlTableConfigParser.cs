@@ -81,7 +81,7 @@ namespace ScrapEngine.Bl.Parser
                     });
 
                     // Process column values for this scrapped node
-                    ProcessColumnParser();
+                    dbConfigConfigParser.Process();
 
                     // Pop the Stacked column iterator
                     configParser.StateModel.RestoreColumn();

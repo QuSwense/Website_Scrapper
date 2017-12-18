@@ -14,7 +14,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Scrap column config parser
         /// </summary>
-        protected ScrapColumnConfigParser scrapColumnConfigParser;
+        protected DbRowConfigParser dbConfigConfigParser;
 
         /// <summary>
         /// Constructor
@@ -23,7 +23,7 @@ namespace ScrapEngine.Bl.Parser
         public ScrapConfigParser(WebScrapConfigParser configParser)
             : base(configParser)
         {
-            scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
+            dbConfigConfigParser = new DbRowConfigParser(configParser);
         }
 
         /// <summary>
@@ -31,49 +31,49 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         public virtual void Process() { }
 
-        /// <summary>
-        /// Check the maximum level of Scrap nodes allowed is 4
-        /// </summary>
-        /// <param name="webScrapConfigObj">The last child Scrap node</param>
-        protected void AssertLevelConstraint()
-        {
-            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
-            int level = 0;
-            for (; tmpObj != null && level <= configParser.AppConfig.ScrapMaxLevel();
-                level++, tmpObj = tmpObj.Parent) ;
+        ///// <summary>
+        ///// Check the maximum level of Scrap nodes allowed is 4
+        ///// </summary>
+        ///// <param name="webScrapConfigObj">The last child Scrap node</param>
+        //protected void AssertLevelConstraint()
+        //{
+        //    ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
+        //    int level = 0;
+        //    for (; tmpObj != null && level <= configParser.AppConfig.ScrapMaxLevel();
+        //        level++, tmpObj = tmpObj.Parent) ;
 
-            if (level > configParser.AppConfig.ScrapMaxLevel() || level <= 0)
-                throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_LEVEL_INVALID,
-                    level.ToString());
-        }
+        //    if (level > configParser.AppConfig.ScrapMaxLevel() || level <= 0)
+        //        throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_LEVEL_INVALID,
+        //            level.ToString());
+        //}
 
-        /// <summary>
-        /// The Scrap element tag (and its child Scrap tags) should contain one and only one name 
-        /// attribute
-        /// </summary>
-        /// <param name="webScrapConfigObj"></param>
-        protected void AssertScrapNameAttribute()
-        {
-            bool isTableNameFound = false;
-            string NameValue = null;
-            ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
+        ///// <summary>
+        ///// The Scrap element tag (and its child Scrap tags) should contain one and only one name 
+        ///// attribute
+        ///// </summary>
+        ///// <param name="webScrapConfigObj"></param>
+        //protected void AssertScrapNameAttribute()
+        //{
+        //    bool isTableNameFound = false;
+        //    string NameValue = null;
+        //    ScrapElement tmpObj = configParser.StateModel.CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
 
-            while (tmpObj != null)
-            {
-                if (!string.IsNullOrEmpty(tmpObj.Name))
-                {
-                    if (isTableNameFound)
-                        throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_MULTIPLE);
-                    isTableNameFound = true;
-                    NameValue = tmpObj.Name;
-                }
+        //    while (tmpObj != null)
+        //    {
+        //        if (!string.IsNullOrEmpty(tmpObj.Name))
+        //        {
+        //            if (isTableNameFound)
+        //                throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_MULTIPLE);
+        //            isTableNameFound = true;
+        //            NameValue = tmpObj.Name;
+        //        }
 
-                tmpObj = tmpObj.Parent;
-            }
+        //        tmpObj = tmpObj.Parent;
+        //    }
 
-            if (!isTableNameFound || string.IsNullOrEmpty(NameValue))
-                throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_EMPTY);
-        }
+        //    if (!isTableNameFound || string.IsNullOrEmpty(NameValue))
+        //        throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_EMPTY);
+        //}
 
         /// <summary>
         /// Parse url value
@@ -118,11 +118,11 @@ namespace ScrapEngine.Bl.Parser
             // 1. Only maximum 4 levels is allowed
             // 2. Only one "name" tag should be present from the top level to bottom Scrap
             //    If multiple "name" tag is present throw error
-            AssertLevelConstraint();
-            AssertScrapNameAttribute();
+            //AssertLevelConstraint();
+            //AssertScrapNameAttribute();
 
             // Read the Column nodes which are the individual reader config nodes
-            scrapColumnConfigParser.Process();
+            //scrapColumnConfigParser.Process();
         }
     }
 }

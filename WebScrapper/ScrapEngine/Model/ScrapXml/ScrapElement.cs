@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Model.ScrapXml;
 using System.Collections.Generic;
 using WebReader.Model;
 
@@ -120,8 +121,8 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The list of column nodes
         /// </summary>
-        [DXmlElement(ScrapXmlConsts.ColumnNodeName)]
-        public List<ColumnElement> Columns { get; set; }
+        [DXmlElement(ScrapXmlConsts.DbRowNodeName)]
+        public DbRowElement DbRow { get; set; }
 
         /// <summary>
         /// The parent node

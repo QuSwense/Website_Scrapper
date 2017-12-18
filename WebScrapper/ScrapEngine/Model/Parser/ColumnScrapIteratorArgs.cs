@@ -12,13 +12,17 @@ namespace ScrapEngine.Model.Parser
         /// </summary>
         public string NodeIndexId { get; set; }
 
+        public ColumnElement ColumnElementConfig { get; set; }
+
+        public ManipulateHtmlData ResultColumnScrap { get; set; }
+
         /// <summary>
         /// The parent Scrap node
         /// </summary>
         public ScrapIteratorArgs Parent { get; set; }
 
         public virtual void PreProcess() { }
-        public virtual string GetDataIterator(int index) { return null;  }
+        public virtual string GetDataIterator() { return null;  }
 
         public static T ConvertValue<T>(string value)
         {

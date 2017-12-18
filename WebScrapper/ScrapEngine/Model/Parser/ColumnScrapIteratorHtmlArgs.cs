@@ -7,9 +7,9 @@ namespace ScrapEngine.Model.Parser
     {
         public HtmlNodeNavigator WebHtmlNode { get; set; }
         
-        public override string GetDataIterator(int index)
+        public override string GetDataIterator()
         {
-            var columnConfig = Parent.ScrapConfigObj.Columns[index];
+            var columnConfig = ColumnElementConfig;
 
             if (columnConfig.Level < 0)
             {

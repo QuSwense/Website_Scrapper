@@ -79,7 +79,7 @@ namespace ScrapEngine
             // Web scrap html context
             WebScrapHtml = Factory.CreateHtmlContext(this);
 
-            logger.InfoFormat("Web scrap Engine context object which is the starting" +
+            logger.InfoFormat("Web scrap Engine context object which is the starting " +
                 "object for a application topic scrapper is successfull initialized for '{0}'", AppTopicPath.AppTopic);
         }
 

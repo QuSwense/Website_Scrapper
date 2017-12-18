@@ -19,6 +19,7 @@
         public const string DbchangeNodeName = "Dbchange";
         public const string DbchangeSelectNodeName = "Select";
         public const string HtmlDecodeNodeName = "HtmlDecode";
+        public const string DbRowNodeName = "DbRow";
 
         #endregion Node Names
 

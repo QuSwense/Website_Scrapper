@@ -1,0 +1,25 @@
+﻿elem,symbl,Symbols,string,3,,,1
+elem,nm,Element Name,string,100,,,
+elem,nmorgn,Element Name Origin,string,1000,,,
+elem,grp,Group,number,2,,,
+elem,prd,Period,number,2,,,
+elem,dnsty,Density in gram per cm3,number,10,8,,
+elem,nmbr,Atomic Number,number,3,,,
+elem,mltngpt,Melting Point in Degree Celsisus,number,4,8,,
+elem,blnggpt,Boiling Point in Degree Celsisus,number,4,8,,
+elem,spfchtcpcty,Specific Heat Capacity in Joules per gram-Kelvin,number,4,8,,
+elem,elctngtvty,Electronegativity,number,4,8,,
+elem,abndncerthcrst,Abundance in Earth's Crust in milligram per Kilogram,number,4,8,,
+elem_wght,symbl,Symbol,string,3,,,1
+elem_wght,cnv,Conventional Weight,number,10,8,,1
+elem_wght,rngmn,Minimum weight range,number,10,8,,1
+elem_wght,rngmx,Maximum weight range,number,10,8,,1
+elemprop,abndcerthcrst,Abundance in Earth's Crust in %,number,3,10,,
+elemprop,abndchmns,Abundance in Humans in %,number,3,10,,
+elemprop,abndcmtrt,Abundance in Meteorites in %,number,3,10,,
+elemprop,abndcocn,Abundance in Ocean in %,number,3,10,,
+elemprop,abndcsn,Abundance in Sun in %,number,3,10,,
+elemprop,abndcunvrs,Abundance in Universe in %,number,3,10,,
+elemprop,atmcrdus,Atomic Radius in pm,number,3,10,,
+elemprop,blngpt,Boiling Points in degree Celcius,number,3,10,,
+elemprop,cvlntrds,Covalent Radius in pm,number,3,10,,

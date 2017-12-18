@@ -156,7 +156,7 @@ namespace ScrapEngine.Db
         {
             List<ColumnScrapMetadataModel> colScrapMdtModels = new List<ColumnScrapMetadataModel>();
 
-            foreach(var colConfig in webScrapConfigObj.Columns)
+            foreach(var colConfig in webScrapConfigObj.DbRow.Columns)
             {
                 ColumnScrapMetadataModel colScrapMdtModel = new ColumnScrapMetadataModel();
                 colScrapMdtModel.ColumnName = colConfig.Name;

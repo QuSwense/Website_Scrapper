@@ -15,10 +15,10 @@
             }
         }
 
-        public override string GetDataIterator(int index)
+        public override string GetDataIterator()
         {
             ScrapCsvElement ScrapConfigCsv = Parent.ScrapConfigObj as ScrapCsvElement;
-            return splitData[ScrapConfigCsv.Columns[index].Index];
+            return splitData[ColumnElementConfig.Index];
         }
     }
 }

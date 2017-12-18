@@ -131,6 +131,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="App.config" />
+    <None Include="ScrapperApps\AppChemicalElement\DbScripts\table_columns.csv" />
+    <None Include="ScrapperApps\AppChemicalElement\DbScripts\table_mdt.csv" />
     <None Include="ScrapperApps\Config\DbScripts\col_scrap_mdt.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -150,7 +152,9 @@
     <None Include="ScrapperApps\Config\DbScripts\table_mdt.csv" />
     <None Include="ScrapperApps\Config\DbScripts\table_scrap_mdt.csv" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ScrapperApps\AppChemicalElement\Scrap\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net45\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,6 +1,7 @@
 ﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using System.Collections.Generic;
+using WebCommon.Error;
 using WebReader.Xml;
 
 namespace ScrapEngine.Bl
@@ -45,6 +46,14 @@ namespace ScrapEngine.Bl
         }
 
         /// <summary>
+        /// The main web database conetxt for website scrapping
+        /// </summary>
+        public ApplicationConfig AppConfig
+        {
+            get { return EngineContext.AppConfig; }
+        }
+
+        /// <summary>
         /// The core database context
         /// </summary>
         public SqliteDatabase.DatabaseContext WebScrapDb
@@ -52,10 +61,12 @@ namespace ScrapEngine.Bl
             get { return WebDbContext.WebScrapDb; }
         }
 
+        /// <summary>
+        /// The root scraps
+        /// </summary>
         public List<ScrapElement> RootScrapNodes
         {
-            get { return configXmlParser.Root.Scraps; 
-            }
+            get { return configXmlParser.Root.Scraps; }
         }
 
         #endregion Properties Helper
@@ -79,11 +90,68 @@ namespace ScrapEngine.Bl
             EngineContext.AppTopicPath.AppTopicScrap.AssertExists();
             configXmlParser = new DXmlReader<WebDataElement>();
             configXmlParser.Read(EngineContext.AppTopicPath.AppTopicScrap.FullPath);
+            AssertScrapXml();
 
             WebScrapParser = new WebScrapConfigParser();
-                WebScrapParser.Initialize(this);
+            WebScrapParser.Initialize(this);
         }
-        
+
+        /// <summary>
+        /// Assert config
+        /// </summary>
+        public void AssertScrapXml()
+        {
+            foreach (var scrapNode in RootScrapNodes)
+            {
+                AssertLevelConstraint(scrapNode);
+                AssertScrapNameAttribute(scrapNode);
+            }
+        }
+
+        /// <summary>
+        /// Check the maximum level of Scrap nodes allowed is 4
+        /// </summary>
+        /// <param name="webScrapConfigObj">The last child Scrap node</param>
+        protected void AssertLevelConstraint(ScrapElement scrapObj)
+        {
+            ScrapElement tmpObj = scrapObj;
+            int level = 0;
+            for (; tmpObj != null && level <= AppConfig.ScrapMaxLevel();
+                level++, tmpObj = tmpObj.Parent) ;
+
+            if (level > AppConfig.ScrapMaxLevel() || level <= 0)
+                throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_LEVEL_INVALID,
+                    level.ToString());
+        }
+
+        /// <summary>
+        /// The Scrap element tag (and its child Scrap tags) should contain one and only one name 
+        /// attribute
+        /// </summary>
+        /// <param name="webScrapConfigObj"></param>
+        protected void AssertScrapNameAttribute(ScrapElement scrapObj)
+        {
+            bool isTableNameFound = false;
+            string NameValue = null;
+            ScrapElement tmpObj = scrapObj;
+
+            while (tmpObj != null)
+            {
+                if (!string.IsNullOrEmpty(tmpObj.Name))
+                {
+                    if (isTableNameFound)
+                        throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_MULTIPLE);
+                    isTableNameFound = true;
+                    NameValue = tmpObj.Name;
+                }
+
+                tmpObj = tmpObj.Parent;
+            }
+
+            if (!isTableNameFound || string.IsNullOrEmpty(NameValue))
+                throw new ScrapParserException(ScrapParserException.EErrorType.SCRAP_NAME_EMPTY);
+        }
+
         /// <summary>
         /// Execute
         /// </summary>

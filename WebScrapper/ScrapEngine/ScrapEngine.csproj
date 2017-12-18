@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="Bl\Parser\AppTopicConfigParser.cs" />
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
+    <Compile Include="Bl\Parser\DbRowConfigParser.cs" />
     <Compile Include="Bl\Parser\ManipulateChildFactory.cs" />
     <Compile Include="Bl\Parser\ScrapColumnConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapConfigParser.cs" />
@@ -124,12 +125,11 @@
     <Compile Include="Interfaces\IInnerBaseParser.cs" />
     <Compile Include="Model\Parser\ParserIteratorArgs.cs" />
     <Compile Include="Model\Parser\ScrapIteratorArgs.cs" />
-    <Compile Include="Model\Parser\ScrapIteratorCsvArgs.cs" />
-    <Compile Include="Model\Parser\ScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\Parser\ScrapIteratorStateModel.cs" />
     <Compile Include="Model\PerformanceState.cs" />
     <Compile Include="Model\ScrapXml\DbchangeElement.cs" />
     <Compile Include="Model\ScrapXml\DbchangeSelectElement.cs" />
+    <Compile Include="Model\ScrapXml\DbRowElement.cs" />
     <Compile Include="Model\ScrapXml\HtmlDecodeElement.cs" />
     <Compile Include="Model\ScrapXml\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />
