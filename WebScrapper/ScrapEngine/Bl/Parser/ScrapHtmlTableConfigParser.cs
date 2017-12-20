@@ -2,8 +2,11 @@
 using log4net;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
+using ScrapEngine.Model.Scrap;
 using System.Collections.Generic;
+using System.Threading;
 using System.Web;
+using System.Windows.Forms;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -23,11 +26,11 @@ namespace ScrapEngine.Bl.Parser
         /// Stores the current state which is getting processed. Save the State before
         /// sending to process child node
         /// </summary>
-        private ScrapIteratorHtmlArgs currentscrapIteratorHtmlArgs
+        private ScrapIteratorArgs currentscrapIteratorHtmlArgs
         {
             get
             {
-                return (ScrapIteratorHtmlArgs)(configParser.StateModel.CurrentScrapIteratorArgs);
+                return configParser.StateModel.CurrentScrapIteratorArgs;
             }
         }
 
@@ -60,7 +63,6 @@ namespace ScrapEngine.Bl.Parser
                 logger.DebugFormat("{0} html Nodes found which will be parsed in loop.", webNodeNavigatorList.Count);
 
                 // Process
-                //int nodeIndex = 0;
                 foreach (var webNodeNavigator in webNodeNavigatorList)
                 {
                     currentscrapIteratorHtmlArgs.NodeIndex++;
@@ -104,6 +106,7 @@ namespace ScrapEngine.Bl.Parser
                 webScrapConfigObj.Url);
 
             var htmlDoc = configParser.ScrapperCommand.Load(webScrapConfigObj.Url);
+
             var navigators =
                 configParser.ScrapperCommand.ReadNodes(htmlDoc, webScrapConfigObj.XPath);
 

@@ -1,0 +1,10 @@
+﻿unofmsr,cd,Code as per NSREG,string,100,,,1
+unofmsr,nm,Name of Unit,string,100,,,
+unofmsr,dfn,Definition of Unit,string,1000,,,
+untcnv,cd,Code as per NSREG,string,100,,,1
+untcnv,grp,Group under which this Unit belongs,string,100,,,
+untcnv,prfconvuntcd,Prefferred Conversion Unit Code,string,100,,,
+untcnv,extcnvfctr,Exact Conversion Factor,number,15,7,,
+phclqnty,cd,Physcial quantity NSREG Code,string,100,,,1
+phclqnty,grp,Physcial quantity NSREG Name,string,100,,,
+phclqnty,dfn,Definition of Unit,string,1000,,,

@@ -21,7 +21,22 @@ namespace ScrapEngine.Model.Parser
         /// </summary>
         public ScrapIteratorArgs Parent { get; set; }
 
-        public virtual void PreProcess() { }
+        /// <summary>
+        /// Pre process column config
+        /// </summary>
+        public virtual void PreProcess()
+        {
+            int level = 0;
+            ScrapIteratorArgs required = Parent;
+            while(required != null && level < ColumnElementConfig.Level)
+            {
+                ++level;
+                required = required.Parent;
+            }
+
+            required.Columns[ColumnElementConfig.ColumnIndex].PreProcess();
+        }
+
         public virtual string GetDataIterator() { return null;  }
 
         public static T ConvertValue<T>(string value)

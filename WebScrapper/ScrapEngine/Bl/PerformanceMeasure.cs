@@ -56,6 +56,9 @@ namespace ScrapEngine.Bl
             stopwatchScrapElementProcessing.Start();
         }
 
+        /// <summary>
+        /// The perfromance counter for the node to be completed
+        /// </summary>
         public void FinalChildNode()
         {
             if (stopwatchScrapElementProcessing != null)

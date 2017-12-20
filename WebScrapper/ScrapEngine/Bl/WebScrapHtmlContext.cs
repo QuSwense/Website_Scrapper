@@ -61,9 +61,6 @@ namespace ScrapEngine.Bl
             get { return WebDbContext.WebScrapDb; }
         }
 
-        /// <summary>
-        /// The root scraps
-        /// </summary>
         public List<ScrapElement> RootScrapNodes
         {
             get { return configXmlParser.Root.Scraps; }

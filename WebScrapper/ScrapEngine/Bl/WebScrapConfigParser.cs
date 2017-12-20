@@ -6,6 +6,7 @@ using ScrapEngine.Model.Parser;
 using System.Collections.Generic;
 using WebCommon.PathHelp;
 using ScrapEngine.Common;
+using ScrapEngine.Model.Scrap;
 
 namespace ScrapEngine.Bl
 {
@@ -101,7 +102,8 @@ namespace ScrapEngine.Bl
             scrapParsers = new Dictionary<string, ScrapConfigParser>
             {
                 { ScrapXmlConsts.ScrapHtmlTableNodeName, new ScrapHtmlTableConfigParser(this) },
-                { ScrapXmlConsts.ScrapCsvNodeName, new ScrapCsvConfigParser(this) }
+                { ScrapXmlConsts.ScrapCsvNodeName, new ScrapCsvConfigParser(this) },
+                { ScrapXmlConsts.ScrapXmlNodeName, new ScrapXmlConfigParser(this) }
             };
         }
 
@@ -194,6 +196,8 @@ namespace ScrapEngine.Bl
                 return scrapParsers[ScrapXmlConsts.ScrapHtmlTableNodeName];
             else if (StateModel.CurrentScrapIteratorArgs.ScrapConfigObj is ScrapCsvElement)
                 return scrapParsers[ScrapXmlConsts.ScrapCsvNodeName];
+            else if (StateModel.CurrentScrapIteratorArgs.ScrapConfigObj is ScrapXmlElement)
+                return scrapParsers[ScrapXmlConsts.ScrapXmlNodeName];
             else
                 return null;
         }
@@ -205,18 +209,10 @@ namespace ScrapEngine.Bl
         /// <returns></returns>
         private ScrapIteratorArgs GetScrapIteratorArgs(ScrapElement scrapObj)
         {
-            if (scrapObj is ScrapHtmlTableElement)
-                return new ScrapIteratorHtmlArgs()
-                {
-                    ScrapConfigObj = scrapObj
-                };
-            else if (scrapObj is ScrapCsvElement)
-                return new ScrapIteratorCsvArgs()
-                {
-                    ScrapConfigObj = scrapObj
-                };
-            else
-                return null;
+            return new ScrapIteratorArgs()
+            {
+                ScrapConfigObj = scrapObj
+            };
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SqliteDatabase.Model;
+using System.Collections.Generic;
+using System;
 
 namespace ScrapEngine.Model.Parser
 {
@@ -29,12 +31,18 @@ namespace ScrapEngine.Model.Parser
         public ColumnScrapIteratorArgs CurrentColumnScrapIteratorArgs { get; protected set; }
 
         /// <summary>
+        /// Store the row data for one single loop of iteration for each level of data scrapping
+        /// </summary>
+        public List<List<DynamicTableDataInsertModel>> RowDataInCurrentLoop { get; protected set; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         public ScrapIteratorStateModel()
         {
             WebScrapArgs = new Dictionary<string, ScrapIteratorArgs>();
             ColumnMetadataUpdateFlags = new Dictionary<string, bool>();
+            RowDataInCurrentLoop = new List<List<DynamicTableDataInsertModel>>();
         }
 
         /// <summary>
@@ -77,6 +85,70 @@ namespace ScrapEngine.Model.Parser
         {
             CurrentScrapIteratorArgs.Columns.Add(columnScrapIteratorArgs);
             CurrentColumnScrapIteratorArgs = columnScrapIteratorArgs;
+        }
+
+        /// <summary>
+        /// Add column data
+        /// </summary>
+        /// <param name="columnData"></param>
+        /// <param name="colElement"></param>
+        public void AddColumnData(List<DynamicTableDataInsertModel> columnData, ColumnElement colElement)
+        {
+            foreach (var row in RowDataInCurrentLoop)
+            {
+                foreach (var col in columnData)
+                {
+                    row.Add(col);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add column data
+        /// </summary>
+        /// <param name="columnData"></param>
+        /// <param name="colElement"></param>
+        public void AddColumnData(List<List<DynamicTableDataInsertModel>> columnData, ColumnElement colElement)
+        {
+            foreach (var row in RowDataInCurrentLoop)
+            {
+                foreach (var col in columnData)
+                {
+                    row.AddRange(col);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if the column scrapped data is already available
+        /// </summary>
+        /// <param name="colElement"></param>
+        /// <returns></returns>
+        public bool IsColumnDataAvailable(ColumnElement colElement)
+        {
+            if (colElement.Level != -1 && colElement.Level < colElement.Parent.Level)
+                if (RowDataInCurrentLoop.ContainsKey(colElement.Parent.Level))
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Get column data list
+        /// </summary>
+        /// <returns></returns>
+        public List<List<DynamicTableDataInsertModel>> GetColumnDataList()
+        {
+            var rows = new List<List<DynamicTableDataInsertModel>>();
+
+            foreach (var kvcols in RowDataInCurrentLoop)
+            {
+                foreach (var col in kvcols.Value)
+                {
+                    rows.Add(col);
+                }
+            }
+
+            return rows;
         }
 
         /// <summary>

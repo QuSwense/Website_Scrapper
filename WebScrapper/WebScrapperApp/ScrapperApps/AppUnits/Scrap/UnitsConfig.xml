@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<WebData>
+  <ScrapHtmlTable id="units_nsreg" name="unofmsr" url="https://nsgreg.nga.mil/ir/browse?register=PQ&amp;type=um&amp;field=name&amp;show=all&amp;status=all&amp;day=15&amp;month=12&amp;year=2017&amp;sort=nameasc?xyzallow" xpath="//body/table[3]//table[1]//tr[1]//table[1]//tr[@class='valid' and position()>1]">
+    <Column name="cd" xpath="td[1]"/>
+    <Column name="nm" xpath="td[2]"/>
+    <Column name="dfn" xpath="td[3]"/>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="units_nsreg" name="unofmsr" url="https://nsgreg.nga.mil/ir/browse?register=PQ&amp;type=um&amp;field=name&amp;show=all&amp;status=all&amp;day=15&amp;month=12&amp;year=2017&amp;sort=nameasc?xyzallow" xpath="//body/table[3]//table[1]//tr[1]//table[1]//tr[position()>1]">
+    <ScrapHtmlTable xpath="//body/table[3]" url="@{parentValue}/td[2]/a/@href">
+      <Column name="cd" xpath="//tr[2]//tr[1]/td/font[@class='code']">
+        <Manipulate>
+          <HtmlDecode />
+          <Trim />
+          <Regex pattern="\[(.*)\]" />
+        </Manipulate>
+      </Column>
+      <Column name="grp" xpath="//body/table[3]//tr[3]/td/table//tr[1]/td[1]/table//tr[7]/td[3]/a"/>
+      <Column name="prfconvuntcd" xpath="//body/table[3]//tr[3]/td/table//tr[1]/td[1]/table//tr[9]/td[3]/a/@href">
+        <HtmlUrlProcess value="@{parent}@{data}" />
+        <HtmlNavigate />
+        <HtmlScrap xpath="//body/table[3]//tr[2]/td/table//tr/td[1]/font[1]" />
+        <Manipulate>
+          <HtmlDecode />
+          <Trim />
+        </Manipulate>
+      </Column>
+      <Column name="extcnvfctr" xpath="//body/table[3]//tr[3]/td/table//tr[1]/td[1]/table//tr[10]/td[3]" />
+    </ScrapHtmlTable>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="units_nsreg" name="unofmsr" url="https://nsgreg.nga.mil/ir/browse?register=PQ&amp;type=pq&amp;field=name&amp;show=all&amp;status=all&amp;day=15&amp;month=12&amp;year=2017&amp;sort=nameasc?xyzallow" xpath="//body/table[3]//tr[4]/td/table//tr/td/table//tr[position()>1]">
+    <Column name="cd" xpath="td[1]/a/font/text()[2]"/>
+    <Column name="grp" xpath="td[2]/a/font"/>
+    <Column name="dfn" xpath="td[3]"/>
+  </ScrapHtmlTable>
+</WebData>

@@ -19,6 +19,7 @@ namespace WebScrapper
         /// 1: The name of the application topic, or "*" for all
         /// </summary>
         /// <param name="args"></param>
+        [STAThread]
         static void Main(string[] args)
         {
             logger.Info("Start of the Application Data Scrapper");

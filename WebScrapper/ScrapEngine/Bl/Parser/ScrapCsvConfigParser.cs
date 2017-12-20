@@ -1,6 +1,7 @@
 ﻿using log4net;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
+using ScrapEngine.Model.Scrap;
 using System.IO;
 
 namespace ScrapEngine.Bl.Parser
@@ -20,12 +21,11 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Current Csv iterator scrap
         /// </summary>
-        private ScrapIteratorCsvArgs currentscrapIteratorCsvArgs
+        private ScrapIteratorArgs currentscrapIteratorCsvArgs
         {
             get
             {
-                return (ScrapIteratorCsvArgs)
-                    configParser.StateModel.CurrentScrapIteratorArgs;
+                return configParser.StateModel.CurrentScrapIteratorArgs;
             }
         }
 
@@ -83,7 +83,7 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         /// <param name="webScrapConfigObj"></param>
         /// <returns></returns>
-        private StringReader FetchFileReader(ScrapIteratorCsvArgs scrapIteratorCsvArgs)
+        private StringReader FetchFileReader(ScrapIteratorArgs scrapIteratorCsvArgs)
         {
             configParser.Performance.NewHtmlLoad(scrapIteratorCsvArgs.ScrapConfigObj);
 

@@ -53,22 +53,92 @@
       <Column name="iso31661a2yrentr" xpath="td[3]"></Column>
     </DbRow>
   </ScrapHtmlTable>
-  <ScrapXml id="countries_genc" name="nsgreg_genc" url="https://api.nsgreg.nga.mil/geo-political/GENC/2/ed1" xpath="/genc:GENCStandardBaseline/genc:GeopoliticalEntityEntry">
+  <ScrapHtmlTable id="countries_geonames" name="rgn" url="http://api.geonames.org/countryInfo?username=sndjones007" xpath="//geonames/country" doupdateonly="true">
     <DbRow>
-      <Column name="genc_2a" xpath="genc:encoding/genc-cmn:char2Code"></Column>
-      <Column name="genc_3a" xpath="genc:encoding/genc-cmn:char3Code"></Column>
-      <Column name="genc_no" xpath="genc:encoding/genc-cmn:numericCode"></Column>
-    </DbRow>
-  </ScrapXml>
-  <ScrapHtmlTable id="countries_geonames" name="rgn" url="http://www.geonames.org/countries/" xpath="(//table[@id='countries']//tr)[position() > 1]" doupdateonly="true">
-    <DbRow>
-      <Column name="iso31661a2" xpath="td[1]" isunique="1"></Column>
-      <Column name="fips" xpath="td[4]"></Column>
-      <Column name="ttlareakm2_geonm" xpath="td[7]">
+      <Column name="iso31661a2" xpath="countryCode" isunique="1">
         <Manipulate>
-          <Replace in="," out=""></Replace>
+          <Split data="," index="0"></Split>
+          <Trim />
         </Manipulate>
       </Column>
+      <Column name="fips" xpath="fipsCode"></Column>
+      <Column name="ttlareakm2_geonm" xpath="areaInSqKm"></Column>
+      <Column name="bb_west" xpath="west"></Column>
+      <Column name="bb_nrth" xpath="north"></Column>
+      <Column name="bb_east" xpath="east"></Column>
+      <Column name="bb_south" xpath="south"></Column>
+      <Column name="pcfmt" xpath="postalCodeFormat"></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_elevations" name="elevtn" url="https://en.wikipedia.org/wiki/List_of_elevation_extremes_by_country" xpath="//*[@id='mw-content-text']/div/table//tr[position()>1]" >
+    <DbRow>
+      <Column name="nm" xpath="td[1]" isunique="1"></Column>
+      <Column name="hgptkm" xpath="td[3]/text()[1]"></Column>
+      <Column name="hgptnm" xpath="td[2]/a"></Column>
+      <Column name="lwptkm" xpath="td[5]/text()[1]"></Column>
+      <Column name="lwptnm" xpath="td[4]/a"></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_notsovereign" name="nsvgn" url="https://www.state.gov/s/inr/rls/10543.htm" xpath="//*[@id='centerblock']/div/div/div[2]/table//tr[position()>1]" >
+    <DbRow>
+      <Column name="nm" xpath="td[1]/p/text()" isunique="1">
+        <Manipulate>
+          <RegexReplace pattern="\(see note .*\)" replace="" />
+        </Manipulate>
+      </Column>
+      <Column name="pnm" xpath="td[3]/p" isunique="1"></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_genc" name="genc" url="https://www.state.gov/s/inr/rls/4250.htm" xpath="//*[@id='centerblock']/div[1]/table//tr[position()>1]" >
+    <DbRow>
+      <Column name="nm" xpath="td[1]/p" isunique="1">
+        <Manipulate>
+          <RegexReplace pattern="\(see note .*\)" replace="" />
+          <Regex pattern="(.*)\*?\+?" />
+          <Trim />
+        </Manipulate>
+      </Column>
+      <Column name="a2" xpath="td[3]/p"></Column>
+      <Column name="a3" xpath="td[4]/p"></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_genc" name="genc" url="https://www.state.gov/s/inr/rls/10543.htm" xpath="//*[@id='centerblock']/div[1]/table//tr[position()>1]" >
+    <DbRow>
+      <Column name="nm" xpath="td[1]/p" isunique="1">
+        <Manipulate>
+          <RegexReplace pattern="\(see note .*\)" replace="" />
+          <Regex pattern="(.*)\*?\+?" />
+          <Trim />
+        </Manipulate>
+      </Column>
+      <Column name="a2" xpath="td[3]/p"></Column>
+      <Column name="a3" xpath="td[4]/p"></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_unsd_ldc" name="unsdldc" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//*[@id='ENG']/table//tr[position()>1]/td[2]" >
+    <DbRow>
+      <Column name="m49" xpath="."></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_unsd_lldc" name="unsdlldc" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//*[@id='ENG_LLDC']/table//tr[position()>1]/td[2]" >
+    <DbRow>
+      <Column name="m49" xpath="."></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_unsd_sidc" name="unsdsidc" url="https://unstats.un.org/unsd/methodology/m49/" xpath="//*[@id='ENG_SIDS']/table//tr[position()>1]/td[2]" >
+    <DbRow>
+      <Column name="m49" xpath="."></Column>
+    </DbRow>
+  </ScrapHtmlTable>
+  <ScrapHtmlTable id="country_capitals" name="cptl" url="http://www.lab.lmnixon.org/4th/worldcapitals.html" xpath="/html/body/div[1]/table//tr[position()>1]" >
+    <DbRow>
+      <Column name="cntrnm" xpath="td[1]"></Column>
+      <GroupColumn xpath="td[2]">
+        <Split data="/" />
+        <Regex pattern="(.*)\((.*)\)" />
+        <ColumnPick name="nm" index="0"/>
+        <ColumnPick name="typ" index="1"/>
+      </GroupColumn>
     </DbRow>
   </ScrapHtmlTable>
   <ScrapHtmlTable id="all_languages" name="lang" url="http://www.loc.gov/standards/iso639-2/php/code_list.php" xpath="//body//table//table[1]//tr[position() > 1]">

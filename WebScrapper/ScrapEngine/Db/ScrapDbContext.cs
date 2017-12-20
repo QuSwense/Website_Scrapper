@@ -5,6 +5,7 @@ using SqliteDatabase;
 using SqliteDatabase.Model;
 using WebCommon.Combinatorics;
 using ScrapEngine.Bl;
+using ScrapEngine.Model.Scrap;
 
 namespace ScrapEngine.Db
 {
@@ -111,12 +112,12 @@ namespace ScrapEngine.Db
         public void AddOrUpdate(ScrapElement scrapConfig, List<List<DynamicTableDataInsertModel>> rows)
         {
             // Create Combinations of data list
-            GroupCombinations<DynamicTableDataInsertModel> rowCombinations =
-                new GroupCombinations<DynamicTableDataInsertModel>(rows, rows.Count);
+            //GroupCombinations<DynamicTableDataInsertModel> rowCombinations =
+            //    new GroupCombinations<DynamicTableDataInsertModel>(rows, rows.Count);
 
-            rowCombinations.GenerateNonRepetive();
+            //rowCombinations.GenerateNonRepetive();
 
-            foreach (var row in rowCombinations.ResultSets)
+            foreach (var row in rows)
             {
                 WebScrapDb.AddOrUpdate(scrapConfig.TableName, row, scrapConfig.DoUpdateOnly);
             }

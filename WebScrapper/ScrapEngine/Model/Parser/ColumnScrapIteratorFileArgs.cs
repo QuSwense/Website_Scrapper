@@ -1,5 +1,10 @@
-﻿namespace ScrapEngine.Model.Parser
+﻿using ScrapEngine.Model.Scrap;
+
+namespace ScrapEngine.Model.Parser
 {
+    /// <summary>
+    /// Column scrap iterator arguments for Csv File type
+    /// </summary>
     public class ColumnScrapIteratorFileArgs : ColumnScrapIteratorArgs
     {
         public string FileLine { get; set; }
@@ -8,11 +13,17 @@
 
         public override void PreProcess()
         {
-            ScrapCsvElement ScrapConfigCsv = Parent.ScrapConfigObj as ScrapCsvElement;
-            if (ScrapConfigCsv != null)
+            // By default take the last parent scrap element
+            if (ColumnElementConfig.Level < 0)
             {
-                splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });
+                ScrapCsvElement ScrapConfigCsv = Parent.ScrapConfigObj as ScrapCsvElement;
+                if (ScrapConfigCsv != null)
+                {
+                    splitData = FileLine.Split(new char[] { ScrapConfigCsv.Delimiter[0] });
+                }
             }
+            else
+                base.PreProcess();
         }
 
         public override string GetDataIterator()

@@ -106,21 +106,27 @@ namespace ScrapEngine.Bl.Parser
 
             for (int indx = 0; indx < ScrapConfig.DbRow.Columns.Count; ++indx)
             {
-                configParser.StateModel.SetColumnConfig(ScrapConfig.DbRow.Columns[indx]);
-                scrapColumnConfigParser.Process();
-                rows.Add(DbTableDataMapper(currentColumnScrapIteratorArgs.ResultColumnScrap,
-                    ScrapConfig.DbRow.Columns[indx]));
+                ColumnElement colElement = ScrapConfig.DbRow.Columns[indx];
+
+                if (!configParser.StateModel.IsColumnDataAvailable(colElement))
+                {
+                    configParser.StateModel.SetColumnConfig(colElement);
+                    scrapColumnConfigParser.Process();
+                    configParser.StateModel.AddColumnData(DbTableDataMapper(currentColumnScrapIteratorArgs.ResultColumnScrap,
+                        colElement), colElement);
+                }
             }
 
-            UpdateScrappedData(rows);
+            UpdateScrappedData();
         }
 
         /// <summary>
         /// Update the rows of scrapped data
         /// </summary>
         /// <param name="rows"></param>
-        private void UpdateScrappedData(List<List<DynamicTableDataInsertModel>> rows)
+        private void UpdateScrappedData()
         {
+            var rows = configParser.StateModel.GetColumnDataList();
             if (ScrapConfig.DbRow.Columns.Count > 0 && rows.Count > 0)
             {
                 configParser.Performance.NewDbUpdate(rows, currentColumnScrapIteratorArgs);

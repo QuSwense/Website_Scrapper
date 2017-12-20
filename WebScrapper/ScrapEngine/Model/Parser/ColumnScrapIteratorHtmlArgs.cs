@@ -11,7 +11,7 @@ namespace ScrapEngine.Model.Parser
         {
             var columnConfig = ColumnElementConfig;
 
-            if (columnConfig.Level < 0)
+            if (ColumnElementConfig.Level < 0)
             {
                 XPathNavigator htmlPathNav = WebHtmlNode.SelectSingleNode(columnConfig.XPath);
                 if (htmlPathNav != null)
@@ -22,24 +22,25 @@ namespace ScrapEngine.Model.Parser
                 else return null;
             }
             else
-            {
-                ScrapIteratorArgs scrapIteratorArgs = Parent;
+                base.PreProcess();
+            //{
+            //    ScrapIteratorArgs scrapIteratorArgs = Parent;
 
-                while (scrapIteratorArgs.ScrapConfigObj != null &&
-                    scrapIteratorArgs.ScrapConfigObj.Level != columnConfig.Level)
-                    scrapIteratorArgs = scrapIteratorArgs.Parent;
+            //    while (scrapIteratorArgs.ScrapConfigObj != null &&
+            //        scrapIteratorArgs.ScrapConfigObj.Level != columnConfig.Level)
+            //        scrapIteratorArgs = scrapIteratorArgs.Parent;
 
-                if (scrapIteratorArgs == null || scrapIteratorArgs.ScrapConfigObj == null) return null;
-                else
-                {
-                    XPathNavigator htmlPathNav = scrapIteratorArgs.WebHtmlNode.SelectSingleNode(columnConfig.XPath);
-                    if (htmlPathNav != null)
-                    {
-                        if (columnConfig.ValueAsInnerHtml) return htmlPathNav.InnerXml;
-                        else return htmlPathNav.Value;
-                    }
-                }
-            }
+            //    if (scrapIteratorArgs == null || scrapIteratorArgs.ScrapConfigObj == null) return null;
+            //    else
+            //    {
+            //        XPathNavigator htmlPathNav = scrapIteratorArgs.WebHtmlNode.SelectSingleNode(columnConfig.XPath);
+            //        if (htmlPathNav != null)
+            //        {
+            //            if (columnConfig.ValueAsInnerHtml) return htmlPathNav.InnerXml;
+            //            else return htmlPathNav.Value;
+            //        }
+            //    }
+            //}
 
             return null;
         }

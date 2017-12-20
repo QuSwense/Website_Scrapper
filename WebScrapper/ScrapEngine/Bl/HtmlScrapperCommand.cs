@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 using System.Xml.XPath;
 using WebCommon.Error;
 
@@ -111,7 +113,7 @@ namespace ScrapEngine.Bl
             using (StreamReader reader = new StreamReader(stream, encoding))
                 htmlText = reader.ReadToEnd();
 
-            HtmlDocument document = new HtmlDocument();
+            HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument();
             document.LoadHtml(htmlText);
 
             return document.DocumentNode;
