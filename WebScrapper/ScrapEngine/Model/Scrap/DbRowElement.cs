@@ -16,6 +16,7 @@ namespace ScrapEngine.Model.Scrap
         /// The list of column nodes
         /// </summary>
         [DXmlElement(ScrapXmlConsts.ColumnNodeName)]
+        [DXmlElement(ScrapXmlConsts.GroupColumnNodeName)]
         public List<ColumnElement> Columns { get; set; }
 
         /// <summary>

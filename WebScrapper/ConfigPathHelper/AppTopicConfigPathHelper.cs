@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using ConfigPathHelper.Common;
+using System.Collections.Generic;
 using System.IO;
 
-namespace WebCommon.PathHelp
+namespace ConfigPathHelper
 {
     /// <summary>
     /// A helper class to access a Application specific config paths
@@ -12,9 +13,9 @@ namespace WebCommon.PathHelp
         #region Properties
 
         /// <summary>
-        /// The application topic 
+        /// The application topic name
         /// </summary>
-        public string AppTopic { get; set; }
+        public string AppTopicName { get; set; }
 
         #endregion Properties
 
@@ -31,16 +32,22 @@ namespace WebCommon.PathHelp
         /// <param name="appTopic"></param>
         public AppTopicConfigPathHelper(string appTopic)
         {
-            AppTopic = appTopic;
+            AppTopicName = appTopic;
 
-            AppTopicMain = new PathGeneric("App" + AppTopic, AppGenericConfigPathHelper.I.ScrapperApps);
-            AppConfig = new PathGeneric(AppTopic + "Config.xml", AppTopicMain, true);
-            ScrapConfig = new PathGeneric("Scrap", AppTopicMain);
-            AppTopicScrap = new PathGeneric(AppTopic + "Scrap.xml", ScrapConfig, true);
-            DbScripts = new PathGeneric("DbScripts", AppTopicMain);
-            DbScriptsTableColumn = new PathGeneric("table_columns.csv", DbScripts, true);
-            DbScriptsTableEnum = new PathGeneric("table_enums.csv", DbScripts, true);
-            DbScriptsTableMdt = new PathGeneric("table_mdt.csv", DbScripts, true);
+            AppTopicMain = new PathGeneric(PathConstants.PrefixAppFolderName + AppTopicName,
+                AppGenericConfigPathHelper.I.ScrapperApps);
+            AppConfig = new PathGeneric(AppTopicName + PathConstants.SuffixConfigFileName, 
+                AppTopicMain, true);
+            ScrapConfig = new PathGeneric(PathConstants.PrefixScrapFolderName, AppTopicMain);
+            AppTopicScrap = new PathGeneric(AppTopicName + PathConstants.SuffixScrapFileName,
+                ScrapConfig, true);
+            DbScripts = new PathGeneric(PathConstants.DbScriptsFolderName, AppTopicMain);
+            DbScriptsTableColumn = new PathGeneric(PathConstants.TableColumnsFileName,
+                DbScripts, true);
+            DbScriptsTableEnum = new PathGeneric(PathConstants.TableEnumsFileName,
+                DbScripts, true);
+            DbScriptsTableMdt = new PathGeneric(PathConstants.TableMetadataFileName,
+                DbScripts, true);
         }
 
         #endregion Constructor
@@ -98,7 +105,8 @@ namespace WebCommon.PathHelp
         public static IEnumerable<AppTopicConfigPathHelper> GetAppTopics()
         {
             foreach (var folderAppTopic in 
-                Directory.GetDirectories(AppGenericConfigPathHelper.I.ScrapperApps.FullPath, "App*"))
+                Directory.GetDirectories(AppGenericConfigPathHelper.I.ScrapperApps.FullPath,
+                PathConstants.PrefixAppFolderSearch))
             {
                 // Remove "App" from the folder name
                 DirectoryInfo di = new DirectoryInfo(folderAppTopic);

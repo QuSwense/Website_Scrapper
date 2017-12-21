@@ -2,6 +2,7 @@
 using ScrapEngine.Db;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
+using ScrapEngine.Model.Scrap;
 using SqliteDatabase.Model;
 using System;
 using System.Collections.Generic;
@@ -63,10 +64,16 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         protected ScrapColumnConfigParser scrapColumnConfigParser;
 
+        /// <summary>
+        /// Scrap column config parser
+        /// </summary>
+        protected GroupColumnConfigParser groupColumnConfigParser;
+
         public DbRowConfigParser(WebScrapConfigParser configParser)
             : base(configParser)
         {
             scrapColumnConfigParser = new ScrapColumnConfigParser(configParser);
+            groupColumnConfigParser = new GroupColumnConfigParser(configParser);
         }
 
         /// <summary>
@@ -111,9 +118,19 @@ namespace ScrapEngine.Bl.Parser
                 if (!configParser.StateModel.IsColumnDataAvailable(colElement))
                 {
                     configParser.StateModel.SetColumnConfig(colElement);
-                    scrapColumnConfigParser.Process();
-                    configParser.StateModel.AddColumnData(DbTableDataMapper(currentColumnScrapIteratorArgs.ResultColumnScrap,
+                    
+                    if(colElement is GroupColumnElement)
+                    {
+                        groupColumnConfigParser.Process();
+                        configParser.StateModel.AddColumnData(groupColumnConfigParser.DbTableDataMapper(currentColumnScrapIteratorArgs.ResultColumnScrap,
                         colElement), colElement);
+                    }
+                    else
+                    {
+                        scrapColumnConfigParser.Process();
+                        configParser.StateModel.AddColumnData(scrapColumnConfigParser.DbTableDataMapper(currentColumnScrapIteratorArgs.ResultColumnScrap,
+                        colElement), colElement);
+                    }
                 }
             }
 
@@ -133,38 +150,6 @@ namespace ScrapEngine.Bl.Parser
                 configParser.WebDbContext.AddOrUpdate(ScrapConfig, rows);
                 configParser.Performance.FinalDbUpdate(rows, currentColumnScrapIteratorArgs);
             }
-        }
-
-        /// <summary>
-        /// For each data scrapped from the reference link
-        /// </summary>
-        /// <param name="manipulateHtml"></param>
-        /// <param name="columnConfig"></param>
-        /// <returns></returns>
-        private List<DynamicTableDataInsertModel> DbTableDataMapper(ManipulateHtmlData manipulateHtml,
-            ColumnElement columnConfig)
-        {
-            // A list to store multiple column values for >1 cardinal values
-            var colValues = new List<DynamicTableDataInsertModel>();
-
-            foreach (var result in manipulateHtml.Results)
-            {
-                var tableDataColumn = new DynamicTableDataInsertModel()
-                {
-                    Name = columnConfig.Name,
-                    IsPk = columnConfig.IsUnique,
-                    Value = result,
-                    DataType =
-                    MetaDbConfig.TableColumnConfigs[
-                        ScrapConfig.TableName][columnConfig.Name].DataType
-                };
-
-                if (tableDataColumn.IsPk && string.IsNullOrEmpty(tableDataColumn.Value))
-                    continue;
-                colValues.Add(tableDataColumn);
-            }
-
-            return colValues;
         }
     }
 }

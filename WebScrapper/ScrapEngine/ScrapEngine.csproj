@@ -98,6 +98,7 @@
     <Compile Include="Bl\Parser\AppTopicConfigParser.cs" />
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
     <Compile Include="Bl\Parser\DbRowConfigParser.cs" />
+    <Compile Include="Bl\Parser\GroupColumnConfigParser.cs" />
     <Compile Include="Bl\Parser\ManipulateChildFactory.cs" />
     <Compile Include="Bl\Parser\ScrapColumnConfigParser.cs" />
     <Compile Include="Bl\Parser\ScrapConfigParser.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Model\Scrap\DbchangeElement.cs" />
     <Compile Include="Model\Scrap\DbchangeSelectElement.cs" />
     <Compile Include="Model\Scrap\DbRowElement.cs" />
+    <Compile Include="Model\Scrap\GroupColumnElement.cs" />
     <Compile Include="Model\Scrap\HtmlDecodeElement.cs" />
     <Compile Include="Model\Scrap\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />

@@ -131,6 +131,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ConfigPathHelper\ConfigPathHelper.csproj">
+      <Project>{3548c5a0-7d98-431c-b907-7e037ba4364b}</Project>
+      <Name>ConfigPathHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ScrapEngine\ScrapEngine.csproj">
       <Project>{2d25c05d-63d5-4644-8a7b-daa9d73744d4}</Project>
       <Name>ScrapEngine</Name>

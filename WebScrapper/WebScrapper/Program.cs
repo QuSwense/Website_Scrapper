@@ -1,11 +1,11 @@
 ﻿using CommandLine;
+using ConfigPathHelper;
 using log4net;
 using ScrapEngine;
 using ScrapEngine.Db;
 using ScrapEngine.Model;
 using System;
 using WebCommon.Error;
-using WebCommon.PathHelp;
 using WebReader.Xml;
 
 namespace WebScrapper
@@ -19,20 +19,14 @@ namespace WebScrapper
         /// 1: The name of the application topic, or "*" for all
         /// </summary>
         /// <param name="args"></param>
-        [STAThread]
         static void Main(string[] args)
         {
+            Program application = new Program();
+
             logger.Info("Start of the Application Data Scrapper");
 
-            // Parse arguments
-            var options = new CommandOptions();
-            
-            if (!Parser.Default.ParseArguments(args, options))
-                throw new CommandLineException(CommandLineException.EErrorType.PARSE_ERROR, args);
-
-            if(logger.IsDebugEnabled)
-                logger.DebugFormat("Command line arguments parsed : \n{0}", string.Join(Environment.NewLine,
-                    options.PrintParsed()));
+            // Get command options
+            CommandOptions options = application.ParseCommandLine(args);
 
             // Initialize the root config path at the beginning (Always)
             AppGenericConfigPathHelper.I.Initialize(options.ScrapperFolderPath);
@@ -73,6 +67,35 @@ namespace WebScrapper
                 ScrapEngineContext.Execute(new AppTopicConfigPathHelper(options.AppTopic), appGenericConfig);
 
             logger.Info("End of the Application Data Scrapper");
+        }
+
+        /// <summary>
+        /// Parse command line arguments
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public CommandOptions ParseCommandLine(string[] args)
+        {
+            // Parse arguments
+            var options = new CommandOptions();
+
+            if (!Parser.Default.ParseArguments(args, options))
+                throw new CommandLineException(CommandLineException.EErrorType.PARSE_ERROR, args);
+
+            if (logger.IsDebugEnabled)
+                logger.DebugFormat("Command line arguments parsed : \n{0}", string.Join(Environment.NewLine,
+                    options.PrintParsed()));
+
+            return options;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        public void InitializeConfigPath(CommandOptions options)
+        {
+
         }
     }
 }

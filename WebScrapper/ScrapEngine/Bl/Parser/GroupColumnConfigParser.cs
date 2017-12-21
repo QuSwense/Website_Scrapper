@@ -3,16 +3,15 @@ using ScrapEngine.Db;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using SqliteDatabase.Model;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ScrapEngine.Bl.Parser
 {
-    /// <summary>
-    /// The business logic to parse the "Columns" Xml node and execute web scrapping
-    /// process. This class uses the scrapped data to save it into the table column specified
-    /// after the manipulations
-    /// </summary>
-    public class ScrapColumnConfigParser : AppTopicConfigParser
+    public class GroupColumnConfigParser : AppTopicConfigParser
     {
         #region Properties
 
@@ -67,18 +66,11 @@ namespace ScrapEngine.Bl.Parser
 
         #region Constructor
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="configParser"></param>
-        public ScrapColumnConfigParser(WebScrapConfigParser configParser)
-            : base(configParser)
-        {
-            manipulateChildFactory = new ManipulateChildFactory(configParser);
-        }
+        public GroupColumnConfigParser(WebScrapConfigParser configParser)
+            : base(configParser) { }
 
         #endregion Constructor
-        
+
         /// <summary>
         /// This method scraps the actual data from the webpage as per the column info
         /// </summary>
@@ -112,7 +104,7 @@ namespace ScrapEngine.Bl.Parser
         {
             if (columnConfig.IsUnique && (manipulateHtml.Results.Count <= 0)) return true;
 
-            if(columnConfig.SkipIfValues != null && columnConfig.SkipIfValues.Count > 0)
+            if (columnConfig.SkipIfValues != null && columnConfig.SkipIfValues.Count > 0)
             {
                 foreach (var result in manipulateHtml.Results)
                 {
@@ -122,7 +114,7 @@ namespace ScrapEngine.Bl.Parser
 
             return false;
         }
-        
+
         /// <summary>
         /// Manipulate the scrapped column data
         /// </summary>
@@ -132,7 +124,7 @@ namespace ScrapEngine.Bl.Parser
         /// <returns></returns>
         private void Manipulate(ColumnElement columnConfig, ManipulateHtmlData manipulateHtml)
         {
-            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'", 
+            logger.DebugFormat("For Column '{0}' Scrapped data '{1}'",
                 columnConfig.Name, manipulateHtml.OriginalValue);
 
             // Even if Scrapped data is null send to manipulation tag. As there can be a default

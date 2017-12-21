@@ -1,4 +1,6 @@
-﻿namespace WebCommon.PathHelp
+﻿using ConfigPathHelper.Common;
+
+namespace ConfigPathHelper
 {
     /// <summary>
     /// A helper function to determine all the paths accessed throughout the solution
@@ -40,14 +42,20 @@
         /// </summary>
         protected AppGenericConfigPathHelper()
         {
-            ScrapperApps = new PathGeneric("ScrapperApps");
-            GlobalAppConfig = new PathGeneric("AppConfig.xml", ScrapperApps, true);
-            GlobalConfig = new PathGeneric("Config", ScrapperApps);
-            GlobalDbScripts = new PathGeneric("DbScripts", GlobalConfig);
-            DbScriptsTableScrapMdt = new PathGeneric("table_scrap_mdt.csv", GlobalDbScripts, true);
-            DbScriptsPerformanceMdt = new PathGeneric("performance_mdt.csv", GlobalDbScripts, true);
-            DbScriptsTableMdt = new PathGeneric("table_mdt.csv", GlobalDbScripts, true);
-            DbScriptsColumnScrapMdt = new PathGeneric("col_scrap_mdt.csv", GlobalDbScripts, true);
+            ScrapperApps = new PathGeneric(PathConstants.ScrapperAppsFolderName, RootPath);
+            GlobalAppConfig = new PathGeneric(PathConstants.AppConfigFileName,
+                ScrapperApps, true);
+            GlobalConfig = new PathGeneric(PathConstants.ConfigFolderName, ScrapperApps);
+            GlobalDbScripts = new PathGeneric(PathConstants.DbScriptsFolderName,
+                GlobalConfig);
+            DbScriptsTableScrapMdt = new PathGeneric(PathConstants.TableScrapMetadataFileName,
+                GlobalDbScripts, true);
+            DbScriptsPerformanceMdt = new PathGeneric(PathConstants.PerformanceMetadataFileName,
+                GlobalDbScripts, true);
+            DbScriptsTableMdt = new PathGeneric(PathConstants.TableMetadataFileName,
+                GlobalDbScripts, true);
+            DbScriptsColumnScrapMdt = new PathGeneric(PathConstants.ColumnScrapMetadataFileName,
+                GlobalDbScripts, true);
         }
 
         #endregion Singleton
