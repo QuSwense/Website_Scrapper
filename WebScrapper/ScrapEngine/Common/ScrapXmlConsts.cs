@@ -20,7 +20,6 @@
         public const string DbchangeSelectNodeName = "Select";
         public const string HtmlDecodeNodeName = "HtmlDecode";
         public const string DbRowNodeName = "DbRow";
-        public const string ScrapXmlNodeName = "ScrapXml";
         public const string GroupColumnNodeName = "GroupColumn";
 
         #endregion Node Names

@@ -6,6 +6,7 @@ namespace ScrapEngine.Bl.Parser
 {
     public class ScrapTrimConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapTrimConfigParser() { }
         public ScrapTrimConfigParser(WebScrapConfigParser configParser)
             : base(configParser) { }
         

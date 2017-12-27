@@ -4,9 +4,9 @@ using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System.Collections.Generic;
-using WebCommon.PathHelp;
 using ScrapEngine.Common;
 using ScrapEngine.Model.Scrap;
+using ConfigPathHelper;
 
 namespace ScrapEngine.Bl
 {
@@ -102,8 +102,7 @@ namespace ScrapEngine.Bl
             scrapParsers = new Dictionary<string, ScrapConfigParser>
             {
                 { ScrapXmlConsts.ScrapHtmlTableNodeName, new ScrapHtmlTableConfigParser(this) },
-                { ScrapXmlConsts.ScrapCsvNodeName, new ScrapCsvConfigParser(this) },
-                { ScrapXmlConsts.ScrapXmlNodeName, new ScrapXmlConfigParser(this) }
+                { ScrapXmlConsts.ScrapCsvNodeName, new ScrapCsvConfigParser(this) }
             };
         }
 
@@ -129,7 +128,7 @@ namespace ScrapEngine.Bl
             foreach (ScrapElement rootScrapObj in RootScrapNodes)
             {
                 logger.InfoFormat("Parsing Scrap xml node from {0} Xml config {1}",
-                    AppTopicPath.AppTopic, AppTopicPath.AppTopicScrap.FullPath);
+                    AppTopicPath.AppTopicName, AppTopicPath.AppTopicScrap.FullPath);
 
                 if (string.IsNullOrEmpty(rootScrapObj.IdString))
                     throw new System.Exception();
@@ -145,6 +144,21 @@ namespace ScrapEngine.Bl
                 if (!string.IsNullOrEmpty(Performance.CurrentScrapNodeName))
                     WebDbContext.AddMetadata(Performance.CurrentScrapNodeName, Performance);
             }
+        }
+
+        /// <summary>
+        /// Process scrap node
+        /// </summary>
+        /// <param name="configElement"></param>
+        private void ProcessScrapNode(IConfigElement configElement)
+        {
+            Performance.NewChildNode(configElement.IdScrapUnit);
+
+            StateModel.AddRootScrapArgsState(GetScrapIteratorArgs(configElement));
+
+            if (!ConfigScrapElementFactory()) return;
+
+            Performance.FinalChildNode();
         }
 
         /// <summary>

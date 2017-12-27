@@ -1,12 +1,13 @@
 ﻿using ScrapEngine.Model;
 using ScrapEngine.Model.Scrap;
+using ScrapException;
 using System.Collections.Generic;
-using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
     public class ScrapValidateConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapValidateConfigParser() { }
         public ScrapValidateConfigParser(WebScrapConfigParser configParser) 
             : base(configParser) { }
 

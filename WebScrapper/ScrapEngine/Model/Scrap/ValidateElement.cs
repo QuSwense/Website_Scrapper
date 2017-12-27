@@ -4,9 +4,9 @@ using WebReader.Model;
 namespace ScrapEngine.Model.Scrap
 {
     /// <summary>
-    /// Validate the scrapped data
+    /// Validate the scrapped data against database. If not validated throw error.
     /// </summary>
-    public class ValidateElement
+    public class ValidateElement : ConfigElementBase
     {
         #region Xml Attributes
 
@@ -23,15 +23,5 @@ namespace ScrapEngine.Model.Scrap
         public string Column { get; set; }
 
         #endregion Xml Attributes
-
-        #region References
-
-        /// <summary>
-        /// Parent column element
-        /// </summary>
-        [DXmlParent]
-        public ColumnElement Parent { get; set; }
-
-        #endregion References
     }
 }

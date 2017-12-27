@@ -3,12 +3,12 @@ using ScrapEngine.Model.Scrap;
 using System;
 using WebReader.Model;
 
-namespace ScrapEngine.Model
+namespace ScrapEngine.Model.Scrap
 {
     /// <summary>
     /// A mnipulation Child element
     /// </summary>
-    public class RegexElement : ManipulateChildElement
+    public class RegexElement : ConfigElementBase
     {
         #region Xml Attributes
 
@@ -45,17 +45,5 @@ namespace ScrapEngine.Model
         }
 
         #endregion Calculated
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public RegexElement()
-        {
-            IndexString = "0";
-        }
-
-        #endregion Constructor
     }
 }

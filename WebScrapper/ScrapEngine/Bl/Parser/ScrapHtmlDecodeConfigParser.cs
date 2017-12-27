@@ -7,6 +7,7 @@ namespace ScrapEngine.Bl.Parser
 {
     public class ScrapHtmlDecodeConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapHtmlDecodeConfigParser() { }
         /// <summary>
         /// Constructor
         /// </summary>

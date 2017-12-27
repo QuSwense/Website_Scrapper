@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using System.Collections.Generic;
 using WebReader.Model;
 
@@ -8,29 +9,24 @@ namespace ScrapEngine.Model.Scrap
     /// Refers to the Manipulate node of xml config
     /// </summary>
     [DXmlElement(ScrapXmlConsts.ManipulateNodeName)]
-    public class ManipulateElement
+    public class ManipulateElement : ConfigElementBase
     {
-        #region References
+        #region IConfigElement Implementation
 
         /// <summary>
-        /// Child manipulation nodes
+        /// A set of child elements in order of occurance
         /// </summary>
-        [DXmlElement(ScrapXmlConsts.DbchangeNodeName, typeof(DbchangeElement))]
-        [DXmlElement(ScrapXmlConsts.HtmlDecodeNodeName, typeof(HtmlDecodeElement))]
-        [DXmlElement(ScrapXmlConsts.PurgeNodeName, typeof(PurgeElement))]
-        [DXmlElement(ScrapXmlConsts.RegexNodeName, typeof(RegexElement))]
-        [DXmlElement(ScrapXmlConsts.RegexReplaceNodeName, typeof(RegexReplaceElement))]
-        [DXmlElement(ScrapXmlConsts.ReplaceNodeName, typeof(ReplaceElement))]
-        [DXmlElement(ScrapXmlConsts.SplitNodeName, typeof(SplitElement))]
-        [DXmlElement(ScrapXmlConsts.TrimNodeName, typeof(TrimElement))]
-        public List<ManipulateChildElement> ManipulateChilds { get; set; }
+        [DXmlElement(ScrapXmlConsts.DbchangeNodeName)]
+        [DXmlElement(ScrapXmlConsts.HtmlDecodeNodeName)]
+        [DXmlElement(ScrapXmlConsts.PurgeNodeName)]
+        [DXmlElement(ScrapXmlConsts.RegexNodeName)]
+        [DXmlElement(ScrapXmlConsts.RegexReplaceNodeName)]
+        [DXmlElement(ScrapXmlConsts.ReplaceNodeName)]
+        [DXmlElement(ScrapXmlConsts.SplitNodeName)]
+        [DXmlElement(ScrapXmlConsts.TrimNodeName)]
+        [DXmlElement(ScrapXmlConsts.ValidateNodeName)]
+        public override List<IConfigElement> Children { get; set; }
 
-        /// <summary>
-        /// Points to the parent scrap node
-        /// </summary>
-        [DXmlParent]
-        public ColumnElement Parent { get; set; }
-
-        #endregion References
+        #endregion IConfigElement Implementation
     }
 }

@@ -74,6 +74,19 @@ namespace WebCommon.Extn
         /// <param name="type"></param>
         /// <param name="value"></param>
         /// <returns></returns>
+        public static object ChangeType(this Type type, object value)
+        {
+            string valueString = string.Empty;
+            if (value != null) valueString = value.ToString();
+            return ChangeType(type, valueString);
+        }
+
+        /// <summary>
+        /// Convert method to convert from one type to another for class <see cref="Type"/>
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static object ChangeType(this Type type, string value)
         {
             object result = null;

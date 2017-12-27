@@ -1,7 +1,7 @@
 ﻿using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
+using ScrapException;
 using System.Collections.Generic;
-using WebCommon.Error;
 using WebReader.Xml;
 
 namespace ScrapEngine.Bl

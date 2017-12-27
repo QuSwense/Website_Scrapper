@@ -1,5 +1,7 @@
-﻿using ScrapEngine.Model;
+﻿using ScrapEngine.Interfaces;
+using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
+using ScrapException;
 using SqliteDatabase.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,9 @@ using System.Linq;
 
 namespace ScrapEngine.Bl
 {
+    /// <summary>
+    /// The class to measure performance
+    /// </summary>
     public class PerformanceMeasure
     {
         /// <summary>
@@ -26,6 +31,11 @@ namespace ScrapEngine.Bl
         public Dictionary<string, PerformanceState> StorePerformances { get; set; }
 
         /// <summary>
+        /// Store the list of performances by unique names
+        /// </summary>
+        public Dictionary<string, PerformanceStateModel> Performances { get; set; }
+
+        /// <summary>
         /// The name of the current scrap node
         /// </summary>
         public string CurrentScrapNodeName { get; set; }
@@ -36,6 +46,45 @@ namespace ScrapEngine.Bl
         public PerformanceMeasure()
         {
             StorePerformances = new Dictionary<string, PerformanceState>();
+            Performances = new Dictionary<string, PerformanceStateModel>();
+        }
+
+        /// <summary>
+        /// Get the key for the current config element in a loop with index
+        /// </summary>
+        /// <param name="configElement"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private string GetKey(IConfigElement configElement, int index)
+        {
+            return string.Format("{0}_{1}", configElement.IdCurrent, index);
+        }
+
+        /// <summary>
+        /// Start measuring performance for the element
+        /// </summary>
+        /// <param name="configElement"></param>
+        public void Start(IConfigElement configElement, int index)
+        {
+            string key = GetKey(configElement, index);
+            Debug.Assert(!StorePerformances.ContainsKey(key));
+
+            PerformanceStateModel state = new PerformanceStateModel();
+            state.Start();
+
+            Performances.Add(key, state);
+        }
+
+        /// <summary>
+        /// Start measuring performance for the element
+        /// </summary>
+        /// <param name="configElement"></param>
+        public void Stop(IConfigElement configElement, int index)
+        {
+            string key = GetKey(configElement, index);
+            Debug.Assert(StorePerformances.ContainsKey(key));
+
+            Performances[key].Stop();
         }
 
         /// <summary>
@@ -101,7 +150,7 @@ namespace ScrapEngine.Bl
         /// Add a new url load
         /// </summary>
         /// <param name="url"></param>
-        public void NewDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapIteratorArgs scrapArgs)
+        public void NewDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapStateModel scrapArgs)
         {
             stopwatchTemp = new Stopwatch();
             stopwatchTemp.Start();
@@ -116,7 +165,7 @@ namespace ScrapEngine.Bl
         /// Time the load of url
         /// </summary>
         /// <param name="url"></param>
-        public void FinalDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapIteratorArgs scrapArgs)
+        public void FinalDbUpdate(List<List<DynamicTableDataInsertModel>> colValues, ColumnScrapStateModel scrapArgs)
         {
             stopwatchTemp.Stop();
             //string key = GetColumnKey(colValues, keyIndex);

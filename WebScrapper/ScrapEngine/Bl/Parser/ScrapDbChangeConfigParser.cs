@@ -14,6 +14,8 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         private ScrapDbChangeSelectConfigParser scrapDbChangesSelectConfigParser;
 
+        public ScrapDbChangeConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>

@@ -29,6 +29,8 @@ namespace ScrapEngine.Bl.Parser
             }
         }
 
+        public ScrapCsvConfigParser() { }
+
         /// <summary>
         /// Constructor (no default constructor)
         /// </summary>

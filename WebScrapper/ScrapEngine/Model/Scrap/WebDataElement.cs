@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model.Scrap;
 using System.Collections.Generic;
 using WebReader.Model;
@@ -10,9 +11,9 @@ namespace ScrapEngine.Model
     /// multiple websites.
     /// </summary>
     [DXmlElement(ScrapXmlConsts.WebDataNodeName)]
-    public class WebDataElement
+    public class WebDataElement : ConfigElementBase
     {
-        #region References
+        #region IConfigElement Implementation
 
         /// <summary>
         /// A Root node may contain different type of Scrap class elements which has same base type
@@ -20,8 +21,8 @@ namespace ScrapEngine.Model
         /// </summary>
         [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, DerivedType = typeof(ScrapCsvElement))]
         [DXmlElement(ScrapXmlConsts.ScrapHtmlTableNodeName, DerivedType = typeof(ScrapHtmlTableElement))]
-        public List<ScrapElement> Scraps { get; set; }
+        public override List<IConfigElement> Children { get; set; }
 
-        #endregion References
+        #endregion IConfigElement Implementation
     }
 }

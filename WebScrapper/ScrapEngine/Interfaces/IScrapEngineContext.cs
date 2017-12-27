@@ -1,5 +1,5 @@
-﻿using ScrapEngine.Model;
-using WebCommon.PathHelp;
+﻿using ConfigPathHelper;
+using ScrapEngine.Model;
 
 namespace ScrapEngine.Interfaces
 {

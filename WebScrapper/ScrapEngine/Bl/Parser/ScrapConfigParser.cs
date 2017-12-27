@@ -1,8 +1,8 @@
-﻿using ScrapEngine.Model;
+﻿using log4net;
+using ScrapEngine.Model;
 using ScrapEngine.Model.Parser;
 using System;
 using System.Xml.XPath;
-using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -11,20 +11,37 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapConfigParser : AppTopicConfigParser
     {
+        #region Properties
+
+        /// <summary>
+        /// Logger
+        /// </summary>
+        public static ILog logger = LogManager.GetLogger(typeof(ScrapHtmlTableConfigParser));
+
+        #endregion Properties
+
+        #region Helper Properties
+
+        /// <summary>
+        /// Stores the current state which is getting processed. Save the State before
+        /// sending to process child node
+        /// </summary>
+        private ScrapStateModel currentState
+        {
+            get
+            {
+                return configParserTemplate.StateModel.PeekScrap();
+            }
+        }
+
+        #endregion Helper Properties
+
         /// <summary>
         /// Scrap column config parser
         /// </summary>
         protected DbRowConfigParser dbConfigConfigParser;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="configParser"></param>
-        public ScrapConfigParser(WebScrapConfigParser configParser)
-            : base(configParser)
-        {
-            dbConfigConfigParser = new DbRowConfigParser(configParser);
-        }
+        public ScrapConfigParser() { }
 
         /// <summary>
         /// Start Processing from the Scrap Html node
@@ -81,30 +98,35 @@ namespace ScrapEngine.Bl.Parser
         /// <param name="urlValue"></param>
         /// <param name="scrapNode"></param>
         /// <returns></returns>
-        protected void ParseUrlValue(ScrapIteratorArgs childScrapIteratorArgs)
+        protected void ParseUrlValue()
         {
-            string urlValue = childScrapIteratorArgs.ScrapConfigObj.Url;
+            ScrapStateModel currentState = this.currentState;
+            ScrapElement scrapObj = ((ScrapElement)currentState.Config);
+            ScrapElement scrapParentObj = ((ScrapElement)currentState.Parent.Config);
 
-            if (childScrapIteratorArgs.ScrapConfigObj.Parent == null ||
-                string.IsNullOrEmpty(childScrapIteratorArgs.ScrapConfigObj.Parent.Url)) return;
-            if (urlValue != null && !urlValue.Contains("{parentValue}")) return;
-
-            urlValue = urlValue.Replace("{parentValue}", "");
-
-            if (string.IsNullOrEmpty(urlValue))
+            if (scrapParentObj == null ||
+                string.IsNullOrEmpty(scrapParentObj.UrlOriginal)) return;
+            if (!string.IsNullOrEmpty(scrapParentObj.UrlOriginal)
+                && scrapParentObj.UrlOriginal.Contains("{parentValue}"))
             {
-                urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
-                childScrapIteratorArgs.Parent.WebHtmlNode.Value).AbsoluteUri;
-            }
-            else
-            {
-                XPathNavigator htmlNode =
-                    childScrapIteratorArgs.Parent.WebHtmlNode.SelectSingleNode(urlValue);
-                urlValue = new Uri(new Uri(childScrapIteratorArgs.ScrapConfigObj.Parent.Url),
-                htmlNode.Value).AbsoluteUri;
-            }
+                currentState.AbsoluteUrl = scrapParentObj.UrlOriginal.Replace("{parentValue}", "");
 
-            childScrapIteratorArgs.ScrapConfigObj.UrlCalculated = urlValue;
+                if (string.IsNullOrEmpty(scrapObj.UrlOriginal))
+                {
+                    currentState.AbsoluteUrl = new Uri(new Uri(scrapParentObj.UrlOriginal),
+                    ((ScrapStateModel)currentState.Parent).WebHtmlNode.Value).AbsoluteUri;
+                }
+                else
+                {
+                    XPathNavigator htmlNode =
+                        ((ScrapStateModel)currentState.Parent).WebHtmlNode.SelectSingleNode(
+                            currentState.AbsoluteUrl);
+                    currentState.AbsoluteUrl = new Uri(new Uri(scrapParentObj.Url),
+                    htmlNode.Value).AbsoluteUri;
+                }
+            }
+            
+            currentState.AbsoluteUrl = urlValue;
         }
 
         /// <summary>

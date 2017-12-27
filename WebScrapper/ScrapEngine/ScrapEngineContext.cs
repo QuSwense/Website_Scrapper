@@ -1,7 +1,7 @@
-﻿using log4net;
+﻿using ConfigPathHelper;
+using log4net;
 using ScrapEngine.Interfaces;
 using ScrapEngine.Model;
-using WebCommon.PathHelp;
 using WebReader.Xml;
 
 namespace ScrapEngine
@@ -80,7 +80,7 @@ namespace ScrapEngine
             WebScrapHtml = Factory.CreateHtmlContext(this);
 
             logger.InfoFormat("Web scrap Engine context object which is the starting " +
-                "object for a application topic scrapper is successfull initialized for '{0}'", AppTopicPath.AppTopic);
+                "object for a application topic scrapper is successfull initialized for '{0}'", AppTopicPath.AppTopicName);
         }
 
         /// <summary>
@@ -110,8 +110,7 @@ namespace ScrapEngine
         {
             logger.InfoFormat("Generate Application Web Scrapped data for {0}", appTopicPath);
 
-            ScrapEngineContext engineContext = ScrapEngineContext.Init(appTopicPath,
-                        appGenericConfig);
+            ScrapEngineContext engineContext = Init(appTopicPath, appGenericConfig);
             engineContext.Run();
         }
 

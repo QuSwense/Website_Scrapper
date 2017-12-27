@@ -8,6 +8,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapManipulateChildConfigParser : AppTopicConfigParser
     {
+        public ScrapManipulateChildConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>

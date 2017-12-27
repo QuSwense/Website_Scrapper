@@ -17,30 +17,66 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapHtmlTableConfigParser : ScrapConfigParser
     {
+        #region Properties
+
         /// <summary>
         /// Logger
         /// </summary>
         public static ILog logger = LogManager.GetLogger(typeof(ScrapHtmlTableConfigParser));
-        
+
+        #endregion Properties
+
+        #region Helper Properties
+
         /// <summary>
         /// Stores the current state which is getting processed. Save the State before
         /// sending to process child node
         /// </summary>
-        private ScrapIteratorArgs currentscrapIteratorHtmlArgs
+        private ScrapHtmlTableStateModel currentState
         {
             get
             {
-                return configParser.StateModel.CurrentScrapIteratorArgs;
+                return (ScrapHtmlTableStateModel)configParserTemplate.StateModel.PeekScrap();
             }
         }
 
         /// <summary>
-        /// Constructor (no default constructor)
+        /// Current config element
         /// </summary>
-        /// <param name="configParser"></param>
-        /// <param name="startState"></param>
-        public ScrapHtmlTableConfigParser(WebScrapConfigParser configParser)
-            : base(configParser) { }
+        private ScrapHtmlTableElement currentConfig
+        {
+            get
+            {
+                return (ScrapHtmlTableElement)currentState.Config;
+            }
+        }
+
+        #endregion Helper Properties
+
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public ScrapHtmlTableConfigParser() { }
+
+        #endregion Constructor
+
+        #region Parser Methods
+
+        /// <summary>
+        /// Process data at the beginnging of the main loop
+        /// </summary>
+        protected override void PreProcess()
+        {
+            logger.Info("Parsing Config ScrapHtmlTable node");
+
+            ParseUrlValue();
+
+            logger.DebugFormat("The Calculated Url {0}", currentState.AbsoluteUrl);
+        }
+
+        #endregion Parser Methods
 
         /// <summary>
         /// Start Processing from the Scrap Html node

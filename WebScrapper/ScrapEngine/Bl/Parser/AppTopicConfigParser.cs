@@ -1,4 +1,7 @@
 ﻿using ScrapEngine.Interfaces;
+using System.Collections.Generic;
+using System;
+using System.Collections;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -7,18 +10,94 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class AppTopicConfigParser : IInnerBaseParser
     {
+        #region Properties
+
         /// <summary>
-        /// The reference to the config parser engine
+        /// The config parser template
         /// </summary>
-        protected WebScrapConfigParser configParser;
+        protected ConfigParserTemplate configParserTemplate;
+
+        #endregion Properties
+
+        #region Constructor
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="configParser"></param>
-        public AppTopicConfigParser(WebScrapConfigParser configParser)
+        public AppTopicConfigParser() { }
+
+        #endregion Constructor
+
+        #region Parser Methods
+        
+        /// <summary>
+        /// The template method for processing
+        /// </summary>
+        public virtual void Process()
         {
-            this.configParser = configParser;
+            PreProcess();
+            IList listResult = GetDataListIterator();
+
+            if (listResult != null && listResult.Count > 0)
+            {
+                PreLoopProcess(listResult);
+
+                foreach (var item in listResult)
+                {
+                    LoopProcess(item);
+                }
+
+                PostLoopProcess(listResult);
+            }
+
+            PostProcess();
         }
+
+        protected virtual void PostLoopProcess(IList listResult)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void LoopProcess<T>(T item)
+        {
+            StartInLoopProcess();
+
+            configParserTemplate.ParseChildren(
+                configParserTemplate.StateModel.ConfigStack.Peek());
+
+            EndInLoopProcess();
+        }
+
+        protected virtual void EndInLoopProcess()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void StartInLoopProcess()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void PreLoopProcess(IList listResult)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual IList GetDataListIterator()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void PreProcess()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void PostProcess()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion Parser Methods
     }
 }

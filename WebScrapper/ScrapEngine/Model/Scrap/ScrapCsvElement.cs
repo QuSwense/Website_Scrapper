@@ -25,18 +25,5 @@ namespace ScrapEngine.Model.Scrap
         public int SkipFirstLines { get; set; }
 
         #endregion Xml Attributes
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public ScrapCsvElement()
-        {
-            SkipFirstLines = 0;
-            Delimiter = ASCIICharacters.TabString;
-        }
-
-        #endregion Constructor
     }
 }

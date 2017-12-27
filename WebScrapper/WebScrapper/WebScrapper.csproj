@@ -139,6 +139,10 @@
       <Project>{2d25c05d-63d5-4644-8a7b-daa9d73744d4}</Project>
       <Name>ScrapEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ScrapException\ScrapException.csproj">
+      <Project>{225e9524-6d52-4469-8613-00b79af9f570}</Project>
+      <Name>ScrapException</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebCommon\WebCommon.csproj">
       <Project>{59422652-b685-4205-b494-b7a40e66220b}</Project>
       <Name>WebCommon</Name>

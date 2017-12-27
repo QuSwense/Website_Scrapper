@@ -2,12 +2,12 @@
 using ScrapEngine.Model.Scrap;
 using WebReader.Model;
 
-namespace ScrapEngine.Model
+namespace ScrapEngine.Model.Scrap
 {
     /// <summary>
     /// Manipulate node data
     /// </summary>
-    public class TrimElement : ManipulateChildElement
+    public class TrimElement : ConfigElementBase
     {
         #region Xml Attributes
 

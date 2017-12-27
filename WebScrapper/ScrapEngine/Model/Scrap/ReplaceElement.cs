@@ -2,9 +2,9 @@
 using ScrapEngine.Model.Scrap;
 using WebReader.Model;
 
-namespace ScrapEngine.Model
+namespace ScrapEngine.Model.Scrap
 {
-    public class ReplaceElement : ManipulateChildElement
+    public class ReplaceElement : ConfigElementBase
     {
         #region Xml Attributes
 

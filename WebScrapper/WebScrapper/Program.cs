@@ -4,8 +4,8 @@ using log4net;
 using ScrapEngine;
 using ScrapEngine.Db;
 using ScrapEngine.Model;
+using ScrapException;
 using System;
-using WebCommon.Error;
 using WebReader.Xml;
 
 namespace WebScrapper
@@ -28,30 +28,12 @@ namespace WebScrapper
             // Get command options
             CommandOptions options = application.ParseCommandLine(args);
 
-            // Initialize the root config path at the beginning (Always)
-            AppGenericConfigPathHelper.I.Initialize(options.ScrapperFolderPath);
-
-            logger.DebugFormat("Root Config file(s) from the path {0} is initialized",
-                AppGenericConfigPathHelper.I.RootPath);
-
-            // Check mandatory path
-            AppGenericConfigPathHelper.I.GlobalAppConfig.AssertExists();
-
-            logger.DebugFormat("Global Application config path {0} is present",
-                AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
+            // Initialize
+            application.InitializeConfigPath(options);
 
             // Read the generic application configuration file independent of any application topic
             var appGenericConfig = DXmlSerializeReader.Load<ApplicationConfig>(
                 AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
-
-            // Read database generic config
-            DynamicGenericDbConfig.I.Read();
-
-            // Before starting the loops check the global database configs
-            AppGenericConfigPathHelper.I.DbScriptsTableMdt.AssertExists();
-            AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.AssertExists();
-            AppGenericConfigPathHelper.I.DbScriptsPerformanceMdt.AssertExists();
-            AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.AssertExists();
 
             // If application topic value is "*" run scrapper for all
             // available application folders
@@ -95,7 +77,26 @@ namespace WebScrapper
         /// <param name="options"></param>
         public void InitializeConfigPath(CommandOptions options)
         {
+            // Initialize the root config path at the beginning (Always)
+            AppGenericConfigPathHelper.I.Initialize(options.ScrapperFolderPath);
 
+            logger.DebugFormat("Root Config file(s) from the path {0} is initialized",
+                AppGenericConfigPathHelper.I.RootPath);
+
+            // Check mandatory path
+            AppGenericConfigPathHelper.I.GlobalAppConfig.AssertExists();
+
+            logger.DebugFormat("Global Application config path {0} is present",
+                AppGenericConfigPathHelper.I.GlobalAppConfig.FullPath);
+
+            // Read database generic config
+            DynamicGenericDbConfig.I.Read();
+
+            // Before starting the loops check the global database configs
+            AppGenericConfigPathHelper.I.DbScriptsTableMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsTableScrapMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsPerformanceMdt.AssertExists();
+            AppGenericConfigPathHelper.I.DbScriptsColumnScrapMdt.AssertExists();
         }
     }
 }

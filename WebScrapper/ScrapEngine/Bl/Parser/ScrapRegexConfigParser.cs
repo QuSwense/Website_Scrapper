@@ -2,7 +2,6 @@
 using ScrapEngine.Model.Scrap;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using WebCommon.Error;
 
 namespace ScrapEngine.Bl.Parser
 {
@@ -11,6 +10,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapRegexConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapRegexConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>

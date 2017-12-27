@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using ScrapEngine.Model.Scrap;
 using System.Collections.Generic;
 using WebReader.Model;
@@ -8,7 +9,7 @@ namespace ScrapEngine.Model
     /// <summary>
     /// Base class for any Scrap type element
     /// </summary>
-    public abstract class ScrapElement
+    public abstract class ScrapElement : ConfigElementBase
     {
         #region Xml Attributes
 
@@ -17,13 +18,7 @@ namespace ScrapEngine.Model
         /// </summary>
         [DXmlAttribute(ScrapXmlConsts.IdAttributeName)]
         public string IdString { get; set; }
-
-        /// <summary>
-        /// The name of the node
-        /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.NameAttributeName)]
-        public string Name { get; set; }
-
+        
         /// <summary>
         /// The url value present in the xml config
         /// </summary>
@@ -33,7 +28,8 @@ namespace ScrapEngine.Model
         /// <summary>
         /// The type of the scrap node
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.DoUpdateOnlyAttributeName)]
+        [DXmlAttribute(ScrapXmlConsts.DoUpdateOnlyAttributeName,
+            ConfigElementConsts.DoUpdateOnlyColumnDefault)]
         public bool DoUpdateOnly { get; set; }
 
         #endregion Xml Attributes
@@ -41,23 +37,15 @@ namespace ScrapEngine.Model
         #region Calculated
 
         /// <summary>
-        /// Get the level of the node wrt the parent scrap nodes.
-        /// It does not get the actual level of the node in the xml config.
-        /// It gets the level of the Scrap node under other scrap nodes.
+        /// Get the root Scrap element tag
         /// </summary>
-        public int Level
+        public IConfigElement ScrapRoot
         {
             get
             {
-                int level = 0;
-                ScrapElement tmpObj = this;
-                while (tmpObj.Parent != null)
-                {
-                    tmpObj = tmpObj.Parent;
-                    ++level;
-                }
-
-                return level;
+                IConfigElement scrapRoot = this;
+                while (scrapRoot.ParentConfig != null) scrapRoot = scrapRoot.ParentConfig;
+                return scrapRoot;
             }
         }
 
@@ -67,34 +55,7 @@ namespace ScrapEngine.Model
         /// </summary>
         public string TableName
         {
-            get
-            {
-                ScrapElement tmpObj = this;
-                while (tmpObj != null)
-                {
-                    if (!string.IsNullOrEmpty(tmpObj.Name)) return tmpObj.Name;
-                    tmpObj = tmpObj.Parent;
-                }
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// The id of the scrap nodes. There is only one id attribute defined at
-        /// the parent level of a scrap node
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                ScrapElement tmpObj = this;
-                while (tmpObj != null)
-                {
-                    if (!string.IsNullOrEmpty(tmpObj.IdString)) return tmpObj.IdString;
-                    tmpObj = tmpObj.Parent;
-                }
-                return string.Empty;
-            }
+            get { return ScrapRoot.Name; }
         }
 
         /// <summary>
@@ -116,39 +77,30 @@ namespace ScrapEngine.Model
 
         #endregion Calculated
 
-        #region References
+        #region IConfigElement Implementation
 
         /// <summary>
-        /// The list of column nodes
+        /// Get the Id of the scrap config unit.
+        /// If the current element is child element then find the id defined at the parent level 
+        /// recursively
         /// </summary>
-        [DXmlElement(ScrapXmlConsts.DbRowNodeName)]
-        public DbRowElement DbRow { get; set; }
-
-        /// <summary>
-        /// The parent node
-        /// </summary>
-        [DXmlParent]
-        public ScrapElement Parent { get; set; }
-
-        /// <summary>
-        /// The list of child Scrap element
-        /// </summary>
-        [DXmlElement(ScrapXmlConsts.ScrapHtmlTableNodeName, typeof(ScrapHtmlTableElement))]
-        [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, typeof(ScrapCsvElement))]
-        public List<ScrapElement> Scraps { get; set; }
-
-        #endregion References
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public ScrapElement()
+        public override string IdScrapUnit
         {
-            DoUpdateOnly = false;
+            get
+            {
+                if (ScrapParent == null) return IdString;
+                else return ScrapParent.IdScrapUnit;
+            }
         }
 
-        #endregion Constructor
+        /// <summary>
+        /// A set of child elements in order of occurance
+        /// </summary>
+        [DXmlElement(ScrapXmlConsts.DbRowNodeName)]
+        [DXmlElement(ScrapXmlConsts.ScrapHtmlTableNodeName, typeof(ScrapHtmlTableElement))]
+        [DXmlElement(ScrapXmlConsts.ScrapCsvNodeName, typeof(ScrapCsvElement))]
+        public override List<IConfigElement> Children { get; set; }
+
+        #endregion IConfigElement Implementation
     }
 }

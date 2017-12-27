@@ -6,7 +6,7 @@ namespace ScrapEngine.Model.Scrap
     /// <summary>
     /// This manipulate node uses "Regex.Replace"
     /// </summary>
-    public class RegexReplaceElement : ManipulateChildElement
+    public class RegexReplaceElement : ConfigElementBase
     {
         #region Xml Attributes
 

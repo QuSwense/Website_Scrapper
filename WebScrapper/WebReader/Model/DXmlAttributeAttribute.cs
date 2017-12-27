@@ -19,12 +19,18 @@ namespace WebReader.Model
         public bool IsMandatory { get; set; }
 
         /// <summary>
+        /// The default value in case the attribute is not defined
+        /// </summary>
+        public object Default { get; set; }
+
+        /// <summary>
         /// Constructor with Name parameter
         /// </summary>
         /// <param name="name"></param>
-        public DXmlAttributeAttribute(string name)
+        public DXmlAttributeAttribute(string name, object defVal = null)
         {
             Name = name;
+            Default = defVal;
             IsMandatory = false;
         }
     }

@@ -12,6 +12,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapSplitConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapSplitConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>

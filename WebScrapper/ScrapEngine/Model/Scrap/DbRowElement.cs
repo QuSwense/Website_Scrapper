@@ -1,4 +1,5 @@
 ﻿using ScrapEngine.Common;
+using ScrapEngine.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,23 +9,17 @@ using WebReader.Model;
 
 namespace ScrapEngine.Model.Scrap
 {
-    public class DbRowElement
+    public class DbRowElement : ConfigElementBase
     {
-        #region References
-        
+        #region IConfigElement Implementation
+
         /// <summary>
-        /// The list of column nodes
+        /// A set of child elements in order of occurance
         /// </summary>
         [DXmlElement(ScrapXmlConsts.ColumnNodeName)]
         [DXmlElement(ScrapXmlConsts.GroupColumnNodeName)]
-        public List<ColumnElement> Columns { get; set; }
+        public override List<IConfigElement> Children { get; set; }
 
-        /// <summary>
-        /// The parent node
-        /// </summary>
-        [DXmlParent]
-        public ScrapElement Parent { get; set; }
-
-        #endregion References
+        #endregion IConfigElement Implementation
     }
 }

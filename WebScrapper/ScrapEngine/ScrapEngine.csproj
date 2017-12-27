@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="Bl\Parser\AppTopicConfigParser.cs" />
     <Compile Include="Bl\HtmlScrapperCommand.cs" />
+    <Compile Include="Bl\Parser\ConfigParserTemplate.cs" />
     <Compile Include="Bl\Parser\DbRowConfigParser.cs" />
     <Compile Include="Bl\Parser\GroupColumnConfigParser.cs" />
     <Compile Include="Bl\Parser\ManipulateChildFactory.cs" />
@@ -119,23 +120,30 @@
     <Compile Include="Bl\PerformanceMeasure.cs" />
     <Compile Include="Bl\WebScrapConfigParser.cs" />
     <Compile Include="Bl\WebScrapHtmlContext.cs" />
+    <Compile Include="Common\ConfigElementConsts.cs" />
     <Compile Include="Common\ScrapXmlConsts.cs" />
     <Compile Include="Db\DynamicAppDbConfig.cs" />
     <Compile Include="Db\DynamicGenericDbConfig.cs" />
     <Compile Include="Db\ScrapDbContext.cs" />
+    <Compile Include="Factory\ConfigParserFactory.cs" />
     <Compile Include="Interfaces\IColumnChild.cs" />
+    <Compile Include="Interfaces\IConfigElement.cs" />
     <Compile Include="Interfaces\IIdentity.cs" />
     <Compile Include="Interfaces\IInnerBaseParser.cs" />
+    <Compile Include="Model\Parser\ManipulateStateModel.cs" />
     <Compile Include="Model\Parser\ParserIteratorArgs.cs" />
-    <Compile Include="Model\Parser\ScrapIteratorArgs.cs" />
+    <Compile Include="Model\Parser\ParserStateModel.cs" />
+    <Compile Include="Model\Parser\ScrapHtmlTableStateModel.cs" />
     <Compile Include="Model\Parser\ScrapIteratorStateModel.cs" />
+    <Compile Include="Model\Parser\ScrapStateModel.cs" />
     <Compile Include="Model\PerformanceState.cs" />
+    <Compile Include="Model\PerformanceStateModel.cs" />
+    <Compile Include="Model\Scrap\ConfigElementBase.cs" />
     <Compile Include="Model\Scrap\DbchangeElement.cs" />
     <Compile Include="Model\Scrap\DbchangeSelectElement.cs" />
     <Compile Include="Model\Scrap\DbRowElement.cs" />
     <Compile Include="Model\Scrap\GroupColumnElement.cs" />
     <Compile Include="Model\Scrap\HtmlDecodeElement.cs" />
-    <Compile Include="Model\Scrap\ManipulateChildElement.cs" />
     <Compile Include="Interfaces\IScrapDbContext.cs" />
     <Compile Include="Interfaces\IScrapEngineContext.cs" />
     <Compile Include="Interfaces\IScrapHtmlContext.cs" />
@@ -145,7 +153,7 @@
     <Compile Include="Model\ApplicationConfigKey.cs" />
     <Compile Include="Model\EWebDataConfigType.cs" />
     <Compile Include="Model\ManipulateHtmlData.cs" />
-    <Compile Include="Model\Parser\ColumnScrapIteratorArgs.cs" />
+    <Compile Include="Model\Parser\ColumnScrapStateModel.cs" />
     <Compile Include="Model\Parser\ColumnScrapIteratorFileArgs.cs" />
     <Compile Include="Model\Parser\ColumnScrapIteratorHtmlArgs.cs" />
     <Compile Include="Model\Scrap\ColumnElement.cs" />
@@ -157,7 +165,6 @@
     <Compile Include="Model\Scrap\ScrapElement.cs" />
     <Compile Include="Model\Scrap\ScrapCsvElement.cs" />
     <Compile Include="Model\Scrap\ScrapHtmlTableElement.cs" />
-    <Compile Include="Model\Scrap\ScrapXmlElement.cs" />
     <Compile Include="Model\Scrap\SplitElement.cs" />
     <Compile Include="Model\Scrap\TrimElement.cs" />
     <Compile Include="Model\Scrap\ValidateElement.cs" />
@@ -170,6 +177,14 @@
     <Compile Include="ScrapFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ConfigPathHelper\ConfigPathHelper.csproj">
+      <Project>{3548c5a0-7d98-431c-b907-7e037ba4364b}</Project>
+      <Name>ConfigPathHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScrapException\ScrapException.csproj">
+      <Project>{225e9524-6d52-4469-8613-00b79af9f570}</Project>
+      <Name>ScrapException</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SqliteDatabase\SqliteDatabase.csproj">
       <Project>{7342fda2-9d9e-45b7-9986-d61a6cf92c22}</Project>
       <Name>SqliteDatabase</Name>

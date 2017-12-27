@@ -1,6 +1,8 @@
 ﻿using SqliteDatabase.Model;
 using System.Collections.Generic;
 using System;
+using ScrapEngine.Interfaces;
+using System.Diagnostics;
 
 namespace ScrapEngine.Model.Parser
 {
@@ -10,191 +12,95 @@ namespace ScrapEngine.Model.Parser
     /// </summary>
     public class ScrapIteratorStateModel
     {
-        /// <summary>
-        /// Stores all the states for the scrap nodes
-        /// </summary>
-        public Dictionary<string, ScrapIteratorArgs> WebScrapArgs { get; set; }
+        #region Properties
 
         /// <summary>
-        /// This stores if the column metadata is updated in database for a Scrap unit id 
+        /// The stack of parameters for storing all <see cref="ScrapStateModel"/>
         /// </summary>
-        public Dictionary<string, bool> ColumnMetadataUpdateFlags { get; set; }
+        public Stack<ScrapStateModel> ScrapStack { get; set; }
 
         /// <summary>
-        /// The current scrap iterator argumnets
+        /// The stack of parameters for storing all <see cref="ColumnScrapStateModel"/>
         /// </summary>
-        public ScrapIteratorArgs CurrentScrapIteratorArgs { get; protected set; }
+        public Stack<ColumnScrapStateModel> ColumnStack { get; set; }
 
         /// <summary>
-        /// The current column iterator arguments
+        /// The stack of parameters for storing all <see cref="ManipulateStateModel"/>
         /// </summary>
-        public ColumnScrapIteratorArgs CurrentColumnScrapIteratorArgs { get; protected set; }
+        public Stack<ManipulateStateModel> ManipulateStack { get; set; }
+
+        #endregion Properties
+
+        #region Constructor
 
         /// <summary>
-        /// Store the row data for one single loop of iteration for each level of data scrapping
-        /// </summary>
-        public List<List<DynamicTableDataInsertModel>> RowDataInCurrentLoop { get; protected set; }
-
-        /// <summary>
-        /// Constructor
+        /// Default constructor
         /// </summary>
         public ScrapIteratorStateModel()
         {
-            WebScrapArgs = new Dictionary<string, ScrapIteratorArgs>();
-            ColumnMetadataUpdateFlags = new Dictionary<string, bool>();
-            RowDataInCurrentLoop = new List<List<DynamicTableDataInsertModel>>();
+            ScrapStack = new Stack<ScrapStateModel>();
+            ColumnStack = new Stack<ColumnScrapStateModel>();
+            ManipulateStack = new Stack<ManipulateStateModel>();
         }
 
+        #endregion Constructor
+
+        #region Methods
+
         /// <summary>
-        /// Add the root scrap node arguments state
+        /// Push the Scrap state
         /// </summary>
-        /// <param name="scrapIteratorArgs"></param>
-        public void AddRootScrapArgsState(ScrapIteratorArgs scrapIteratorArgs)
-        {
-            // If the Xml Node contains Id then this is the root Scrap node
-            if (!WebScrapArgs.ContainsKey(scrapIteratorArgs.ScrapConfigObj.IdString))
-                WebScrapArgs.Add(scrapIteratorArgs.ScrapConfigObj.IdString, scrapIteratorArgs);
-            CurrentScrapIteratorArgs = scrapIteratorArgs;
-        }
+        /// <param name="state"></param>
+        public void Push(ScrapStateModel state) => ScrapStack.Push(state);
 
         /// <summary>
-        /// Add the intermediate scrap iterator arguments
-        /// </summary>
-        /// <param name="scrapIteratorArgs"></param>
-        public void AddNewScrap(ScrapIteratorArgs scrapIteratorArgs)
-        {
-            scrapIteratorArgs.Parent = CurrentScrapIteratorArgs;
-            CurrentScrapIteratorArgs.Child.Add(scrapIteratorArgs);
-            CurrentScrapIteratorArgs = scrapIteratorArgs;
-        }
-
-        /// <summary>
-        /// When the currenr scrap iterator work is completed, restore or reset the current
-        /// pointer to the parent
-        /// </summary>
-        public void RestoreScrap()
-        {
-            CurrentScrapIteratorArgs = CurrentScrapIteratorArgs.Parent;
-        }
-
-        /// <summary>
-        /// Add the current column scrap iterator (as a row)
-        /// </summary>
-        /// <param name="columnScrapIteratorArgs"></param>
-        public void AddNewColumn(ColumnScrapIteratorArgs columnScrapIteratorArgs)
-        {
-            CurrentScrapIteratorArgs.Columns.Add(columnScrapIteratorArgs);
-            CurrentColumnScrapIteratorArgs = columnScrapIteratorArgs;
-        }
-
-        /// <summary>
-        /// Add column data
-        /// </summary>
-        /// <param name="columnData"></param>
-        /// <param name="colElement"></param>
-        public void AddColumnData(List<DynamicTableDataInsertModel> columnData, ColumnElement colElement)
-        {
-            foreach (var row in RowDataInCurrentLoop)
-            {
-                foreach (var col in columnData)
-                {
-                    row.Add(col);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add column data
-        /// </summary>
-        /// <param name="columnData"></param>
-        /// <param name="colElement"></param>
-        public void AddColumnData(List<List<DynamicTableDataInsertModel>> columnData, ColumnElement colElement)
-        {
-            foreach (var row in RowDataInCurrentLoop)
-            {
-                foreach (var col in columnData)
-                {
-                    row.AddRange(col);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check if the column scrapped data is already available
-        /// </summary>
-        /// <param name="colElement"></param>
-        /// <returns></returns>
-        public bool IsColumnDataAvailable(ColumnElement colElement)
-        {
-            if (colElement.Level != -1 && colElement.Level < colElement.Parent.Level)
-                if (RowDataInCurrentLoop.ContainsKey(colElement.Parent.Level))
-                    return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Get column data list
+        /// Peek the topmost scrap state 
         /// </summary>
         /// <returns></returns>
-        public List<List<DynamicTableDataInsertModel>> GetColumnDataList()
-        {
-            var rows = new List<List<DynamicTableDataInsertModel>>();
-
-            foreach (var kvcols in RowDataInCurrentLoop)
-            {
-                foreach (var col in kvcols.Value)
-                {
-                    rows.Add(col);
-                }
-            }
-
-            return rows;
-        }
+        public ScrapStateModel PeekScrap() => ScrapStack.Peek();
 
         /// <summary>
-        /// Set the current column configurator
+        /// Peek the topmost scrap state 
         /// </summary>
-        /// <param name="columnConfig"></param>
-        public void SetColumnConfig(ColumnElement columnConfig)
-        {
-            CurrentScrapIteratorArgs.Columns[CurrentScrapIteratorArgs.Columns.Count - 1].ColumnElementConfig = columnConfig;
-        }
+        /// <returns></returns>
+        public ScrapStateModel PopScrap() => ScrapStack.Pop();
 
         /// <summary>
-        /// Reset the current column iterator
+        /// Push the Scrap state
         /// </summary>
-        public void RestoreColumn()
-        {
-            CurrentColumnScrapIteratorArgs = null;
-        }
+        /// <param name="state"></param>
+        public void Push(ColumnScrapStateModel state) => ColumnStack.Push(state);
 
         /// <summary>
-        /// Check if the column metadat is already upfdated in the database
+        /// Peek the topmost scrap state 
         /// </summary>
-        public bool IsColumnMetadataUpdated
-        {
-            get
-            {
-                if (!ColumnMetadataUpdateFlags.ContainsKey(CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id)) return false;
-                else
-                {
-                    return ColumnMetadataUpdateFlags[CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj.Id];
-                }
-            }
-        }
+        /// <returns></returns>
+        public ColumnScrapStateModel PeekColumn() => ColumnStack.Peek();
 
         /// <summary>
-        /// Set the column metdata flag
+        /// Peek the topmost scrap state 
         /// </summary>
-        public void SetColumnMetadataFlag()
-        {
-            ScrapElement scrapElement = CurrentColumnScrapIteratorArgs.Parent.ScrapConfigObj;
-            if (!ColumnMetadataUpdateFlags.ContainsKey(scrapElement.Id))
-            {
-                ColumnMetadataUpdateFlags.Add(scrapElement.Id, true);
-            }
-            else
-                ColumnMetadataUpdateFlags[scrapElement.Id] = true;
-        }
+        /// <returns></returns>
+        public ColumnScrapStateModel PopColumn() => ColumnStack.Pop();
+
+        /// <summary>
+        /// Push the Scrap state
+        /// </summary>
+        /// <param name="state"></param>
+        public void Push(ManipulateStateModel state) => ManipulateStack.Push(state);
+
+        /// <summary>
+        /// Peek the topmost scrap state 
+        /// </summary>
+        /// <returns></returns>
+        public ManipulateStateModel PeekManipulate() => ManipulateStack.Peek();
+
+        /// <summary>
+        /// Peek the topmost scrap state 
+        /// </summary>
+        /// <returns></returns>
+        public ManipulateStateModel PopManipulate() => ManipulateStack.Pop();
+
+        #endregion Methods
     }
 }

@@ -27,7 +27,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Reference to column scrap iterator args
         /// </summary>
-        public ColumnScrapIteratorArgs currentColumnScrapIteratorArgs
+        public ColumnScrapStateModel currentColumnScrapIteratorArgs
         {
             get
             {
@@ -69,6 +69,8 @@ namespace ScrapEngine.Bl.Parser
         /// </summary>
         protected GroupColumnConfigParser groupColumnConfigParser;
 
+        public DbRowConfigParser() { }
+
         public DbRowConfigParser(WebScrapConfigParser configParser)
             : base(configParser)
         {
@@ -79,7 +81,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Process
         /// </summary>
-        public void Process()
+        public override void Process()
         {
             logger.DebugFormat("Scrapping data from online text file");
             ParseColumnsConfig();

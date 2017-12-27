@@ -3,14 +3,14 @@ using ScrapEngine.Model.Scrap;
 using System;
 using WebReader.Model;
 
-namespace ScrapEngine.Model
+namespace ScrapEngine.Model.Scrap
 {
     /// <summary>
     /// The class for manipulating a scrapped data
     /// The element is used to manipulate the data by splitting the scrapped data
     /// and picking a split element by index.
     /// </summary>
-    public class SplitElement : ManipulateChildElement
+    public class SplitElement : ConfigElementBase
     {
         #region Xml Attributes
 
@@ -25,7 +25,8 @@ namespace ScrapEngine.Model
         /// This flag is related with the <see cref="Data"/> property which if true Split the string
         /// using the whole Data string, if false, split using the Character array
         /// </summary>
-        [DXmlAttribute(ScrapXmlConsts.SplitAsStringAttributeName)]
+        [DXmlAttribute(ScrapXmlConsts.SplitAsStringAttributeName,
+            ConfigElementConsts.SplitAsStringColumnDefault)]
         public bool SplitAsString { get; set; }
 
         /// <summary>
@@ -54,18 +55,5 @@ namespace ScrapEngine.Model
         }
 
         #endregion Calculated
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public SplitElement()
-        {
-            IndexString = "0";
-            SplitAsString = false;
-        }
-
-        #endregion Constructor
     }
 }

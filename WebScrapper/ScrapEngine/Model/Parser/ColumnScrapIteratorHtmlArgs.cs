@@ -3,7 +3,7 @@ using System.Xml.XPath;
 
 namespace ScrapEngine.Model.Parser
 {
-    public class ColumnScrapIteratorHtmlArgs : ColumnScrapIteratorArgs
+    public class ColumnScrapIteratorHtmlArgs : ColumnScrapStateModel
     {
         public HtmlNodeNavigator WebHtmlNode { get; set; }
         

@@ -80,18 +80,6 @@
   <ItemGroup>
     <Compile Include="Combinatorics\GroupCombinations.cs" />
     <Compile Include="Const\ASCIICharacters.cs" />
-    <Compile Include="Error\CombinatoricsException.cs" />
-    <Compile Include="Error\CommandLineException.cs" />
-    <Compile Include="Error\ConfigException.cs" />
-    <Compile Include="Error\DynamicDbException.cs" />
-    <Compile Include="Error\DynamicReaderException.cs" />
-    <Compile Include="Error\GenericConfigException.cs" />
-    <Compile Include="Error\GenericDbConfigException.cs" />
-    <Compile Include="Error\HtmlNodeException.cs" />
-    <Compile Include="Error\PathException.cs" />
-    <Compile Include="Error\ScrapParserException.cs" />
-    <Compile Include="Error\ScrapXmlException.cs" />
-    <Compile Include="Error\XmlReaderException.cs" />
     <Compile Include="Extn\ListClassExtension.cs" />
     <Compile Include="Extn\StringInjectExtension.cs" />
     <Compile Include="Extn\TypeExtensionMethods.cs" />

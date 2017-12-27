@@ -33,7 +33,7 @@ namespace ScrapEngine.Bl.Parser
         /// <summary>
         /// Reference to column scrap iterator args
         /// </summary>
-        public ColumnScrapIteratorArgs currentColumnScrapIteratorArgs
+        public ColumnScrapStateModel currentColumnScrapIteratorArgs
         {
             get
             {
@@ -66,6 +66,8 @@ namespace ScrapEngine.Bl.Parser
         #endregion Helper Properties
 
         #region Constructor
+
+        public ScrapColumnConfigParser() { }
 
         /// <summary>
         /// Constructor

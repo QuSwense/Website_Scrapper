@@ -9,6 +9,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapDbChangeSelectConfigParser : AppTopicConfigParser
     {
+        public ScrapDbChangeSelectConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>

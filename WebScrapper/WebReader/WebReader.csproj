@@ -87,10 +87,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Csv\CSVReader.cs" />
     <Compile Include="Csv\Meta\SplitIndexAttribute.cs" />
+    <Compile Include="Xml\DXmlPropertyReader.cs" />
     <Compile Include="Xml\DXmlReader.cs" />
     <Compile Include="Xml\DXmlSerializeReader.cs" />
+    <Compile Include="Xml\StateXmlParse.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScrapException\ScrapException.csproj">
+      <Project>{225e9524-6d52-4469-8613-00b79af9f570}</Project>
+      <Name>ScrapException</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebCommon\WebCommon.csproj">
       <Project>{59422652-b685-4205-b494-b7a40e66220b}</Project>
       <Name>WebCommon</Name>

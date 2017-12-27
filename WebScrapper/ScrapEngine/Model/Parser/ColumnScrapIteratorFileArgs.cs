@@ -5,7 +5,7 @@ namespace ScrapEngine.Model.Parser
     /// <summary>
     /// Column scrap iterator arguments for Csv File type
     /// </summary>
-    public class ColumnScrapIteratorFileArgs : ColumnScrapIteratorArgs
+    public class ColumnScrapIteratorFileArgs : ColumnScrapStateModel
     {
         public string FileLine { get; set; }
 

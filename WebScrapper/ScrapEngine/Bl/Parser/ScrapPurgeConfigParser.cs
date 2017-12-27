@@ -9,6 +9,8 @@ namespace ScrapEngine.Bl.Parser
     /// </summary>
     public class ScrapPurgeConfigParser : ScrapManipulateChildConfigParser
     {
+        public ScrapPurgeConfigParser() { }
+
         /// <summary>
         /// Constructor
         /// </summary>
