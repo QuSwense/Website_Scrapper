@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScrapException;
+using System;
 using System.IO;
-using WebCommon.Error;
 
 namespace WebReader
 {

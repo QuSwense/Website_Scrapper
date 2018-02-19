@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using WebCommon.Error;
+﻿using ScrapException;
+using System.Collections.Generic;
 
 namespace WebCommon.Combinatorics
 {

@@ -1,5 +1,5 @@
-﻿using System.IO;
-using WebCommon.Error;
+﻿using ScrapException;
+using System.IO;
 
 namespace ConfigPathHelper
 {

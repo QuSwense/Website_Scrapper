@@ -12,6 +12,9 @@ namespace WebScrapper
 {
     class Program
     {
+        /// <summary>
+        /// Log the application data
+        /// </summary>
         public static ILog logger = LogManager.GetLogger(typeof(Program));
 
         /// <summary>
